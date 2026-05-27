@@ -944,7 +944,12 @@ function saveData() {
   if (!db || !currentRef) return;
   setSyncStatus('syncing');
   localWriting = true;
-  const saveObj = { tasks, weekData, goals: { week: goalWeek, month2: goalMonth2 }, rewardNames: { week: rewardWeekName, month2: rewardMonth2Name }, lastActivity: { timestamp: firebase.database.ServerValue.TIMESTAMP, device: deviceId } };
+  const saveObj = { tasks, weekData, goals: { week: goalWeek, month2: goalMonth2 }, rewardNames: { week: rewardWeekName, month2: rewardMonth2Name } };
+  // Debounce lastActivity to avoid push spam
+  clearTimeout(window._lastActivityTimer);
+  window._lastActivityTimer = setTimeout(() => {
+    if (currentRef) currentRef.child('lastActivity').set({ timestamp: firebase.database.ServerValue.TIMESTAMP, device: deviceId });
+  }, 5000);
   const ht = document.getElementById('headerTitle');
   const hs = document.getElementById('headerSub');
   if (ht) saveObj.headerTitle = ht.textContent.trim();
