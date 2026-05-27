@@ -101,7 +101,7 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif
 .page.active { display:block; }
 
 .edit-task-card { background:var(--surface); border-radius:var(--radius); padding:14px; margin-bottom:8px; }
-.edit-task-card input { width:100%; padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:var(--bg); color:var(--text); font-size:14px; margin-bottom:8px; }
+.edit-task-card input { width:100%; padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:var(--bg); color:var(--text); font-size:14px; margin-bottom:8px; color-scheme:dark; }
 .edit-row { display:flex; gap:8px; align-items:flex-end; }
 .edit-row input { flex:1; }
 .edit-field { flex:1; }
@@ -177,7 +177,7 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif
 .goal-icon { font-size:22px; }
 .goal-label { font-size:14px; font-weight:500; }
 .goal-sub { font-size:11px; color:var(--text2); margin-top:1px; }
-.goal-input { width:70px; padding:8px 6px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:var(--bg); color:var(--yellow); font-size:18px; font-weight:700; text-align:center; }
+.goal-input { width:70px; padding:8px 6px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:var(--bg); color:var(--yellow); font-size:18px; font-weight:700; text-align:center; color-scheme:dark; }
 .goal-input:focus { outline:none; border-color:var(--accent); }
 
 .danger-zone { margin:16px 16px 0; padding:12px; border:1px solid rgba(233,69,96,0.3); border-radius:var(--radius); }
@@ -362,21 +362,21 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif
         <span class="goal-icon">🎯</span>
         <div><div class="goal-label">Wochenziel</div><div class="goal-sub">Belohnung pro Woche</div></div>
       </div>
-      <input type="number" class="goal-input" id="goalWeekInput" value="25" min="1" max="999" onchange="saveGoals()" onfocus="this.select()">
+      <input type="number" class="goal-input" id="goalWeekInput" value="0" min="0" max="999" onchange="saveGoals()" onfocus="this.dataset.old=this.value;this.value=''" onblur="if(!this.value)this.value=this.dataset.old">
     </div>
     <div class="goal-row">
       <div class="goal-info">
         <span class="goal-icon">🎁</span>
         <div><div class="goal-label">Monats-Belohnung</div><div class="goal-sub">Erste Stufe im Monat</div></div>
       </div>
-      <input type="number" class="goal-input" id="goalMonth1Input" value="25" min="1" max="999" onchange="saveGoals()" onfocus="this.select()">
+      <input type="number" class="goal-input" id="goalMonth1Input" value="0" min="0" max="999" onchange="saveGoals()" onfocus="this.dataset.old=this.value;this.value=''" onblur="if(!this.value)this.value=this.dataset.old">
     </div>
     <div class="goal-row">
       <div class="goal-info">
         <span class="goal-icon">⭐</span>
         <div><div class="goal-label">Monats-Wunsch</div><div class="goal-sub">Zweite Stufe im Monat</div></div>
       </div>
-      <input type="number" class="goal-input" id="goalMonth2Input" value="50" min="1" max="999" onchange="saveGoals()" onfocus="this.select()">
+      <input type="number" class="goal-input" id="goalMonth2Input" value="0" min="0" max="999" onchange="saveGoals()" onfocus="this.dataset.old=this.value;this.value=''" onblur="if(!this.value)this.value=this.dataset.old">
     </div>
   </div>
   <div class="lang-card">
@@ -756,9 +756,9 @@ let selectedDay = new Date().getDay();
 selectedDay = selectedDay === 0 ? 6 : selectedDay - 1;
 let currentMonthDate = new Date();
 let localWriting = false;
-let goalWeek = 25;
-let goalMonth1 = 25;
-let goalMonth2 = 50;
+let goalWeek = 0;
+let goalMonth1 = 0;
+let goalMonth2 = 0;
 
 // ── SYNC CODE ──
 function getSavedCode() { try { return localStorage.getItem('pflichten_sync_code_2'); } catch(e) { return null; } }
@@ -1290,9 +1290,9 @@ function loadHeaderText(data) {
 
 // ── GOALS ──
 function saveGoals() {
-  goalWeek = parseInt(document.getElementById('goalWeekInput').value) || 25;
-  goalMonth1 = parseInt(document.getElementById('goalMonth1Input').value) || 25;
-  goalMonth2 = parseInt(document.getElementById('goalMonth2Input').value) || 50;
+  goalWeek = parseInt(document.getElementById('goalWeekInput').value) || 0;
+  goalMonth1 = parseInt(document.getElementById('goalMonth1Input').value) || 0;
+  goalMonth2 = parseInt(document.getElementById('goalMonth2Input').value) || 0;
   updateScores();
   if (document.getElementById('page-month').classList.contains('active')) renderMonth();
   if (currentRef) {
@@ -1302,7 +1302,7 @@ function saveGoals() {
 }
 function loadGoals(data) {
   const g = (data && data.goals) || (() => { try { return JSON.parse(localStorage.getItem('pflichten_goals')); } catch(e) { return null; } })();
-  if (g) { goalWeek = g.week || 25; goalMonth1 = g.month1 || 25; goalMonth2 = g.month2 || 50; }
+  if (g) { goalWeek = g.week || 0; goalMonth1 = g.month1 || 0; goalMonth2 = g.month2 || 0; }
   const el1 = document.getElementById('goalWeekInput');
   const el2 = document.getElementById('goalMonth1Input');
   const el3 = document.getElementById('goalMonth2Input');
@@ -1400,8 +1400,8 @@ function renderEditList() {
     card.innerHTML = `
       <input type="text" data-idx="${idx}" data-field="name" value="${tk.name.replace(/"/g,'&quot;')}" placeholder="${t('taskPlaceholder')}">
       <div class="edit-row">
-        <div class="edit-field"><label class="edit-label">${t('plusPoints')}</label><input type="number" data-idx="${idx}" data-field="plus" value="${tk.plus}" placeholder="0" min="0" max="99" onfocus="this.select()"></div>
-        <div class="edit-field"><label class="edit-label">${t('minusPoints')}</label><input type="number" data-idx="${idx}" data-field="minus" value="${tk.minus}" placeholder="0" min="0" max="99" onfocus="this.select()"></div>
+        <div class="edit-field"><label class="edit-label">${t('plusPoints')}</label><input type="number" data-idx="${idx}" data-field="plus" value="${tk.plus}" placeholder="0" min="0" max="99" onfocus="this.dataset.old=this.value;this.value=''" onblur="if(!this.value)this.value=this.dataset.old"></div>
+        <div class="edit-field"><label class="edit-label">${t('minusPoints')}</label><input type="number" data-idx="${idx}" data-field="minus" value="${tk.minus}" placeholder="0" min="0" max="99" onfocus="this.dataset.old=this.value;this.value=''" onblur="if(!this.value)this.value=this.dataset.old"></div>
         <button class="btn-delete" onclick="deleteTask(${idx})">${t('deleteBtn')}</button>
       </div>`;
     container.appendChild(card);
