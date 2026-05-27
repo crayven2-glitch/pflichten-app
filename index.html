@@ -947,9 +947,11 @@ function saveData() {
   const saveObj = { tasks, weekData, goals: { week: goalWeek, month2: goalMonth2 }, rewardNames: { week: rewardWeekName, month2: rewardMonth2Name } };
   // Debounce lastActivity to avoid push spam
   clearTimeout(window._lastActivityTimer);
+  console.log('Push: debounce timer started');
   window._lastActivityTimer = setTimeout(() => {
+    console.log('Push: debounce fired, writing lastActivity');
     if (currentRef) currentRef.child('lastActivity').set({ timestamp: firebase.database.ServerValue.TIMESTAMP, device: deviceId });
-  }, 5000);
+  }, 3000);
   const ht = document.getElementById('headerTitle');
   const hs = document.getElementById('headerSub');
   if (ht) saveObj.headerTitle = ht.textContent.trim();
