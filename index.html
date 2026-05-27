@@ -949,7 +949,7 @@ function saveData() {
   const hs = document.getElementById('headerSub');
   if (ht) saveObj.headerTitle = ht.textContent.trim();
   if (hs) saveObj.headerSub = hs.textContent.trim();
-  currentRef.set(saveObj)
+  currentRef.update(saveObj)
     .then(() => {
       setSyncStatus('synced');
       setTimeout(() => {
