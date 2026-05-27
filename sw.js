@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pflichten-v13';
+const CACHE_NAME = 'pflichten-v14';
 const ASSETS = [
   './',
   './index.html',
