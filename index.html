@@ -950,7 +950,16 @@ function saveData() {
   console.log('Push: debounce timer started');
   window._lastActivityTimer = setTimeout(() => {
     console.log('Push: debounce fired, writing lastActivity');
-    if (currentRef) currentRef.child('lastActivity').set({ timestamp: firebase.database.ServerValue.TIMESTAMP, device: deviceId });
+    const activityObj = { timestamp: firebase.database.ServerValue.TIMESTAMP, device: deviceId };
+    // Include last task action for detailed push notification
+    if (window._lastTaskAction) {
+      activityObj.taskName = window._lastTaskAction.name;
+      activityObj.taskStatus = window._lastTaskAction.status;
+      activityObj.taskPlus = window._lastTaskAction.plus;
+      activityObj.taskMinus = window._lastTaskAction.minus;
+      window._lastTaskAction = null;
+    }
+    if (currentRef) currentRef.child('lastActivity').set(activityObj);
   }, 3000);
   const ht = document.getElementById('headerTitle');
   const hs = document.getElementById('headerSub');
@@ -1496,6 +1505,11 @@ function cycleStatus(taskId) {
   const next = cycle[(cycle.indexOf(current)+1) % cycle.length];
   if (next === '') delete weekData[key].days[selectedDay][taskId];
   else weekData[key].days[selectedDay][taskId] = next;
+  // Track last status change for detailed push
+  const task = tasks.find(t => t.id === taskId);
+  if (task && next) {
+    window._lastTaskAction = { name: task.name, status: next, plus: task.plus, minus: task.minus };
+  }
   render();
   saveData();
 }
