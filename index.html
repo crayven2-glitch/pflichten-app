@@ -603,6 +603,14 @@ function setLanguage(lang) {
 }
 
 function applyLanguage() {
+  // Header defaults – swap if it's still the default text
+  const defaultTitles = [I18N.de.defaultTitle, I18N.en.defaultTitle];
+  const defaultSubs = [I18N.de.defaultSub, I18N.en.defaultSub];
+  const titleEl = document.getElementById('headerTitle');
+  const subEl = document.getElementById('headerSub');
+  if (titleEl && defaultTitles.includes(titleEl.textContent.trim())) titleEl.textContent = t('defaultTitle');
+  if (subEl && defaultSubs.includes(subEl.textContent.trim())) subEl.textContent = t('defaultSub');
+
   // Setup screen
   const setupH2 = document.querySelector('#setupScreen h2');
   const setupP = document.querySelector('#setupScreen p');
