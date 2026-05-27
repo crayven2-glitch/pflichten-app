@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1a1a2e">
+<title>Pflichten des Sklaven</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<style>
+:root {
+  --bg: #1a1a2e; --surface: #16213e; --surface2: #0f3460;
+  --accent: #e94560; --accent2: #533483;
+  --text: #eee; --text2: #aaa;
+  --green: #4ecca3; --red: #e94560; --yellow: #f0c040;
+  --radius: 12px;
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; padding-bottom:140px; overflow-x:hidden; }
+
+.sync-bar { position:fixed; top:0; left:0; right:0; height:3px; z-index:999; background:transparent; transition:background .3s; }
+.sync-bar.syncing { background:var(--yellow); animation:syncPulse 1s infinite; }
+.sync-bar.synced { background:var(--green); }
+.sync-bar.error { background:var(--red); }
+@keyframes syncPulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+.setup-screen { position:fixed; inset:0; background:var(--bg); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px; z-index:500; text-align:center; }
+.setup-screen.hidden { display:none; }
+.setup-logo { font-size:48px; margin-bottom:16px; }
+.setup-screen h2 { font-size:22px; margin-bottom:8px; }
+.setup-screen p { font-size:14px; color:var(--text2); margin-bottom:24px; max-width:320px; }
+.setup-input { width:100%; max-width:320px; padding:14px 16px; border-radius:var(--radius); border:2px solid rgba(255,255,255,0.1); background:var(--surface); color:var(--text); font-size:16px; margin-bottom:12px; text-align:center; letter-spacing:2px; }
+.setup-input:focus { outline:none; border-color:var(--accent); }
+.setup-btn { width:100%; max-width:320px; padding:14px; border:none; border-radius:var(--radius); background:var(--accent); color:#fff; font-size:16px; font-weight:700; cursor:pointer; margin-bottom:12px; }
+.setup-btn-sec { width:100%; max-width:320px; padding:12px; border:1px solid rgba(255,255,255,0.15); border-radius:var(--radius); background:none; color:var(--text2); font-size:14px; cursor:pointer; }
+.setup-divider { color:var(--text2); font-size:13px; margin:8px 0; }
+.setup-error { color:var(--red); font-size:13px; margin-bottom:8px; min-height:18px; }
+
+.conn-status { position:fixed; top:8px; right:12px; font-size:11px; color:var(--text2); z-index:200; display:flex; align-items:center; gap:4px; }
+.conn-dot { width:6px; height:6px; border-radius:50%; background:var(--text2); }
+.conn-dot.online { background:var(--green); }
+.conn-dot.offline { background:var(--red); }
+
+.bottom-nav { position:fixed; bottom:0; left:0; right:0; background:var(--surface); display:flex; justify-content:space-around; padding:18px 0 calc(env(safe-area-inset-bottom,0px) + 32px); border-top:1px solid rgba(255,255,255,0.08); z-index:100; }
+.nav-btn { background:none; border:none; color:var(--text2); display:flex; flex-direction:column; align-items:center; font-size:10px; gap:2px; padding:4px 8px; cursor:pointer; transition:color .2s; }
+.nav-btn.active { color:var(--accent); }
+.nav-btn svg { width:22px; height:22px; }
+
+.header { background:linear-gradient(135deg,var(--surface) 0%,var(--surface2) 100%); padding:24px 16px 16px; text-align:center; }
+.header h1 { font-size:20px; font-weight:700; outline:none; }
+.header .sub { font-size:13px; color:var(--text2); margin-top:4px; outline:none; }
+.header [contenteditable]:focus { border-bottom:1px dashed rgba(255,255,255,0.3); }
+
+.week-selector, .month-selector { display:flex; align-items:center; justify-content:center; gap:12px; padding:12px 16px; }
+.week-selector button, .month-selector button { background:var(--surface2); border:none; color:var(--text); width:36px; height:36px; border-radius:50%; font-size:18px; cursor:pointer; }
+.week-selector span, .month-selector span { font-size:14px; color:var(--text2); min-width:160px; text-align:center; }
+
+.score-card { margin:8px 16px; background:linear-gradient(135deg,var(--accent2),var(--surface2)); border-radius:var(--radius); padding:16px; display:flex; justify-content:space-around; text-align:center; }
+.score-item .val { font-size:28px; font-weight:800; }
+.score-item .lbl { font-size:11px; color:var(--text2); margin-top:2px; }
+.score-pos .val { color:var(--green); }
+.score-neg .val { color:var(--red); }
+.score-total .val { color:var(--yellow); }
+
+/* WOCHENBALKEN */
+.week-reward-card { margin:8px 16px; background:var(--surface); border-radius:var(--radius); padding:14px 16px; }
+.week-reward-title { font-size:13px; font-weight:600; color:var(--text2); margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; }
+.week-reward-bar-wrap { height:10px; border-radius:5px; background:rgba(255,255,255,0.08); overflow:hidden; }
+.week-reward-bar-fill { height:100%; border-radius:5px; background:linear-gradient(90deg,var(--accent),var(--yellow)); transition:width .5s; }
+.week-reward-label { font-size:11px; color:var(--text2); text-align:right; margin-top:4px; }
+
+.day-tabs { display:flex; gap:4px; padding:8px 16px; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+.day-tabs::-webkit-scrollbar { display:none; }
+.day-tab { flex:1; min-width:42px; background:var(--surface); border:none; color:var(--text2); padding:8px 4px; border-radius:8px; font-size:12px; cursor:pointer; text-align:center; transition:all .2s; }
+.day-tab.active { background:var(--accent); color:#fff; }
+.day-tab.has-data { border-bottom:2px solid var(--green); }
+
+.task-list { padding:8px 16px; }
+.task-card { background:var(--surface); border-radius:var(--radius); margin-bottom:8px; overflow:hidden; animation:fadeIn .3s ease; }
+.task-main { display:flex; align-items:center; padding:14px; gap:12px; }
+.task-nr { width:28px; height:28px; border-radius:50%; background:var(--surface2); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0; }
+.task-info { flex:1; min-width:0; }
+.task-name { font-size:14px; font-weight:500; }
+.task-points { font-size:11px; color:var(--text2); margin-top:2px; }
+.task-status { width:44px; height:44px; border-radius:10px; border:2px solid var(--text2); background:none; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; transition:all .2s; font-size:20px; color:transparent; touch-action:manipulation; }
+.task-status.done { background:var(--green); border-color:var(--green); color:#fff; }
+.task-status.missed { background:var(--red); border-color:var(--red); color:#fff; }
+.task-status.na { background:var(--surface2); border-color:var(--text2); color:var(--text2); font-size:11px; }
+
+.send-bar { padding:12px 16px; display:flex; gap:8px; }
+.send-bar button { flex:1; padding:14px; border:none; border-radius:var(--radius); font-size:15px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:transform .1s; touch-action:manipulation; }
+.send-bar button:active { transform:scale(0.97); }
+.btn-whatsapp { background:#25d366; color:#fff; }
+.btn-email { background:var(--surface2); color:var(--text); }
+
+.page { display:none; }
+.page.active { display:block; }
+
+.edit-task-card { background:var(--surface); border-radius:var(--radius); padding:14px; margin-bottom:8px; }
+.edit-task-card input { width:100%; padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:var(--bg); color:var(--text); font-size:14px; margin-bottom:8px; }
+.edit-row { display:flex; gap:8px; align-items:flex-end; }
+.edit-row input { flex:1; }
+.edit-field { flex:1; }
+.edit-field input { margin-bottom:0; }
+.edit-label { font-size:11px; color:var(--text2); margin-bottom:4px; display:block; }
+.btn-add { width:100%; padding:14px; border:2px dashed rgba(255,255,255,0.15); border-radius:var(--radius); background:none; color:var(--text2); font-size:14px; cursor:pointer; margin-top:4px; }
+.btn-delete { background:var(--red); color:#fff; border:none; padding:8px 14px; border-radius:8px; font-size:12px; cursor:pointer; margin-top:4px; }
+.btn-save { width:100%; padding:14px; border:none; border-radius:var(--radius); background:var(--green); color:#fff; font-size:15px; font-weight:600; cursor:pointer; margin-top:12px; }
+
+.history-card { background:var(--surface); border-radius:var(--radius); padding:14px; margin:8px 16px; cursor:pointer; transition:all .2s; }
+.history-card:active { transform:scale(0.98); }
+.history-header { display:flex; justify-content:space-between; align-items:center; }
+.history-week { font-size:14px; font-weight:600; }
+.history-score { font-size:20px; font-weight:800; }
+.history-bar { height:6px; border-radius:3px; background:rgba(255,255,255,0.08); margin-top:10px; overflow:hidden; }
+.history-bar-fill { height:100%; border-radius:3px; transition:width .5s; }
+
+.remarks-area { margin:8px 16px; }
+.remarks-area textarea { width:100%; height:80px; padding:12px; border-radius:var(--radius); border:1px solid rgba(255,255,255,0.1); background:var(--surface); color:var(--text); font-size:14px; resize:vertical; }
+.remarks-area label { font-size:12px; color:var(--text2); margin-bottom:4px; display:block; }
+
+.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:200; display:none; align-items:flex-end; justify-content:center; }
+.modal-overlay.open { display:flex; }
+.modal { background:var(--surface); border-radius:16px 16px 0 0; width:100%; max-width:500px; padding:20px 16px env(safe-area-inset-bottom,16px); max-height:80vh; overflow-y:auto; }
+.modal h3 { margin-bottom:12px; }
+.modal-close { background:var(--surface2); border:none; color:var(--text); width:100%; padding:12px; border-radius:var(--radius); font-size:15px; cursor:pointer; margin-top:12px; }
+
+.empty-state { text-align:center; padding:40px 16px; color:var(--text2); }
+.empty-state svg { width:64px; height:64px; margin-bottom:12px; opacity:0.3; }
+
+.month-score-card { margin:8px 16px; background:linear-gradient(135deg,#533483,#0f3460); border-radius:var(--radius); padding:20px 16px; text-align:center; }
+.month-total { font-size:48px; font-weight:900; }
+.month-total-label { font-size:13px; color:var(--text2); margin-top:4px; }
+.month-stats { display:flex; justify-content:space-around; margin-top:16px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.1); }
+.month-stat .stat-val { font-size:22px; font-weight:700; }
+.month-stat .stat-lbl { font-size:11px; color:var(--text2); margin-top:2px; }
+
+.reward-card { margin:12px 16px; background:var(--surface); border-radius:var(--radius); padding:16px; }
+.reward-title { font-size:14px; font-weight:600; margin-bottom:12px; }
+.reward-row { display:flex; align-items:center; gap:12px; padding:8px 0; }
+.reward-row + .reward-row { border-top:1px solid rgba(255,255,255,0.05); }
+.reward-icon { font-size:24px; }
+.reward-info { flex:1; }
+.reward-label { font-size:13px; }
+.reward-sub { font-size:11px; color:var(--text2); }
+.reward-check { font-size:20px; }
+.reward-progress { height:8px; border-radius:4px; background:rgba(255,255,255,0.08); margin:8px 0 4px; overflow:hidden; }
+.reward-progress-fill { height:100%; border-radius:4px; background:linear-gradient(90deg,var(--accent),var(--yellow)); transition:width .5s; }
+.reward-progress-label { font-size:11px; color:var(--text2); text-align:right; }
+
+.month-week-card { background:var(--surface); border-radius:var(--radius); padding:14px; margin:8px 16px; }
+.month-week-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+.month-week-label { font-size:13px; font-weight:600; }
+.month-week-score { font-size:18px; font-weight:800; }
+.month-week-bar { height:4px; border-radius:2px; background:rgba(255,255,255,0.08); overflow:hidden; }
+.month-week-bar-fill { height:100%; border-radius:2px; transition:width .5s; }
+
+.section-title { font-size:13px; font-weight:600; color:var(--text2); text-transform:uppercase; letter-spacing:1px; padding:16px 16px 4px; }
+.month-task-row { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.04); }
+.month-task-row:last-child { border-bottom:none; }
+.month-task-name { flex:1; font-size:13px; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.month-task-score { font-size:14px; font-weight:700; min-width:50px; text-align:right; }
+.month-task-bar-wrap { width:60px; flex-shrink:0; }
+.month-task-bar { height:4px; border-radius:2px; background:rgba(255,255,255,0.08); overflow:hidden; }
+.month-task-bar-fill { height:100%; border-radius:2px; }
+
+@keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+.goals-card { margin:4px 16px 8px; background:var(--surface); border-radius:var(--radius); padding:4px 14px; }
+.goal-row { display:flex; align-items:center; justify-content:space-between; padding:12px 0; }
+.goal-row + .goal-row { border-top:1px solid rgba(255,255,255,0.05); }
+.goal-info { display:flex; align-items:center; gap:10px; }
+.goal-icon { font-size:22px; }
+.goal-label { font-size:14px; font-weight:500; }
+.goal-sub { font-size:11px; color:var(--text2); margin-top:1px; }
+.goal-input { width:70px; padding:8px 6px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:var(--bg); color:var(--yellow); font-size:18px; font-weight:700; text-align:center; }
+.goal-input:focus { outline:none; border-color:var(--accent); }
+
+.danger-zone { margin:16px 16px 0; padding:12px; border:1px solid rgba(233,69,96,0.3); border-radius:var(--radius); }
+.danger-zone p { font-size:12px; color:var(--text2); margin-bottom:8px; }
+.btn-logout { background:none; border:1px solid var(--red); color:var(--red); padding:10px 16px; border-radius:8px; font-size:14px; cursor:pointer; width:100%; }
+.history-toggle { display:flex; gap:4px; padding:8px 16px; }
+.history-toggle button { flex:1; padding:8px; border:none; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; background:var(--surface); color:var(--text2); transition:all .2s; }
+.history-toggle button.active { background:var(--accent); color:#fff; }
+.month-history-card { background:var(--surface); border-radius:var(--radius); padding:14px; margin:0 16px 8px; cursor:pointer; transition:all .2s; }
+.month-history-card:active { transform:scale(0.98); }
+.month-history-header { display:flex; justify-content:space-between; align-items:center; }
+.month-history-name { font-size:14px; font-weight:600; }
+.month-history-score { font-size:20px; font-weight:800; }
+.month-history-bar { height:6px; border-radius:3px; background:rgba(255,255,255,0.08); margin-top:10px; overflow:hidden; }
+.month-history-bar-fill { height:100%; border-radius:3px; transition:width .5s; }
+.month-history-sub { display:flex; justify-content:space-between; font-size:11px; color:var(--text2); margin-top:6px; }
+</style>
+</head>
+<body>
+
+<div class="sync-bar" id="syncBar"></div>
+<div class="conn-status">
+  <div class="conn-dot" id="connDot"></div>
+  <span id="connLabel"></span>
+</div>
+
+<!-- SETUP -->
+<div class="setup-screen" id="setupScreen">
+  <div class="setup-logo">⛓️</div>
+  <h2>Verbindung einrichten</h2>
+  <p>Gib einen gemeinsamen Code ein, damit beide Handys dieselben Daten sehen.</p>
+  <div class="setup-error" id="setupError"></div>
+  <input class="setup-input" id="setupCodeInput" type="text" placeholder="Code" maxlength="30" autocomplete="off" autocapitalize="characters">
+  <button class="setup-btn" onclick="connectWithCode()">Verbinden</button>
+  <div class="setup-divider">oder</div>
+  <button class="setup-btn-sec" onclick="generateCode()">Neuen Code generieren</button>
+</div>
+
+<!-- PAGE: WOCHE -->
+<div id="page-week" class="page active">
+  <div class="header">
+    <h1 contenteditable="true" spellcheck="false" id="headerTitle" oninput="saveHeaderText()">Meine Aufgaben</h1>
+    <div class="sub" contenteditable="true" spellcheck="false" id="headerSub" oninput="saveHeaderText()">Tippen zum Bearbeiten</div>
+  </div>
+  <div class="week-selector">
+    <button onclick="changeWeek(-1)">‹</button>
+    <span id="weekLabel"></span>
+    <button onclick="changeWeek(1)">›</button>
+  </div>
+  <div class="score-card">
+    <div class="score-item score-pos"><div class="val" id="scorePos">0</div><div class="lbl">Verdient</div></div>
+    <div class="score-item score-neg"><div class="val" id="scoreNeg">0</div><div class="lbl">Abzug</div></div>
+    <div class="score-item score-total"><div class="val" id="scoreTotal">0</div><div class="lbl">Gesamt</div></div>
+  </div>
+  <!-- WOCHENBALKEN -->
+  <div class="week-reward-card">
+    <div class="week-reward-title">
+      <span>🎁 Wochenbelohnung</span>
+      <span id="weekRewardCheck"></span>
+    </div>
+    <div class="week-reward-bar-wrap">
+      <div class="week-reward-bar-fill" id="weekRewardBar" style="width:0%"></div>
+    </div>
+    <div class="week-reward-label" id="weekRewardLabel">0 / 25 Punkte</div>
+  </div>
+  <div class="day-tabs" id="dayTabs"></div>
+  <div class="task-list" id="taskList"></div>
+  <div class="remarks-area">
+    <label>Bemerkungen</label>
+    <textarea id="remarks" placeholder="Optionale Bemerkungen zur Woche..." oninput="saveRemarks()"></textarea>
+  </div>
+  <div class="send-bar">
+    <button class="btn-whatsapp" onclick="sendWhatsApp()">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.111.546 4.1 1.508 5.832L0 24l6.336-1.469A11.95 11.95 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75c-1.883 0-3.651-.508-5.168-1.395l-.363-.215-3.762.987 1.004-3.668-.24-.378A9.717 9.717 0 012.25 12 9.75 9.75 0 0112 2.25 9.75 9.75 0 0121.75 12 9.75 9.75 0 0112 21.75z"/></svg>
+      WhatsApp
+    </button>
+    <button class="btn-email" onclick="sendEmail()">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 4L12 13 2 4"/></svg>
+      E-Mail
+    </button>
+  </div>
+</div>
+
+<!-- PAGE: MONAT -->
+<div id="page-month" class="page">
+  <div class="header">
+    <h1>Monatsübersicht</h1>
+    <div class="sub">Zusammenfassung &amp; Auswertung</div>
+  </div>
+  <div class="month-selector">
+    <button onclick="changeMonth(-1)">‹</button>
+    <span id="monthLabel"></span>
+    <button onclick="changeMonth(1)">›</button>
+  </div>
+  <div style="text-align:center;padding:4px 0 8px;">
+    <button onclick="forceRefreshMonth()" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:var(--text2);padding:6px 16px;border-radius:20px;font-size:12px;cursor:pointer;">🔄 Aktualisieren</button>
+  </div>
+  <div class="month-score-card">
+    <div class="month-total" id="monthTotal">0</div>
+    <div class="month-total-label">Gesamtpunkte im Monat</div>
+    <div class="month-stats">
+      <div class="month-stat"><div class="stat-val" id="monthPos" style="color:var(--green)">0</div><div class="stat-lbl">Verdient</div></div>
+      <div class="month-stat"><div class="stat-val" id="monthNeg" style="color:var(--red)">0</div><div class="stat-lbl">Abzug</div></div>
+      <div class="month-stat"><div class="stat-val" id="monthWeeks" style="color:var(--text)">0</div><div class="stat-lbl">Wochen</div></div>
+    </div>
+  </div>
+  <div class="reward-card">
+    <div class="reward-title">Belohnungen</div>
+    <div class="reward-row">
+      <div class="reward-icon">🎁</div>
+      <div class="reward-info">
+        <div class="reward-label">Eine Belohnung</div>
+        <div class="reward-sub">ab 25 Punkte</div>
+        <div class="reward-progress"><div class="reward-progress-fill" id="reward1Bar" style="width:0%"></div></div>
+        <div class="reward-progress-label" id="reward1Label">0 / 25</div>
+      </div>
+      <div class="reward-check" id="reward1Check"></div>
+    </div>
+    <div class="reward-row">
+      <div class="reward-icon">⭐</div>
+      <div class="reward-info">
+        <div class="reward-label">Ein Wunsch</div>
+        <div class="reward-sub">ab 50 Punkte</div>
+        <div class="reward-progress"><div class="reward-progress-fill" id="reward2Bar" style="width:0%"></div></div>
+        <div class="reward-progress-label" id="reward2Label">0 / 50</div>
+      </div>
+      <div class="reward-check" id="reward2Check"></div>
+    </div>
+  </div>
+  <div class="section-title">Wochen im Detail</div>
+  <div id="monthWeeksList"></div>
+  <div class="section-title">Aufgaben-Auswertung</div>
+  <div id="monthTaskBreakdown" style="padding:0 16px 8px;"></div>
+  <div class="send-bar">
+    <button class="btn-whatsapp" onclick="sendMonthWhatsApp()">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.111.546 4.1 1.508 5.832L0 24l6.336-1.469A11.95 11.95 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75c-1.883 0-3.651-.508-5.168-1.395l-.363-.215-3.762.987 1.004-3.668-.24-.378A9.717 9.717 0 012.25 12 9.75 9.75 0 0112 2.25 9.75 9.75 0 0121.75 12 9.75 9.75 0 0112 21.75z"/></svg>
+      Monat per WhatsApp
+    </button>
+    <button class="btn-email" onclick="sendMonthEmail()">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 4L12 13 2 4"/></svg>
+      Monat per E-Mail
+    </button>
+  </div>
+</div>
+
+<!-- PAGE: VERLAUF -->
+<div id="page-history" class="page">
+  <div class="header">
+    <h1>Verlauf</h1>
+    <div class="sub">Vergangene Wochen &amp; Monate</div>
+  </div>
+  <div class="history-toggle">
+    <button id="histToggleWeek" class="active" onclick="setHistoryView('week')">📅 Wochen</button>
+    <button id="histToggleMonth" onclick="setHistoryView('month')">📆 Monate</button>
+  </div>
+  <div id="historyList"></div>
+</div>
+
+<!-- PAGE: EINSTELLUNGEN -->
+<div id="page-settings" class="page">
+  <div class="header">
+    <h1>Aufgaben verwalten</h1>
+    <div class="sub">Hinzufügen, bearbeiten, löschen</div>
+  </div>
+  <div style="padding:12px 16px;">
+    <button class="btn-add" onclick="addTask()">+ Neue Aufgabe hinzufügen</button>
+  </div>
+  <div id="editList" style="padding:0 16px;"></div>
+  <div style="padding:0 16px 8px;">
+    <button class="btn-save" onclick="saveTasks()">Speichern</button>
+  </div>
+  <div class="section-title">Zielpunkte</div>
+  <div class="goals-card">
+    <div class="goal-row">
+      <div class="goal-info">
+        <span class="goal-icon">🎯</span>
+        <div><div class="goal-label">Wochenziel</div><div class="goal-sub">Belohnung pro Woche</div></div>
+      </div>
+      <input type="number" class="goal-input" id="goalWeekInput" value="25" min="1" max="999" onchange="saveGoals()">
+    </div>
+    <div class="goal-row">
+      <div class="goal-info">
+        <span class="goal-icon">🎁</span>
+        <div><div class="goal-label">Monats-Belohnung</div><div class="goal-sub">Erste Stufe im Monat</div></div>
+      </div>
+      <input type="number" class="goal-input" id="goalMonth1Input" value="25" min="1" max="999" onchange="saveGoals()">
+    </div>
+    <div class="goal-row">
+      <div class="goal-info">
+        <span class="goal-icon">⭐</span>
+        <div><div class="goal-label">Monats-Wunsch</div><div class="goal-sub">Zweite Stufe im Monat</div></div>
+      </div>
+      <input type="number" class="goal-input" id="goalMonth2Input" value="50" min="1" max="999" onchange="saveGoals()">
+    </div>
+  </div>
+  <div class="danger-zone">
+    <p>Sync-Code: <strong id="currentCodeDisplay">—</strong></p>
+    <button class="btn-logout" onclick="logout()">Anderen Code verwenden</button>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="historyModal">
+  <div class="modal">
+    <h3 id="modalTitle"></h3>
+    <div id="modalContent"></div>
+    <button class="modal-close" onclick="closeModal()">Schließen</button>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" id="nav-week" onclick="showPage('week')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+    Woche
+  </button>
+  <button class="nav-btn" id="nav-month" onclick="showPage('month')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h18v18H3zM3 9h18M9 21V9"/></svg>
+    Monat
+  </button>
+  <button class="nav-btn" id="nav-history" onclick="showPage('history')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>
+    Verlauf
+  </button>
+  <button class="nav-btn" id="nav-settings" onclick="showPage('settings')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+    Aufgaben
+  </button>
+</nav>
+
+<!-- Firebase SDKs - KORREKT geladen (separate script tags, kein inline code) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+const DAY_NAMES = ['Mo','Di','Mi','Do','Fr','Sa','So'];
+const MONTH_NAMES = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+
+const DEFAULT_TASKS = [];
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC_FCW4xncM1O4Yq9f5sHjNF5f7UFnHUXA",
+  authDomain: "pflichten-app-f1ebe.firebaseapp.com",
+  databaseURL: "https://pflichten-app-f1ebe-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "pflichten-app-f1ebe",
+  storageBucket: "pflichten-app-f1ebe.firebasestorage.app",
+  messagingSenderId: "83874401171",
+  appId: "1:83874401171:web:485509d6dc9d790978b666"
+};
+
+let app, db, currentRef = null;
+let syncCode = null;
+let tasks = JSON.parse(JSON.stringify(DEFAULT_TASKS));
+let weekData = {};
+let currentWeekOffset = 0;
+let selectedDay = new Date().getDay();
+selectedDay = selectedDay === 0 ? 6 : selectedDay - 1;
+let currentMonthDate = new Date();
+let localWriting = false;
+let goalWeek = 25;
+let goalMonth1 = 25;
+let goalMonth2 = 50;
+
+// ── SYNC CODE ──
+function getSavedCode() { try { return localStorage.getItem('pflichten_sync_code_2'); } catch(e) { return null; } }
+function saveCodeLocally(code) { try { localStorage.setItem('pflichten_sync_code_2', code); } catch(e) {} }
+
+function generateCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code = '';
+  for (let i = 0; i < 8; i++) code += chars[Math.floor(Math.random() * chars.length)];
+  document.getElementById('setupCodeInput').value = code;
+}
+
+function connectWithCode() {
+  const raw = document.getElementById('setupCodeInput').value.trim().toUpperCase().replace(/[^A-Z0-9]/g,'');
+  if (raw.length < 4) { document.getElementById('setupError').textContent = 'Mindestens 4 Zeichen eingeben.'; return; }
+  document.getElementById('setupError').textContent = '';
+  initSync(raw);
+}
+
+function logout() {
+  if (!confirm('Sync-Verbindung trennen?')) return;
+  if (currentRef) currentRef.off();
+  try { localStorage.removeItem('pflichten_sync_code_2'); } catch(e) {}
+  syncCode = null;
+  document.getElementById('setupCodeInput').value = '';
+  document.getElementById('setupScreen').classList.remove('hidden');
+}
+
+// ── FIREBASE ──
+function initSync(code) {
+  syncCode = code;
+  saveCodeLocally(code);
+  document.getElementById('currentCodeDisplay').textContent = code;
+
+  try {
+    if (!firebase.apps.length) {
+      app = firebase.initializeApp(firebaseConfig);
+    } else {
+      app = firebase.app();
+    }
+    db = firebase.database(app);
+  } catch(e) {
+    console.error('Firebase init error:', e);
+  }
+
+  if (currentRef) currentRef.off();
+  currentRef = db.ref('pflichten/' + code);
+
+  currentRef.on('value', (snapshot) => {
+    if (localWriting) return;
+    const data = snapshot.val();
+    if (data) {
+      const rawTasks = data.tasks;
+      tasks = Array.isArray(rawTasks) ? rawTasks : (rawTasks ? Object.values(rawTasks) : JSON.parse(JSON.stringify(DEFAULT_TASKS)));
+      weekData = data.weekData || {};
+      normalizeWeekData();
+      render();
+      loadHeaderText(data);
+      loadGoals(data);
+      if (document.getElementById('page-month').classList.contains('active')) renderMonth();
+      if (document.getElementById('page-history').classList.contains('active')) renderHistory();
+      if (document.getElementById('page-settings').classList.contains('active')) renderEditList();
+    }
+    setSyncStatus('synced');
+    setConnStatus(true);
+  }, (err) => {
+    setSyncStatus('error');
+    setConnStatus(false);
+    console.error('Firebase error:', err);
+  });
+
+  document.getElementById('setupScreen').classList.add('hidden');
+  loadHeaderText(null);
+  loadGoals(null);
+  render();
+}
+
+function normalizeWeekData() {
+  Object.keys(weekData).forEach(k => {
+    if (weekData[k] && weekData[k].days) {
+      const d = weekData[k].days;
+      if (Array.isArray(d)) {
+        const obj = {};
+        d.forEach((v, i) => { if (v) obj[i] = v; });
+        weekData[k].days = obj;
+      }
+    }
+  });
+}
+
+function saveData() {
+  if (syncCode) {
+    try {
+      localStorage.setItem('pflichten_tasks_' + syncCode, JSON.stringify(tasks));
+      localStorage.setItem('pflichten_week_' + syncCode, JSON.stringify(weekData));
+    } catch(e) {}
+  }
+  if (!db || !currentRef) return;
+  setSyncStatus('syncing');
+  localWriting = true;
+  const saveObj = { tasks, weekData, goals: { week: goalWeek, month1: goalMonth1, month2: goalMonth2 } };
+  const ht = document.getElementById('headerTitle');
+  const hs = document.getElementById('headerSub');
+  if (ht) saveObj.headerTitle = ht.textContent.trim();
+  if (hs) saveObj.headerSub = hs.textContent.trim();
+  currentRef.set(saveObj)
+    .then(() => {
+      setSyncStatus('synced');
+      setTimeout(() => {
+        localWriting = false;
+        if (document.getElementById('page-month').classList.contains('active')) renderMonth();
+        if (document.getElementById('page-history').classList.contains('active')) renderHistory();
+      }, 300);
+    })
+    .catch(err => { setSyncStatus('error'); localWriting = false; console.error(err); });
+}
+
+function forceRefreshMonth() {
+  if (currentRef) {
+    currentRef.once('value', (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        const rawTasks = data.tasks;
+        tasks = Array.isArray(rawTasks) ? rawTasks : (rawTasks ? Object.values(rawTasks) : JSON.parse(JSON.stringify(DEFAULT_TASKS)));
+        weekData = data.weekData || {};
+        normalizeWeekData();
+      }
+      console.log('[DEBUG] forceRefreshMonth – weekData keys:', Object.keys(weekData));
+      console.log('[DEBUG] Month:', currentMonthDate.getFullYear(), currentMonthDate.getMonth());
+      const testWeeks = getMonthWeeks(currentMonthDate.getFullYear(), currentMonthDate.getMonth());
+      console.log('[DEBUG] Matched weeks:', testWeeks.map(w => w.key));
+      renderMonth();
+    });
+  } else {
+    console.log('[DEBUG] forceRefreshMonth (offline) – weekData keys:', Object.keys(weekData));
+    renderMonth();
+  }
+}
+
+// ── STATUS UI ──
+function setSyncStatus(state) {
+  const bar = document.getElementById('syncBar');
+  bar.className = 'sync-bar ' + state;
+  if (state === 'synced') setTimeout(() => { bar.className = 'sync-bar'; }, 2000);
+}
+function setConnStatus(online) {
+  document.getElementById('connDot').className = 'conn-dot ' + (online ? 'online' : 'offline');
+  document.getElementById('connLabel').textContent = online ? 'Sync aktiv' : 'Offline';
+}
+window.addEventListener('online', () => setConnStatus(true));
+window.addEventListener('offline', () => setConnStatus(false));
+
+// ── WEEK HELPERS ──
+function localDateStr(d) {
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function getWeekKey(offset) {
+  const d = new Date();
+  d.setHours(12,0,0,0);
+  d.setDate(d.getDate() + offset * 7);
+  const day = d.getDay();
+  const mon = new Date(d);
+  mon.setDate(d.getDate() - (day === 0 ? 6 : day - 1));
+  return localDateStr(mon);
+}
+function getWeekRange(offset) {
+  const d = new Date();
+  d.setDate(d.getDate() + offset * 7);
+  const day = d.getDay();
+  const mon = new Date(d);
+  mon.setDate(d.getDate() - (day === 0 ? 6 : day - 1));
+  const sun = new Date(mon); sun.setDate(mon.getDate() + 6);
+  const fmt = x => String(x.getDate()).padStart(2,'0') + '.' + String(x.getMonth()+1).padStart(2,'0') + '.';
+  return fmt(mon) + ' – ' + fmt(sun) + ' ' + sun.getFullYear();
+}
+function getWeekData() {
+  const key = getWeekKey(currentWeekOffset);
+  if (!weekData[key]) return { days: {}, remarks: '' };
+  if (!weekData[key].days) weekData[key].days = {};
+  return weekData[key];
+}
+
+// ── SCORE ──
+function calcWeekScore(wd) {
+  if (!wd || !wd.days) return { pos:0, neg:0, total:0 };
+  let pos = 0, neg = 0;
+  for (let di = 0; di < 7; di++) {
+    const de = wd.days[di] || wd.days[String(di)] || {};
+    for (const task of tasks) {
+      const s = de[task.id] !== undefined ? de[task.id] : de[String(task.id)];
+      if (s === 'done') pos += task.plus;
+      else if (s === 'missed') neg += task.minus;
+    }
+  }
+  return { pos, neg, total: pos - neg };
+}
+
+// ── MONTH ──
+// FIX: Scannt die tatsächlich gespeicherten weekData-Keys statt
+// theoretische Keys zu generieren. Löst das Timezone/Key-Mismatch-Problem.
+function getMonthWeeks(year, month) {
+  const weeks = [];
+  const allKeys = Object.keys(weekData).sort();
+
+  for (const key of allKeys) {
+    // Parse key sicher (T12:00:00 verhindert Timezone-Verschiebung)
+    const mon = new Date(key + 'T12:00:00');
+    if (isNaN(mon.getTime())) continue;
+    // Donnerstag bestimmt den Monat (ISO-Standard)
+    const thu = new Date(mon);
+    thu.setDate(mon.getDate() + 3);
+    if (thu.getFullYear() === year && thu.getMonth() === month) {
+      const sun = new Date(mon);
+      sun.setDate(mon.getDate() + 6);
+      weeks.push({ start: new Date(mon), end: sun, key: key });
+    }
+  }
+
+  // Fallback: Wenn keine Daten vorhanden, generiere die theoretischen Wochen
+  if (weeks.length === 0) {
+    const firstDay = new Date(year, month, 1, 12, 0, 0);
+    const lastDay = new Date(year, month + 1, 0, 12, 0, 0);
+    let d = new Date(firstDay);
+    const dow = d.getDay();
+    d.setDate(d.getDate() - (dow === 0 ? 6 : dow - 1));
+    while (d.getTime() <= lastDay.getTime()) {
+      const m = new Date(d);
+      const su = new Date(d); su.setDate(d.getDate() + 6);
+      weeks.push({ start: m, end: su, key: localDateStr(m) });
+      d.setDate(d.getDate() + 7);
+    }
+  }
+
+  return weeks;
+}
+function calcMonthData(year, month) {
+  const weeks = getMonthWeeks(year, month);
+  let totalPos = 0, totalNeg = 0, weekScores = [];
+  const taskTotals = {};
+  tasks.forEach(t => { taskTotals[t.id] = { pos:0, neg:0 }; });
+  for (const w of weeks) {
+    const wd = weekData[w.key] || { days:{}, remarks:'' };
+    const sc = calcWeekScore(wd);
+    totalPos += sc.pos; totalNeg += sc.neg;
+    weekScores.push({ ...w, ...sc });
+    if (!wd.days) continue;
+    for (let di = 0; di < 7; di++) {
+      const de = wd.days[di] || wd.days[String(di)] || {};
+      for (const t of tasks) {
+        const sv = de[t.id] !== undefined ? de[t.id] : de[String(t.id)];
+        if (sv === 'done') taskTotals[t.id].pos += t.plus;
+        else if (sv === 'missed') taskTotals[t.id].neg += t.minus;
+      }
+    }
+  }
+  return { total: totalPos - totalNeg, pos: totalPos, neg: totalNeg, weekScores, taskTotals };
+}
+
+// ── RENDER WEEK ──
+function render() {
+  const wd = getWeekData();
+  document.getElementById('weekLabel').textContent = getWeekRange(currentWeekOffset);
+
+  const tabs = document.getElementById('dayTabs');
+  tabs.innerHTML = '';
+  for (let i = 0; i < 7; i++) {
+    const hasData = wd.days && (wd.days[i] || wd.days[String(i)]) && Object.keys(wd.days[i] || wd.days[String(i)]).length > 0;
+    const btn = document.createElement('button');
+    btn.className = 'day-tab' + (i === selectedDay ? ' active' : '') + (hasData ? ' has-data' : '');
+    btn.innerHTML = DAY_NAMES[i];
+    btn.onclick = () => selectDay(i);
+    tabs.appendChild(btn);
+  }
+
+  const list = document.getElementById('taskList');
+  if (!tasks.length) {
+    list.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg><p>Keine Aufgaben definiert</p></div>';
+    return;
+  }
+
+  const dayEntries = (wd.days && (wd.days[selectedDay] || wd.days[String(selectedDay)])) || {};
+  list.innerHTML = '';
+  tasks.forEach(t => {
+    const status = dayEntries[t.id] || dayEntries[String(t.id)] || '';
+    const icon = status === 'done' ? '✓' : status === 'missed' ? '✗' : status === 'na' ? 'N/A' : '';
+    const div = document.createElement('div');
+    div.className = 'task-card';
+    div.innerHTML = `
+      <div class="task-main">
+        <div class="task-nr">${t.id}</div>
+        <div class="task-info">
+          <div class="task-name">${t.name}</div>
+          <div class="task-points">+${t.plus} / -${t.minus}</div>
+        </div>
+        <button class="task-status ${status}" onclick="cycleStatus(${t.id})">${icon}</button>
+      </div>`;
+    list.appendChild(div);
+  });
+
+  document.getElementById('remarks').value = wd.remarks || '';
+  updateScores();
+}
+
+function updateScores() {
+  const wd = getWeekData();
+  const { pos, neg, total } = calcWeekScore(wd);
+  document.getElementById('scorePos').textContent = pos;
+  document.getElementById('scoreNeg').textContent = neg;
+  document.getElementById('scoreTotal').textContent = total;
+  document.getElementById('scoreTotal').style.color = total >= 0 ? 'var(--green)' : 'var(--red)';
+
+  const clamped = Math.max(0, total);
+  const pct = Math.min(100, Math.round((clamped / goalWeek) * 100));
+  const barEl = document.getElementById('weekRewardBar');
+  const lblEl = document.getElementById('weekRewardLabel');
+  const chkEl = document.getElementById('weekRewardCheck');
+  if (barEl) barEl.style.width = pct + '%';
+  if (lblEl) lblEl.textContent = clamped + ' / ' + goalWeek + ' Punkte';
+  if (chkEl) chkEl.textContent = clamped >= goalWeek ? '✅' : '';
+}
+
+// ── RENDER MONTH ──
+function renderMonth() {
+  const year = currentMonthDate.getFullYear();
+  const month = currentMonthDate.getMonth();
+  document.getElementById('monthLabel').textContent = MONTH_NAMES[month] + ' ' + year;
+
+  const data = calcMonthData(year, month);
+  const totalColor = data.total >= 0 ? 'var(--green)' : 'var(--red)';
+  document.getElementById('monthTotal').textContent = data.total;
+  document.getElementById('monthTotal').style.color = totalColor;
+  document.getElementById('monthPos').textContent = data.pos;
+  document.getElementById('monthNeg').textContent = data.neg;
+  document.getElementById('monthWeeks').textContent = data.weekScores.length;
+
+  const pts = Math.max(0, data.total);
+  document.getElementById('reward1Bar').style.width = Math.min(100, (pts/goalMonth1)*100) + '%';
+  document.getElementById('reward2Bar').style.width = Math.min(100, (pts/goalMonth2)*100) + '%';
+  document.getElementById('reward1Label').textContent = pts + ' / ' + goalMonth1;
+  document.getElementById('reward2Label').textContent = pts + ' / ' + goalMonth2;
+  document.getElementById('reward1Check').textContent = pts >= goalMonth1 ? '✅' : '';
+  document.getElementById('reward2Check').textContent = pts >= goalMonth2 ? '✅' : '';
+  // Update dynamic labels
+  const sub1 = document.querySelector('#reward1Bar')?.closest('.reward-row')?.querySelector('.reward-sub');
+  const sub2 = document.querySelector('#reward2Bar')?.closest('.reward-row')?.querySelector('.reward-sub');
+  if (sub1) sub1.textContent = 'ab ' + goalMonth1 + ' Punkte';
+  if (sub2) sub2.textContent = 'ab ' + goalMonth2 + ' Punkte';
+
+  const fmt = d => String(d.getDate()).padStart(2,'0') + '.' + String(d.getMonth()+1).padStart(2,'0') + '.';
+  const maxPossible = tasks.reduce((s,t) => s + t.plus, 0) * 7;
+
+  const weeksList = document.getElementById('monthWeeksList');
+  weeksList.innerHTML = '';
+  for (const w of data.weekScores) {
+    const color = w.total >= 0 ? 'var(--green)' : 'var(--red)';
+    const pct = maxPossible > 0 ? Math.max(0, Math.min(100, (w.pos/maxPossible)*100)) : 0;
+    const card = document.createElement('div');
+    card.className = 'month-week-card';
+    card.innerHTML = `
+      <div class="month-week-header">
+        <div class="month-week-label">${fmt(w.start)} – ${fmt(w.end)}</div>
+        <div class="month-week-score" style="color:${color}">${w.total > 0 ? '+' : ''}${w.total}</div>
+      </div>
+      <div class="month-week-bar"><div class="month-week-bar-fill" style="width:${pct}%;background:${color}"></div></div>`;
+    weeksList.appendChild(card);
+  }
+
+  const breakdown = document.getElementById('monthTaskBreakdown');
+  const maxNet = Math.max(1, ...tasks.map(t => { const td = data.taskTotals[t.id]; return td ? Math.abs(td.pos - td.neg) : 0; }));
+  breakdown.innerHTML = '';
+  for (const t of tasks) {
+    const td = data.taskTotals[t.id];
+    const net = td ? td.pos - td.neg : 0;
+    const color = net >= 0 ? 'var(--green)' : 'var(--red)';
+    const pct = (Math.abs(net) / maxNet) * 100;
+    const row = document.createElement('div');
+    row.className = 'month-task-row';
+    row.innerHTML = `
+      <div class="month-task-name">${t.name}</div>
+      <div class="month-task-bar-wrap"><div class="month-task-bar"><div class="month-task-bar-fill" style="width:${pct}%;background:${color}"></div></div></div>
+      <div class="month-task-score" style="color:${color}">${net > 0 ? '+' : ''}${net}</div>`;
+    breakdown.appendChild(row);
+  }
+}
+
+function changeMonth(dir) { currentMonthDate.setMonth(currentMonthDate.getMonth() + dir); renderMonth(); }
+
+// ── RENDER HISTORY ──
+let historyView = 'week';
+function setHistoryView(view) {
+  historyView = view;
+  document.getElementById('histToggleWeek').classList.toggle('active', view === 'week');
+  document.getElementById('histToggleMonth').classList.toggle('active', view === 'month');
+  renderHistory();
+}
+function renderHistory() {
+  const container = document.getElementById('historyList');
+  if (historyView === 'month') { renderMonthHistory(container); return; }
+  const keys = Object.keys(weekData).sort().reverse().filter(k => {
+    const wd = weekData[k];
+    return wd && wd.days && Object.values(wd.days).some(d => d && Object.keys(d).length > 0);
+  });
+  if (!keys.length) {
+    container.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg><p>Noch keine Verlaufsdaten</p></div>';
+    return;
+  }
+  container.innerHTML = '';
+  const maxPossible = tasks.reduce((s,t) => s + t.plus, 0) * 7;
+  for (const key of keys) {
+    const wd = weekData[key];
+    const { pos, neg, total } = calcWeekScore(wd);
+    const pct = maxPossible > 0 ? Math.max(0, Math.min(100, (pos/maxPossible)*100)) : 0;
+    const color = total >= 0 ? 'var(--green)' : 'var(--red)';
+    const mon = new Date(key + 'T12:00:00');
+    const sun = new Date(mon); sun.setDate(mon.getDate() + 6);
+    const fmt = d => String(d.getDate()).padStart(2,'0') + '.' + String(d.getMonth()+1).padStart(2,'0') + '.';
+    const card = document.createElement('div');
+    card.className = 'history-card';
+    card.onclick = () => showHistoryDetail(key);
+    card.innerHTML = `
+      <div class="history-header">
+        <div class="history-week">${fmt(mon)} – ${fmt(sun)} ${sun.getFullYear()}</div>
+        <div class="history-score" style="color:${color}">${total > 0 ? '+' : ''}${total}</div>
+      </div>
+      <div class="history-bar"><div class="history-bar-fill" style="width:${pct}%;background:${color}"></div></div>`;
+    container.appendChild(card);
+  }
+}
+function renderMonthHistory(container) {
+  // Collect all months that have data
+  // Use majority-month logic: a week belongs to the month where most of its 7 days fall
+  const monthMap = {};
+  Object.keys(weekData).forEach(key => {
+    const wd = weekData[key];
+    if (!wd || !wd.days) return;
+    const hasData = Object.values(wd.days).some(d => d && Object.keys(d).length > 0);
+    if (!hasData) return;
+    // Count how many days of this week fall in each month
+    const mon = new Date(key + 'T12:00:00');
+    const monthCount = {};
+    for (let i = 0; i < 7; i++) {
+      const day = new Date(mon);
+      day.setDate(mon.getDate() + i);
+      const ym = day.getFullYear() + '-' + String(day.getMonth()+1).padStart(2,'0');
+      monthCount[ym] = (monthCount[ym] || 0) + 1;
+    }
+    // Find the month with the most days (majority month)
+    const majorYm = Object.keys(monthCount).reduce((a, b) => monthCount[a] >= monthCount[b] ? a : b);
+    if (!monthMap[majorYm]) {
+      const d = new Date(majorYm + '-01T12:00:00');
+      monthMap[majorYm] = { year: d.getFullYear(), month: d.getMonth() };
+    }
+  });
+  const months = Object.keys(monthMap).sort().reverse();
+  if (!months.length) {
+    container.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg><p>Noch keine Monatsdaten</p></div>';
+    return;
+  }
+  container.innerHTML = '';
+  const maxMonthPossible = tasks.reduce((s,t) => s + t.plus, 0) * 7 * 5;
+  for (const ym of months) {
+    const { year, month } = monthMap[ym];
+    const data = calcMonthData(year, month);
+    const color = data.total >= 0 ? 'var(--green)' : 'var(--red)';
+    const pct = maxMonthPossible > 0 ? Math.max(0, Math.min(100, (data.pos / maxMonthPossible) * 100)) : 0;
+    const card = document.createElement('div');
+    card.className = 'month-history-card';
+    card.onclick = () => { currentMonthDate = new Date(year, month, 1); showPage('month'); };
+    card.innerHTML = `
+      <div class="month-history-header">
+        <div class="month-history-name">${MONTH_NAMES[month]} ${year}</div>
+        <div class="month-history-score" style="color:${color}">${data.total > 0 ? '+' : ''}${data.total}</div>
+      </div>
+      <div class="month-history-bar"><div class="month-history-bar-fill" style="width:${pct}%;background:${color}"></div></div>
+      <div class="month-history-sub">
+        <span>✅ +${data.pos} Verdient</span>
+        <span>${data.weekScores.length} Wochen</span>
+        <span>❌ -${data.neg} Abzug</span>
+      </div>`;
+    container.appendChild(card);
+  }
+}
+
+function showHistoryDetail(key) {
+  const wd = weekData[key];
+  const mon = new Date(key + 'T12:00:00');
+  const sun = new Date(mon); sun.setDate(mon.getDate() + 6);
+  const fmt = d => String(d.getDate()).padStart(2,'0') + '.' + String(d.getMonth()+1).padStart(2,'0') + '.';
+  document.getElementById('modalTitle').textContent = fmt(mon) + ' – ' + fmt(sun) + ' ' + sun.getFullYear();
+  let html = '';
+  for (const task of tasks) {
+    html += '<div style="margin-bottom:12px"><div style="font-size:13px;font-weight:600;margin-bottom:4px">' + task.name + '</div><div style="display:flex;gap:8px;flex-wrap:wrap">';
+    for (let di = 0; di < 7; di++) {
+      const de = (wd.days && (wd.days[di] || wd.days[String(di)])) || {};
+      const s = de[task.id] || de[String(task.id)] || '';
+      const icon = s === 'done' ? '✅' : s === 'missed' ? '❌' : s === 'na' ? '⬜' : '—';
+      html += '<span style="font-size:12px;color:var(--text2)">' + DAY_NAMES[di] + ': ' + icon + '</span>';
+    }
+    html += '</div></div>';
+  }
+  if (wd.remarks) html += '<div style="margin-top:12px;font-size:13px;color:var(--text2);border-top:1px solid rgba(255,255,255,0.08);padding-top:12px">📝 ' + wd.remarks + '</div>';
+  document.getElementById('modalContent').innerHTML = html;
+  document.getElementById('historyModal').classList.add('open');
+}
+
+function closeModal() { document.getElementById('historyModal').classList.remove('open'); }
+
+// ── HEADER TEXT ──
+function saveHeaderText() {
+  const title = document.getElementById('headerTitle').textContent.trim();
+  const sub = document.getElementById('headerSub').textContent.trim();
+  if (syncCode && currentRef) {
+    currentRef.child('headerTitle').set(title);
+    currentRef.child('headerSub').set(sub);
+  }
+  try {
+    localStorage.setItem('pflichten_headerTitle', title);
+    localStorage.setItem('pflichten_headerSub', sub);
+  } catch(e) {}
+}
+function loadHeaderText(data) {
+  const titleEl = document.getElementById('headerTitle');
+  const subEl = document.getElementById('headerSub');
+  const t = (data && data.headerTitle) || localStorage.getItem('pflichten_headerTitle');
+  const s = (data && data.headerSub) || localStorage.getItem('pflichten_headerSub');
+  if (t && titleEl && !titleEl.matches(':focus')) titleEl.textContent = t;
+  if (s && subEl && !subEl.matches(':focus')) subEl.textContent = s;
+}
+
+// ── GOALS ──
+function saveGoals() {
+  goalWeek = parseInt(document.getElementById('goalWeekInput').value) || 25;
+  goalMonth1 = parseInt(document.getElementById('goalMonth1Input').value) || 25;
+  goalMonth2 = parseInt(document.getElementById('goalMonth2Input').value) || 50;
+  updateScores();
+  if (document.getElementById('page-month').classList.contains('active')) renderMonth();
+  if (currentRef) {
+    currentRef.child('goals').set({ week: goalWeek, month1: goalMonth1, month2: goalMonth2 });
+  }
+  try { localStorage.setItem('pflichten_goals', JSON.stringify({ week: goalWeek, month1: goalMonth1, month2: goalMonth2 })); } catch(e) {}
+}
+function loadGoals(data) {
+  const g = (data && data.goals) || (() => { try { return JSON.parse(localStorage.getItem('pflichten_goals')); } catch(e) { return null; } })();
+  if (g) { goalWeek = g.week || 25; goalMonth1 = g.month1 || 25; goalMonth2 = g.month2 || 50; }
+  const el1 = document.getElementById('goalWeekInput');
+  const el2 = document.getElementById('goalMonth1Input');
+  const el3 = document.getElementById('goalMonth2Input');
+  if (el1 && !el1.matches(':focus')) el1.value = goalWeek;
+  if (el2 && !el2.matches(':focus')) el2.value = goalMonth1;
+  if (el3 && !el3.matches(':focus')) el3.value = goalMonth2;
+}
+
+// ── ACTIONS ──
+function selectDay(i) { selectedDay = i; render(); }
+function changeWeek(dir) { currentWeekOffset += dir; selectedDay = 0; render(); }
+
+function cycleStatus(taskId) {
+  const key = getWeekKey(currentWeekOffset);
+  if (!weekData[key]) weekData[key] = { days:{}, remarks:'' };
+  if (!weekData[key].days) weekData[key].days = {};
+  if (!weekData[key].days[selectedDay]) weekData[key].days[selectedDay] = {};
+  const current = weekData[key].days[selectedDay][taskId] || '';
+  const cycle = ['','done','missed','na'];
+  const next = cycle[(cycle.indexOf(current)+1) % cycle.length];
+  if (next === '') delete weekData[key].days[selectedDay][taskId];
+  else weekData[key].days[selectedDay][taskId] = next;
+  render();
+  saveData();
+}
+
+function saveRemarks() {
+  const key = getWeekKey(currentWeekOffset);
+  if (!weekData[key]) weekData[key] = { days:{}, remarks:'' };
+  weekData[key].remarks = document.getElementById('remarks').value;
+  saveData();
+}
+
+// ── SEND ──
+function buildSummary() {
+  const wd = getWeekData();
+  const range = getWeekRange(currentWeekOffset);
+  let lines = ['📋 *Wochenbericht: ' + range + '*', ''];
+  let totalPos = 0, totalNeg = 0;
+  for (const task of tasks) {
+    let taskLine = '*' + task.id + '. ' + task.name + '*\n';
+    let dayResults = [];
+    for (let di = 0; di < 7; di++) {
+      const de = (wd.days && (wd.days[di] || wd.days[String(di)])) || {};
+      const s = de[task.id] || de[String(task.id)] || '';
+      const icon = s === 'done' ? '✅' : s === 'missed' ? '❌' : s === 'na' ? '⬜' : '—';
+      dayResults.push(DAY_NAMES[di] + ': ' + icon);
+      if (s === 'done') totalPos += task.plus;
+      else if (s === 'missed') totalNeg += task.minus;
+    }
+    lines.push(taskLine + dayResults.join('  '));
+    lines.push('');
+  }
+  lines.push('📊 *Ergebnis: +' + totalPos + ' / -' + totalNeg + ' = ' + (totalPos-totalNeg) + ' Punkte*');
+  if (wd.remarks) lines.push('\n📝 ' + wd.remarks);
+  return lines.join('\n');
+}
+
+function sendWhatsApp() { window.open('https://wa.me/?text=' + encodeURIComponent(buildSummary()), '_blank'); }
+function sendEmail() { window.location.href = 'mailto:?subject=' + encodeURIComponent('Wochenbericht: ' + getWeekRange(currentWeekOffset)) + '&body=' + encodeURIComponent(buildSummary()); }
+
+function buildMonthSummary() {
+  const year = currentMonthDate.getFullYear();
+  const month = currentMonthDate.getMonth();
+  const data = calcMonthData(year, month);
+  const fmt = d => String(d.getDate()).padStart(2,'0') + '.' + String(d.getMonth()+1).padStart(2,'0') + '.';
+  let lines = ['📅 *Monatsbericht: ' + MONTH_NAMES[month] + ' ' + year + '*', ''];
+  const pts = Math.max(0, data.total);
+  lines.push('📊 Gesamtpunkte: *' + data.total + '*  (+' + data.pos + ' / -' + data.neg + ')');
+  lines.push('');
+  if (pts >= goalMonth2) lines.push('⭐ Ein Wunsch verdient!');
+  else if (pts >= goalMonth1) lines.push('🎁 Eine Belohnung verdient!');
+  else lines.push('📈 ' + pts + '/' + goalMonth1 + ' für Belohnung');
+  lines.push('', '*Wochen:*');
+  for (const w of data.weekScores) lines.push((w.total >= 0 ? '📈' : '📉') + ' ' + fmt(w.start) + '–' + fmt(w.end) + ': ' + (w.total > 0 ? '+' : '') + w.total);
+  lines.push('', '*Aufgaben:*');
+  for (const t of tasks) {
+    const td = data.taskTotals[t.id];
+    const net = td ? td.pos - td.neg : 0;
+    lines.push((net > 0 ? '✅' : net < 0 ? '❌' : '⬜') + ' ' + t.name + ': ' + (net > 0 ? '+' : '') + net);
+  }
+  return lines.join('\n');
+}
+
+function sendMonthWhatsApp() { window.open('https://wa.me/?text=' + encodeURIComponent(buildMonthSummary()), '_blank'); }
+function sendMonthEmail() { window.location.href = 'mailto:?subject=' + encodeURIComponent('Monatsbericht: ' + MONTH_NAMES[currentMonthDate.getMonth()] + ' ' + currentMonthDate.getFullYear()) + '&body=' + encodeURIComponent(buildMonthSummary()); }
+
+// ── EDIT TASKS ──
+function renderEditList() {
+  const container = document.getElementById('editList');
+  container.innerHTML = '';
+  tasks.forEach((t, idx) => {
+    const card = document.createElement('div');
+    card.className = 'edit-task-card';
+    card.innerHTML = `
+      <input type="text" data-idx="${idx}" data-field="name" value="${t.name.replace(/"/g,'&quot;')}" placeholder="Aufgabe">
+      <div class="edit-row">
+        <div class="edit-field"><label class="edit-label">+ Punkte</label><input type="number" data-idx="${idx}" data-field="plus" value="${t.plus}" placeholder="0" min="0" max="99"></div>
+        <div class="edit-field"><label class="edit-label">- Punkte</label><input type="number" data-idx="${idx}" data-field="minus" value="${t.minus}" placeholder="0" min="0" max="99"></div>
+        <button class="btn-delete" onclick="deleteTask(${idx})">Löschen</button>
+      </div>`;
+    container.appendChild(card);
+  });
+}
+
+function addTask() {
+  const maxId = tasks.reduce((m,t) => Math.max(m, t.id), 0);
+  tasks.push({ id: maxId+1, name:'Neue Aufgabe', plus:1, minus:1 });
+  renderEditList();
+}
+
+function deleteTask(idx) {
+  if (!confirm('Aufgabe wirklich löschen?')) return;
+  tasks.splice(idx, 1);
+  renderEditList();
+}
+
+function saveTasks() {
+  document.querySelectorAll('#editList input').forEach(inp => {
+    const idx = parseInt(inp.dataset.idx);
+    const field = inp.dataset.field;
+    if (field === 'name') tasks[idx].name = inp.value;
+    else tasks[idx][field] = parseInt(inp.value) || 0;
+  });
+  saveData();
+  render();
+  alert('Gespeichert ✓');
+}
+
+// ── NAVIGATION ──
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.getElementById('nav-' + page).classList.add('active');
+  if (page === 'settings') { renderEditList(); loadGoals(null); document.getElementById('currentCodeDisplay').textContent = syncCode || '—'; }
+  if (page === 'history') renderHistory();
+  if (page === 'week') render();
+  if (page === 'month') { renderMonth(); setTimeout(renderMonth, 800); }
+}
+
+// ── INIT ──
+// ── SERVICE WORKER ──
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(e => console.log('SW:', e));
+}
+
+const savedCode = getSavedCode();
+if (savedCode) {
+  document.getElementById('setupScreen').classList.add('hidden');
+  initSync(savedCode);
+} else {
+  document.getElementById('setupScreen').classList.remove('hidden');
+}
+</script>
+</body>
+</html>
