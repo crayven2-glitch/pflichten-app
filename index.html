@@ -362,21 +362,21 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif
         <span class="goal-icon">🎯</span>
         <div><div class="goal-label">Wochenziel</div><div class="goal-sub">Belohnung pro Woche</div></div>
       </div>
-      <input type="number" class="goal-input" id="goalWeekInput" value="25" min="1" max="999" onchange="saveGoals()">
+      <input type="number" class="goal-input" id="goalWeekInput" placeholder="25" min="1" max="999" onchange="saveGoals()">
     </div>
     <div class="goal-row">
       <div class="goal-info">
         <span class="goal-icon">🎁</span>
         <div><div class="goal-label">Monats-Belohnung</div><div class="goal-sub">Erste Stufe im Monat</div></div>
       </div>
-      <input type="number" class="goal-input" id="goalMonth1Input" value="25" min="1" max="999" onchange="saveGoals()">
+      <input type="number" class="goal-input" id="goalMonth1Input" placeholder="25" min="1" max="999" onchange="saveGoals()">
     </div>
     <div class="goal-row">
       <div class="goal-info">
         <span class="goal-icon">⭐</span>
         <div><div class="goal-label">Monats-Wunsch</div><div class="goal-sub">Zweite Stufe im Monat</div></div>
       </div>
-      <input type="number" class="goal-input" id="goalMonth2Input" value="50" min="1" max="999" onchange="saveGoals()">
+      <input type="number" class="goal-input" id="goalMonth2Input" placeholder="50" min="1" max="999" onchange="saveGoals()">
     </div>
   </div>
   <div class="lang-card">
@@ -1290,9 +1290,15 @@ function loadHeaderText(data) {
 
 // ── GOALS ──
 function saveGoals() {
-  goalWeek = parseInt(document.getElementById('goalWeekInput').value) || 25;
-  goalMonth1 = parseInt(document.getElementById('goalMonth1Input').value) || 25;
-  goalMonth2 = parseInt(document.getElementById('goalMonth2Input').value) || 50;
+  const el1 = document.getElementById('goalWeekInput');
+  const el2 = document.getElementById('goalMonth1Input');
+  const el3 = document.getElementById('goalMonth2Input');
+  goalWeek = parseInt(el1.value) || parseInt(el1.placeholder) || 25;
+  goalMonth1 = parseInt(el2.value) || parseInt(el2.placeholder) || 25;
+  goalMonth2 = parseInt(el3.value) || parseInt(el3.placeholder) || 50;
+  el1.value = ''; el1.placeholder = goalWeek;
+  el2.value = ''; el2.placeholder = goalMonth1;
+  el3.value = ''; el3.placeholder = goalMonth2;
   updateScores();
   if (document.getElementById('page-month').classList.contains('active')) renderMonth();
   if (currentRef) {
@@ -1306,9 +1312,9 @@ function loadGoals(data) {
   const el1 = document.getElementById('goalWeekInput');
   const el2 = document.getElementById('goalMonth1Input');
   const el3 = document.getElementById('goalMonth2Input');
-  if (el1 && !el1.matches(':focus')) el1.value = goalWeek;
-  if (el2 && !el2.matches(':focus')) el2.value = goalMonth1;
-  if (el3 && !el3.matches(':focus')) el3.value = goalMonth2;
+  if (el1 && !el1.matches(':focus')) { el1.value = ''; el1.placeholder = goalWeek; }
+  if (el2 && !el2.matches(':focus')) { el2.value = ''; el2.placeholder = goalMonth1; }
+  if (el3 && !el3.matches(':focus')) { el3.value = ''; el3.placeholder = goalMonth2; }
 }
 
 // ── ACTIONS ──
@@ -1400,8 +1406,8 @@ function renderEditList() {
     card.innerHTML = `
       <input type="text" data-idx="${idx}" data-field="name" value="${tk.name.replace(/"/g,'&quot;')}" placeholder="${t('taskPlaceholder')}">
       <div class="edit-row">
-        <div class="edit-field"><label class="edit-label">${t('plusPoints')}</label><input type="number" data-idx="${idx}" data-field="plus" value="${tk.plus}" placeholder="0" min="0" max="99"></div>
-        <div class="edit-field"><label class="edit-label">${t('minusPoints')}</label><input type="number" data-idx="${idx}" data-field="minus" value="${tk.minus}" placeholder="0" min="0" max="99"></div>
+        <div class="edit-field"><label class="edit-label">${t('plusPoints')}</label><input type="number" data-idx="${idx}" data-field="plus" value="${tk.plus || ''}" placeholder="0" min="0" max="99"></div>
+        <div class="edit-field"><label class="edit-label">${t('minusPoints')}</label><input type="number" data-idx="${idx}" data-field="minus" value="${tk.minus || ''}" placeholder="0" min="0" max="99"></div>
         <button class="btn-delete" onclick="deleteTask(${idx})">${t('deleteBtn')}</button>
       </div>`;
     container.appendChild(card);
@@ -1410,7 +1416,7 @@ function renderEditList() {
 
 function addTask() {
   const maxId = tasks.reduce((m,t) => Math.max(m, t.id), 0);
-  tasks.push({ id: maxId+1, name: t('newTask'), plus:1, minus:1 });
+  tasks.push({ id: maxId+1, name: t('newTask'), plus:0, minus:0 });
   renderEditList();
 }
 
