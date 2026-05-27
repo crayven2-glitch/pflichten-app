@@ -1454,15 +1454,9 @@ async function setupPush() {
     } else {
       console.warn('Push: Token NOT saved - missing:', !fcmToken ? 'token' : '', !syncCode ? 'syncCode' : '', !currentRef ? 'currentRef' : '');
     }
-    // Foreground messages
+    // Foreground messages — no extra notification, SW handles display
     messaging.onMessage((payload) => {
-      if (localWriting) return;
-      if (Notification.permission === 'granted') {
-        new Notification(payload.notification?.title || 'Sub Pflichten', {
-          body: payload.notification?.body || t('notifUpdate'),
-          icon: './icon-192.png'
-        });
-      }
+      console.log('Push: foreground message received');
     });
   } catch(e) {
     console.error('Push setup error:', e);
