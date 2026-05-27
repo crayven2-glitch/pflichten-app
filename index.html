@@ -1400,8 +1400,8 @@ function renderEditList() {
     card.innerHTML = `
       <input type="text" data-idx="${idx}" data-field="name" value="${tk.name.replace(/"/g,'&quot;')}" placeholder="${t('taskPlaceholder')}">
       <div class="edit-row">
-        <div class="edit-field"><label class="edit-label">${t('plusPoints')}</label><input type="number" data-idx="${idx}" data-field="plus" value="${tk.plus || ''}" placeholder="0" min="0" max="99" onfocus="this.select()"></div>
-        <div class="edit-field"><label class="edit-label">${t('minusPoints')}</label><input type="number" data-idx="${idx}" data-field="minus" value="${tk.minus || ''}" placeholder="0" min="0" max="99" onfocus="this.select()"></div>
+        <div class="edit-field"><label class="edit-label">${t('plusPoints')}</label><input type="number" data-idx="${idx}" data-field="plus" value="${tk.plus}" placeholder="0" min="0" max="99" onfocus="this.select()"></div>
+        <div class="edit-field"><label class="edit-label">${t('minusPoints')}</label><input type="number" data-idx="${idx}" data-field="minus" value="${tk.minus}" placeholder="0" min="0" max="99" onfocus="this.select()"></div>
         <button class="btn-delete" onclick="deleteTask(${idx})">${t('deleteBtn')}</button>
       </div>`;
     container.appendChild(card);
