@@ -247,7 +247,7 @@ input[type="number"] { -moz-appearance:textfield; }
   <p>Gib einen gemeinsamen Code ein, damit beide Handys dieselben Daten sehen.</p>
   <div class="setup-error" id="setupError"></div>
   <input class="setup-input" id="setupCodeInput" type="text" placeholder="Code" maxlength="30" autocomplete="off" autocapitalize="characters">
-  <button class="setup-btn" onclick="connectWithCode()">Verbinden</button>
+  <button class="setup-btn" onclick="connectWithCode()">Einloggen</button>
   <div class="setup-divider">oder</div>
   <button class="setup-btn-sec" onclick="generateCode()">Neuen Code generieren</button>
   <div class="setup-version">v1.5</div>
@@ -423,7 +423,7 @@ input[type="number"] { -moz-appearance:textfield; }
   </div>
   <div class="danger-zone">
     <p>Sync-Code: <strong id="currentCodeDisplay">—</strong></p>
-    <button class="btn-logout" onclick="logout()">Anderen Code verwenden</button>
+    <button class="btn-logout" onclick="logout()">Ausloggen</button>
   </div>
 </div>
 
@@ -466,9 +466,9 @@ const I18N = {
   de: {
     days: ['Mo','Di','Mi','Do','Fr','Sa','So'],
     months: ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'],
-    setupTitle: 'Verbindung einrichten',
+    setupTitle: 'Einloggen',
     setupDesc: 'Gib einen gemeinsamen Code ein, damit beide Handys dieselben Daten sehen.',
-    setupConnect: 'Verbinden',
+    setupConnect: 'Einloggen',
     setupOr: 'oder',
     setupGenerate: 'Neuen Code generieren',
     setupMinChars: 'Mindestens 4 Zeichen eingeben.',
@@ -508,8 +508,8 @@ const I18N = {
     goalMonth2: 'Monats-Wunsch',
     goalMonth2Sub: 'Ziel im Monat',
     syncCode: 'Sync-Code:',
-    logout: 'Anderen Code verwenden',
-    logoutConfirm: 'Sync-Verbindung trennen?',
+    logout: 'Ausloggen',
+    logoutConfirm: 'Ausloggen?',
     close: 'Schließen',
     navWeek: 'Woche',
     navMonth: 'Monat',
@@ -551,9 +551,9 @@ const I18N = {
   en: {
     days: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
     months: ['January','February','March','April','May','June','July','August','September','October','November','December'],
-    setupTitle: 'Set up connection',
+    setupTitle: 'Log in',
     setupDesc: 'Enter a shared code so both phones see the same data.',
-    setupConnect: 'Connect',
+    setupConnect: 'Log in',
     setupOr: 'or',
     setupGenerate: 'Generate new code',
     setupMinChars: 'Enter at least 4 characters.',
@@ -593,8 +593,8 @@ const I18N = {
     goalMonth2: 'Monthly Wish',
     goalMonth2Sub: 'Target per month',
     syncCode: 'Sync Code:',
-    logout: 'Use different code',
-    logoutConfirm: 'Disconnect sync?',
+    logout: 'Log out',
+    logoutConfirm: 'Log out?',
     close: 'Close',
     navWeek: 'Week',
     navMonth: 'Month',
