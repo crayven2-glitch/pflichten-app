@@ -1437,9 +1437,15 @@ async function setupPush() {
   try {
     const messaging = firebase.messaging();
     const swReg = await navigator.serviceWorker.ready;
+    console.log('Push: SW ready, getting token...');
     fcmToken = await messaging.getToken({ vapidKey: VAPID_KEY, serviceWorkerRegistration: swReg });
+    console.log('Push: token=' + (fcmToken ? fcmToken.substring(0,20) + '...' : 'NULL'));
+    console.log('Push: syncCode=' + syncCode + ', currentRef=' + !!currentRef + ', deviceId=' + deviceId);
     if (fcmToken && syncCode && currentRef) {
       await currentRef.child('fcmTokens').child(deviceId).set(fcmToken);
+      console.log('Push: Token saved!');
+    } else {
+      console.warn('Push: Token NOT saved - missing:', !fcmToken ? 'token' : '', !syncCode ? 'syncCode' : '', !currentRef ? 'currentRef' : '');
     }
     // Foreground messages
     messaging.onMessage((payload) => {
@@ -1451,7 +1457,12 @@ async function setupPush() {
         });
       }
     });
-  } catch(e) { console.error('Push setup error:', e); }
+  } catch(e) {
+    console.error('Push setup error:', e);
+    // Show error visually on the button for debugging
+    const btn = document.getElementById('notifBtn');
+    if (btn) { btn.textContent = 'Push Fehler!'; btn.className = 'notif-btn blocked'; }
+  }
 }
 
 function updateNotifBtn() {
