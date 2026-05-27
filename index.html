@@ -194,6 +194,10 @@ input[type="number"] { -moz-appearance:textfield; }
 .reward-name-input { flex:1; max-width:140px; padding:8px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:var(--bg); color:var(--text); font-size:13px; }
 .reward-name-input:focus { outline:none; border-color:var(--accent); }
 .reward-name-input::placeholder { color:var(--text2); opacity:0.5; }
+.notif-btn { padding:6px 16px; border-radius:20px; border:1px solid var(--accent); background:transparent; color:var(--accent); font-size:13px; cursor:pointer; transition:all .2s; }
+.notif-btn:hover { background:var(--accent); color:#000; }
+.notif-btn.active { background:var(--green); border-color:var(--green); color:#000; cursor:default; }
+.notif-btn.blocked { background:transparent; border-color:var(--red); color:var(--red); cursor:default; }
 
 .danger-zone { margin:16px 16px 0; padding:12px; border:1px solid rgba(233,69,96,0.3); border-radius:var(--radius); }
 .danger-zone p { font-size:12px; color:var(--text2); margin-bottom:8px; }
@@ -405,6 +409,10 @@ input[type="number"] { -moz-appearance:textfield; }
     </div>
   </div>
   <div class="lang-card">
+    <div class="lang-label">🔔 <span id="notifLabel">Benachrichtigungen</span></div>
+    <button class="notif-btn" id="notifBtn" onclick="enablePush()">Push aktivieren</button>
+  </div>
+  <div class="lang-card">
     <div class="lang-label">🌐 <span id="langLabel">Sprache</span></div>
     <div class="lang-toggle">
       <button id="langDE" class="active" onclick="setLanguage('de')">DE</button>
@@ -449,6 +457,7 @@ input[type="number"] { -moz-appearance:textfield; }
 <!-- Firebase SDKs - KORREKT geladen (separate script tags, kein inline code) -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js"></script>
 <script>
 // ── i18n TRANSLATIONS ──
 const I18N = {
@@ -531,6 +540,11 @@ const I18N = {
     weekRewardPlaceholder: 'z.B. Massage',
     month2RewardName: 'Monats-Wunsch',
     month2RewardPlaceholder: 'z.B. Ausflug',
+    notifications: 'Benachrichtigungen',
+    notifEnable: 'Push aktivieren',
+    notifActive: 'Push aktiv',
+    notifBlocked: 'Im Browser blockiert',
+    notifUpdate: 'Aufgabe aktualisiert',
   },
   en: {
     days: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
@@ -611,6 +625,11 @@ const I18N = {
     weekRewardPlaceholder: 'e.g. Massage',
     month2RewardName: 'Monthly Wish',
     month2RewardPlaceholder: 'e.g. Day trip',
+    notifications: 'Notifications',
+    notifEnable: 'Enable push',
+    notifActive: 'Push active',
+    notifBlocked: 'Blocked in browser',
+    notifUpdate: 'Task updated',
   }
 };
 
@@ -746,6 +765,11 @@ function applyLanguage() {
   if (rwIn3) rwIn3.placeholder = t('month2RewardPlaceholder');
   updateRewardDisplays();
 
+  // Notifications
+  const notifLabel = document.getElementById('notifLabel');
+  if (notifLabel) notifLabel.textContent = t('notifications');
+  updateNotifBtn();
+
   // Danger zone
   const syncLabel = document.querySelector('.danger-zone p');
   if (syncLabel) syncLabel.innerHTML = t('syncCode') + ' <strong id="currentCodeDisplay">' + (syncCode || '—') + '</strong>';
@@ -808,6 +832,11 @@ let goalWeek = 0;
 let goalMonth2 = 0;
 let rewardWeekName = '';
 let rewardMonth2Name = '';
+
+// ── PUSH NOTIFICATIONS ──
+let deviceId = (() => { try { let id = localStorage.getItem('pflichten_device_id'); if (!id) { id = 'dev_' + Math.random().toString(36).substr(2,9) + Date.now().toString(36); localStorage.setItem('pflichten_device_id', id); } return id; } catch(e) { return 'dev_' + Math.random().toString(36).substr(2,9); } })();
+let fcmToken = null;
+const VAPID_KEY = 'BA9_bL94woheLXHh5OiXcF-c3qUxPYky9De12ws6ryTFYMikvkUL8cOch7RsGx6RL1zkXjxN5KYfPKixcKstm7w';
 
 // ── SYNC CODE ──
 function getSavedCode() { try { return localStorage.getItem('pflichten_sync_code_2'); } catch(e) { return null; } }
@@ -883,6 +912,11 @@ function initSync(code) {
   loadHeaderText(null);
   loadGoals(null);
   render();
+  // Auto-setup push if already granted
+  if ('Notification' in window && Notification.permission === 'granted') {
+    setupPush();
+  }
+  updateNotifBtn();
 }
 
 function normalizeWeekData() {
@@ -908,7 +942,7 @@ function saveData() {
   if (!db || !currentRef) return;
   setSyncStatus('syncing');
   localWriting = true;
-  const saveObj = { tasks, weekData, goals: { week: goalWeek, month2: goalMonth2 }, rewardNames: { week: rewardWeekName, month2: rewardMonth2Name } };
+  const saveObj = { tasks, weekData, goals: { week: goalWeek, month2: goalMonth2 }, rewardNames: { week: rewardWeekName, month2: rewardMonth2Name }, lastActivity: { timestamp: firebase.database.ServerValue.TIMESTAMP, device: deviceId } };
   const ht = document.getElementById('headerTitle');
   const hs = document.getElementById('headerSub');
   if (ht) saveObj.headerTitle = ht.textContent.trim();
@@ -1383,6 +1417,55 @@ function updateRewardDisplays() {
   // Month reward labels
   const rewardLabels = document.querySelectorAll('.reward-label');
   if (rewardLabels[0]) rewardLabels[0].textContent = rewardMonth2Name || t('reward2Label');
+}
+
+// ── PUSH NOTIFICATIONS ──
+async function enablePush() {
+  if (!('Notification' in window) || !firebase.messaging) return;
+  try {
+    const permission = await Notification.requestPermission();
+    if (permission === 'granted') {
+      await setupPush();
+    }
+    updateNotifBtn();
+  } catch(e) { console.error('Push permission error:', e); }
+}
+
+async function setupPush() {
+  try {
+    const messaging = firebase.messaging();
+    const swReg = await navigator.serviceWorker.ready;
+    fcmToken = await messaging.getToken({ vapidKey: VAPID_KEY, serviceWorkerRegistration: swReg });
+    if (fcmToken && syncCode && currentRef) {
+      await currentRef.child('fcmTokens').child(deviceId).set(fcmToken);
+    }
+    // Foreground messages
+    messaging.onMessage((payload) => {
+      if (localWriting) return;
+      if (Notification.permission === 'granted') {
+        new Notification(payload.notification?.title || 'Sub Pflichten', {
+          body: payload.notification?.body || t('notifUpdate'),
+          icon: './icon-192.png'
+        });
+      }
+    });
+  } catch(e) { console.error('Push setup error:', e); }
+}
+
+function updateNotifBtn() {
+  const btn = document.getElementById('notifBtn');
+  if (!btn) return;
+  if (!('Notification' in window)) { btn.style.display = 'none'; return; }
+  if (Notification.permission === 'granted') {
+    btn.textContent = t('notifActive');
+    btn.className = 'notif-btn active';
+  } else if (Notification.permission === 'denied') {
+    btn.textContent = t('notifBlocked');
+    btn.className = 'notif-btn blocked';
+  } else {
+    btn.textContent = t('notifEnable');
+    btn.className = 'notif-btn';
+  }
 }
 
 // ── ACTIONS ──
