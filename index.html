@@ -191,6 +191,9 @@ input[type="number"] { -moz-appearance:textfield; }
 .goal-spin .spin-btns { position:absolute; right:2px; }
 .goal-spin .spin-btn { font-size:9px; padding:1px 3px; }
 .goal-input:focus { outline:none; border-color:var(--accent); }
+.reward-name-input { flex:1; max-width:140px; padding:8px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:var(--bg); color:var(--text); font-size:13px; }
+.reward-name-input:focus { outline:none; border-color:var(--accent); }
+.reward-name-input::placeholder { color:var(--text2); opacity:0.5; }
 
 .danger-zone { margin:16px 16px 0; padding:12px; border:1px solid rgba(233,69,96,0.3); border-radius:var(--radius); }
 .danger-zone p { font-size:12px; color:var(--text2); margin-bottom:8px; }
@@ -401,6 +404,30 @@ input[type="number"] { -moz-appearance:textfield; }
       <div class="goal-spin"><input type="number" class="goal-input" id="goalMonth2Input" value="0" min="0" max="999" onchange="saveGoals()" onfocus="this.dataset.old=this.value;this.value=''" onblur="if(!this.value)this.value=this.dataset.old"><div class="spin-btns"><button class="spin-btn" onclick="spinVal(this,1)" type="button">▲</button><button class="spin-btn" onclick="spinVal(this,-1)" type="button">▼</button></div></div>
     </div>
   </div>
+  <div class="section-title" id="rewardNamesTitle">Belohnungen benennen</div>
+  <div class="goals-card">
+    <div class="goal-row">
+      <div class="goal-info">
+        <span class="goal-icon">🎁</span>
+        <div><div class="goal-label" id="rwNameWeekLabel">Wochenbelohnung</div></div>
+      </div>
+      <input type="text" class="reward-name-input" id="rewardWeekNameInput" placeholder="z.B. Massage" oninput="saveRewardNames()">
+    </div>
+    <div class="goal-row">
+      <div class="goal-info">
+        <span class="goal-icon">🎁</span>
+        <div><div class="goal-label" id="rwNameMonth1Label">Monats-Belohnung</div></div>
+      </div>
+      <input type="text" class="reward-name-input" id="rewardMonth1NameInput" placeholder="z.B. Essen gehen" oninput="saveRewardNames()">
+    </div>
+    <div class="goal-row">
+      <div class="goal-info">
+        <span class="goal-icon">⭐</span>
+        <div><div class="goal-label" id="rwNameMonth2Label">Monats-Wunsch</div></div>
+      </div>
+      <input type="text" class="reward-name-input" id="rewardMonth2NameInput" placeholder="z.B. Ausflug" oninput="saveRewardNames()">
+    </div>
+  </div>
   <div class="lang-card">
     <div class="lang-label">🌐 <span id="langLabel">Sprache</span></div>
     <div class="lang-toggle">
@@ -527,6 +554,13 @@ const I18N = {
     language: 'Sprache',
     fromPoints: 'ab',
     appTitle: 'Sub Pflichten',
+    rewardNames: 'Belohnungen benennen',
+    weekRewardName: 'Wochenbelohnung',
+    weekRewardPlaceholder: 'z.B. Massage',
+    month1RewardName: 'Monats-Belohnung',
+    month1RewardPlaceholder: 'z.B. Essen gehen',
+    month2RewardName: 'Monats-Wunsch',
+    month2RewardPlaceholder: 'z.B. Ausflug',
   },
   en: {
     days: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
@@ -606,6 +640,13 @@ const I18N = {
     language: 'Language',
     fromPoints: 'from',
     appTitle: 'Sub Duties',
+    rewardNames: 'Name Rewards',
+    weekRewardName: 'Weekly Reward',
+    weekRewardPlaceholder: 'e.g. Massage',
+    month1RewardName: 'Monthly Reward',
+    month1RewardPlaceholder: 'e.g. Dinner out',
+    month2RewardName: 'Monthly Wish',
+    month2RewardPlaceholder: 'e.g. Day trip',
   }
 };
 
@@ -658,9 +699,9 @@ function applyLanguage() {
   document.querySelectorAll('.score-item.score-neg .lbl').forEach(el => el.textContent = t('deduction'));
   document.querySelectorAll('.score-item.score-total .lbl').forEach(el => el.textContent = t('total'));
 
-  // Week reward
+  // Week reward (custom name or default)
   const wrTitle = document.querySelector('.week-reward-title span:first-child');
-  if (wrTitle) wrTitle.textContent = t('weekReward');
+  if (wrTitle) wrTitle.textContent = rewardWeekName ? '🎁 ' + rewardWeekName : t('weekReward');
 
   // Remarks
   const remLabel = document.querySelector('.remarks-area label');
@@ -683,8 +724,8 @@ function applyLanguage() {
   const rewardTitle = document.querySelector('.reward-title');
   if (rewardTitle) rewardTitle.textContent = t('rewards');
   const rewardLabels = document.querySelectorAll('.reward-label');
-  if (rewardLabels[0]) rewardLabels[0].textContent = t('reward1Label');
-  if (rewardLabels[1]) rewardLabels[1].textContent = t('reward2Label');
+  if (rewardLabels[0]) rewardLabels[0].textContent = rewardMonth1Name || t('reward1Label');
+  if (rewardLabels[1]) rewardLabels[1].textContent = rewardMonth2Name || t('reward2Label');
   const refreshBtn = document.querySelector('#page-month button[onclick="forceRefreshMonth()"]');
   if (refreshBtn) refreshBtn.textContent = t('refresh');
 
@@ -694,6 +735,7 @@ function applyLanguage() {
     if (s.textContent.match(/Wochen im Detail|Weeks in Detail/)) s.textContent = t('weeksDetail');
     if (s.textContent.match(/Aufgaben-Auswertung|Task Breakdown/)) s.textContent = t('taskBreakdown');
     if (s.textContent.match(/Zielpunkte|Target Points/)) s.textContent = t('goalTitle');
+    if (s.textContent.match(/Belohnungen benennen|Name Rewards/)) s.textContent = t('rewardNames');
   });
 
   // Month send buttons
@@ -729,6 +771,23 @@ function applyLanguage() {
   if (goalSubs[1]) goalSubs[1].textContent = t('goalMonth1Sub');
   if (goalLabels[2]) goalLabels[2].textContent = t('goalMonth2');
   if (goalSubs[2]) goalSubs[2].textContent = t('goalMonth2Sub');
+
+  // Reward names section
+  const rnTitle = document.getElementById('rewardNamesTitle');
+  if (rnTitle) rnTitle.textContent = t('rewardNames');
+  const rwLbl1 = document.getElementById('rwNameWeekLabel');
+  const rwLbl2 = document.getElementById('rwNameMonth1Label');
+  const rwLbl3 = document.getElementById('rwNameMonth2Label');
+  if (rwLbl1) rwLbl1.textContent = t('weekRewardName');
+  if (rwLbl2) rwLbl2.textContent = t('month1RewardName');
+  if (rwLbl3) rwLbl3.textContent = t('month2RewardName');
+  const rwIn1 = document.getElementById('rewardWeekNameInput');
+  const rwIn2 = document.getElementById('rewardMonth1NameInput');
+  const rwIn3 = document.getElementById('rewardMonth2NameInput');
+  if (rwIn1) rwIn1.placeholder = t('weekRewardPlaceholder');
+  if (rwIn2) rwIn2.placeholder = t('month1RewardPlaceholder');
+  if (rwIn3) rwIn3.placeholder = t('month2RewardPlaceholder');
+  updateRewardDisplays();
 
   // Danger zone
   const syncLabel = document.querySelector('.danger-zone p');
@@ -791,6 +850,9 @@ let localWriting = false;
 let goalWeek = 0;
 let goalMonth1 = 0;
 let goalMonth2 = 0;
+let rewardWeekName = '';
+let rewardMonth1Name = '';
+let rewardMonth2Name = '';
 
 // ── SYNC CODE ──
 function getSavedCode() { try { return localStorage.getItem('pflichten_sync_code_2'); } catch(e) { return null; } }
@@ -891,7 +953,7 @@ function saveData() {
   if (!db || !currentRef) return;
   setSyncStatus('syncing');
   localWriting = true;
-  const saveObj = { tasks, weekData, goals: { week: goalWeek, month1: goalMonth1, month2: goalMonth2 } };
+  const saveObj = { tasks, weekData, goals: { week: goalWeek, month1: goalMonth1, month2: goalMonth2 }, rewardNames: { week: rewardWeekName, month1: rewardMonth1Name, month2: rewardMonth2Name } };
   const ht = document.getElementById('headerTitle');
   const hs = document.getElementById('headerSub');
   if (ht) saveObj.headerTitle = ht.textContent.trim();
@@ -1110,6 +1172,9 @@ function updateScores() {
   if (barEl) barEl.style.width = pct + '%';
   if (lblEl) lblEl.textContent = clamped + ' / ' + goalWeek + ' ' + t('points');
   if (chkEl) chkEl.textContent = clamped >= goalWeek ? '✅' : '';
+  // Update week reward title with custom name
+  const wrT = document.querySelector('.week-reward-title span:first-child');
+  if (wrT) wrT.textContent = rewardWeekName ? '🎁 ' + rewardWeekName : t('weekReward');
 }
 
 // ── RENDER MONTH ──
@@ -1341,6 +1406,38 @@ function loadGoals(data) {
   if (el1 && !el1.matches(':focus')) el1.value = goalWeek;
   if (el2 && !el2.matches(':focus')) el2.value = goalMonth1;
   if (el3 && !el3.matches(':focus')) el3.value = goalMonth2;
+  loadRewardNames(data);
+}
+
+function saveRewardNames() {
+  rewardWeekName = document.getElementById('rewardWeekNameInput').value.trim();
+  rewardMonth1Name = document.getElementById('rewardMonth1NameInput').value.trim();
+  rewardMonth2Name = document.getElementById('rewardMonth2NameInput').value.trim();
+  updateRewardDisplays();
+  if (currentRef) {
+    currentRef.child('rewardNames').set({ week: rewardWeekName, month1: rewardMonth1Name, month2: rewardMonth2Name });
+  }
+  try { localStorage.setItem('pflichten_rewardNames', JSON.stringify({ week: rewardWeekName, month1: rewardMonth1Name, month2: rewardMonth2Name })); } catch(e) {}
+}
+function loadRewardNames(data) {
+  const r = (data && data.rewardNames) || (() => { try { return JSON.parse(localStorage.getItem('pflichten_rewardNames')); } catch(e) { return null; } })();
+  if (r) { rewardWeekName = r.week || ''; rewardMonth1Name = r.month1 || ''; rewardMonth2Name = r.month2 || ''; }
+  const el1 = document.getElementById('rewardWeekNameInput');
+  const el2 = document.getElementById('rewardMonth1NameInput');
+  const el3 = document.getElementById('rewardMonth2NameInput');
+  if (el1 && !el1.matches(':focus')) el1.value = rewardWeekName;
+  if (el2 && !el2.matches(':focus')) el2.value = rewardMonth1Name;
+  if (el3 && !el3.matches(':focus')) el3.value = rewardMonth2Name;
+  updateRewardDisplays();
+}
+function updateRewardDisplays() {
+  // Week reward title
+  const wrTitle = document.querySelector('.week-reward-title span:first-child');
+  if (wrTitle) wrTitle.textContent = rewardWeekName ? '🎁 ' + rewardWeekName : t('weekReward');
+  // Month reward labels
+  const rewardLabels = document.querySelectorAll('.reward-label');
+  if (rewardLabels[0]) rewardLabels[0].textContent = rewardMonth1Name || t('reward1Label');
+  if (rewardLabels[1]) rewardLabels[1].textContent = rewardMonth2Name || t('reward2Label');
 }
 
 // ── ACTIONS ──
@@ -1389,6 +1486,11 @@ function buildSummary() {
     lines.push('');
   }
   lines.push('📊 *' + t('result') + ': +' + totalPos + ' / -' + totalNeg + ' = ' + (totalPos-totalNeg) + ' ' + t('points') + '*');
+  const weekNet = totalPos - totalNeg;
+  if (goalWeek > 0) {
+    const rwName = rewardWeekName || t('weekReward').replace('🎁 ','');
+    lines.push(weekNet >= goalWeek ? '✅ ' + rwName + '!' : '📈 ' + weekNet + '/' + goalWeek + ' ' + t('forReward'));
+  }
   if (wd.remarks) lines.push('\n📝 ' + wd.remarks);
   return lines.join('\n');
 }
@@ -1405,8 +1507,8 @@ function buildMonthSummary() {
   const pts = Math.max(0, data.total);
   lines.push('📊 ' + t('totalPoints') + ': *' + data.total + '*  (+' + data.pos + ' / -' + data.neg + ')');
   lines.push('');
-  if (pts >= goalMonth2) lines.push(t('wishEarned'));
-  else if (pts >= goalMonth1) lines.push(t('rewardEarned'));
+  if (pts >= goalMonth2) lines.push('⭐ ' + (rewardMonth2Name || t('reward2Label')) + '!');
+  else if (pts >= goalMonth1) lines.push('🎁 ' + (rewardMonth1Name || t('reward1Label')) + '!');
   else lines.push('📈 ' + pts + '/' + goalMonth1 + ' ' + t('forReward'));
   lines.push('', '*' + t('weeksLabel') + ':*');
   for (const w of data.weekScores) lines.push((w.total >= 0 ? '📈' : '📉') + ' ' + fmt(w.start) + '–' + fmt(w.end) + ': ' + (w.total > 0 ? '+' : '') + w.total);
