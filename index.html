@@ -597,6 +597,7 @@ function setLanguage(lang) {
   try { localStorage.setItem('pflichten_lang', lang); } catch(e) {}
   applyLanguage();
   render();
+  setConnStatus(navigator.onLine && !!currentRef);
   if (document.getElementById('page-month').classList.contains('active')) renderMonth();
   if (document.getElementById('page-history').classList.contains('active')) renderHistory();
 }
