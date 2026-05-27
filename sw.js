@@ -14,15 +14,10 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
+// FCM auto-displays notification from the notification field,
+// so we don't call showNotification() here to avoid duplicates
 messaging.onBackgroundMessage((payload) => {
-  const title = payload.notification?.title || 'Sub Pflichten';
-  const options = {
-    body: payload.notification?.body || 'Es gibt Änderungen!',
-    icon: './icon-192.png',
-    badge: './icon-192.png',
-    data: payload.data || {}
-  };
-  self.registration.showNotification(title, options);
+  console.log('Push: background message received');
 });
 
 // ── Notification Click → open app ──
@@ -41,7 +36,7 @@ self.addEventListener('notificationclick', e => {
 });
 
 // ── Cache (PWA offline) ──
-const CACHE_NAME = 'pflichten-v20';
+const CACHE_NAME = 'pflichten-v21';
 const ASSETS = [
   './',
   './index.html',
