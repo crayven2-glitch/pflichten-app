@@ -210,6 +210,7 @@ input[type="number"] { -moz-appearance:textfield; }
 .setup-lang-toggle { position:absolute; top:16px; right:16px; display:flex; background:var(--surface); border-radius:8px; overflow:hidden; }
 .setup-lang-toggle button { padding:6px 14px; border:none; font-size:13px; font-weight:600; cursor:pointer; background:none; color:var(--text2); transition:all .2s; }
 .setup-lang-toggle button.active { background:var(--accent); color:#fff; }
+.setup-app-title { font-size:28px; font-weight:800; letter-spacing:1px; margin-bottom:8px; }
 
 .lang-card { margin:12px 16px; background:var(--surface); border-radius:var(--radius); padding:14px; display:flex; align-items:center; justify-content:space-between; }
 .lang-label { font-size:14px; font-weight:500; display:flex; align-items:center; gap:8px; }
@@ -232,7 +233,8 @@ input[type="number"] { -moz-appearance:textfield; }
     <button id="setupLangDE" class="active" onclick="setLanguage('de')">DE</button>
     <button id="setupLangEN" onclick="setLanguage('en')">EN</button>
   </div>
-  <div class="setup-logo">⛓️</div>
+  <div class="setup-app-title" id="setupAppTitle">Sub Pflichten</div>
+  <div class="setup-logo"><img src="icon-192.png" alt="Sub Pflichten" style="width:72px;height:72px;border-radius:16px;"></div>
   <h2>Verbindung einrichten</h2>
   <p>Gib einen gemeinsamen Code ein, damit beide Handys dieselben Daten sehen.</p>
   <div class="setup-error" id="setupError"></div>
@@ -524,6 +526,7 @@ const I18N = {
     taskPlaceholder: 'Aufgabe',
     language: 'Sprache',
     fromPoints: 'ab',
+    appTitle: 'Sub Pflichten',
   },
   en: {
     days: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
@@ -602,6 +605,7 @@ const I18N = {
     taskPlaceholder: 'Task',
     language: 'Language',
     fromPoints: 'from',
+    appTitle: 'Sub Duties',
   }
 };
 
@@ -630,6 +634,10 @@ function applyLanguage() {
   const subEl = document.getElementById('headerSub');
   if (titleEl && defaultTitles.includes(titleEl.textContent.trim())) titleEl.textContent = t('defaultTitle');
   if (subEl && defaultSubs.includes(subEl.textContent.trim())) subEl.textContent = t('defaultSub');
+
+  // Setup app title
+  const setupAppTitle = document.getElementById('setupAppTitle');
+  if (setupAppTitle) setupAppTitle.textContent = t('appTitle');
 
   // Setup screen
   const setupH2 = document.querySelector('#setupScreen h2');
