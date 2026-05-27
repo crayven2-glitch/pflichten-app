@@ -207,6 +207,10 @@ input[type="number"] { -moz-appearance:textfield; }
 .month-history-bar-fill { height:100%; border-radius:3px; transition:width .5s; }
 .month-history-sub { display:flex; justify-content:space-between; font-size:11px; color:var(--text2); margin-top:6px; }
 
+.setup-lang-toggle { position:absolute; top:16px; right:16px; display:flex; background:var(--surface); border-radius:8px; overflow:hidden; }
+.setup-lang-toggle button { padding:6px 14px; border:none; font-size:13px; font-weight:600; cursor:pointer; background:none; color:var(--text2); transition:all .2s; }
+.setup-lang-toggle button.active { background:var(--accent); color:#fff; }
+
 .lang-card { margin:12px 16px; background:var(--surface); border-radius:var(--radius); padding:14px; display:flex; align-items:center; justify-content:space-between; }
 .lang-label { font-size:14px; font-weight:500; display:flex; align-items:center; gap:8px; }
 .lang-toggle { display:flex; background:var(--bg); border-radius:8px; overflow:hidden; }
@@ -224,6 +228,10 @@ input[type="number"] { -moz-appearance:textfield; }
 
 <!-- SETUP -->
 <div class="setup-screen" id="setupScreen">
+  <div class="setup-lang-toggle">
+    <button id="setupLangDE" class="active" onclick="setLanguage('de')">DE</button>
+    <button id="setupLangEN" onclick="setLanguage('en')">EN</button>
+  </div>
   <div class="setup-logo">⛓️</div>
   <h2>Verbindung einrichten</h2>
   <p>Gib einen gemeinsamen Code ein, damit beide Handys dieselben Daten sehen.</p>
@@ -735,11 +743,15 @@ function applyLanguage() {
     if (id === 'nav-settings') { btn.textContent = ''; btn.appendChild(svg); btn.append('\n    ' + t('navSettings') + '\n  '); }
   });
 
-  // Language selector
+  // Language selectors (settings + setup)
   const langDE = document.getElementById('langDE');
   const langEN = document.getElementById('langEN');
   if (langDE) langDE.classList.toggle('active', currentLang === 'de');
   if (langEN) langEN.classList.toggle('active', currentLang === 'en');
+  const sDE = document.getElementById('setupLangDE');
+  const sEN = document.getElementById('setupLangEN');
+  if (sDE) sDE.classList.toggle('active', currentLang === 'de');
+  if (sEN) sEN.classList.toggle('active', currentLang === 'en');
   const langLabel = document.getElementById('langLabel');
   if (langLabel) langLabel.textContent = t('language');
 
