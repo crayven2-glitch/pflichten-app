@@ -1,6 +1,6 @@
 {
-  "name": "Pflichten des Sklaven",
-  "short_name": "Pflichten",
+  "name": "Sub Pflichten",
+  "short_name": "Sub Pflichten",
   "description": "Aufgaben-Tracker mit Punktesystem",
   "start_url": "./",
   "display": "standalone",

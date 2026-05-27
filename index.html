@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#1a1a2e">
-<title>Pflichten des Sklaven</title>
+<title>Sub Pflichten</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -194,6 +194,12 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif
 .month-history-bar { height:6px; border-radius:3px; background:rgba(255,255,255,0.08); margin-top:10px; overflow:hidden; }
 .month-history-bar-fill { height:100%; border-radius:3px; transition:width .5s; }
 .month-history-sub { display:flex; justify-content:space-between; font-size:11px; color:var(--text2); margin-top:6px; }
+
+.lang-card { margin:12px 16px; background:var(--surface); border-radius:var(--radius); padding:14px; display:flex; align-items:center; justify-content:space-between; }
+.lang-label { font-size:14px; font-weight:500; display:flex; align-items:center; gap:8px; }
+.lang-toggle { display:flex; background:var(--bg); border-radius:8px; overflow:hidden; }
+.lang-toggle button { padding:8px 16px; border:none; font-size:13px; font-weight:600; cursor:pointer; background:none; color:var(--text2); transition:all .2s; }
+.lang-toggle button.active { background:var(--accent); color:#fff; }
 </style>
 </head>
 <body>
@@ -373,6 +379,13 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif
       <input type="number" class="goal-input" id="goalMonth2Input" value="50" min="1" max="999" onchange="saveGoals()">
     </div>
   </div>
+  <div class="lang-card">
+    <div class="lang-label">🌐 <span id="langLabel">Sprache</span></div>
+    <div class="lang-toggle">
+      <button id="langDE" class="active" onclick="setLanguage('de')">DE</button>
+      <button id="langEN" onclick="setLanguage('en')">EN</button>
+    </div>
+  </div>
   <div class="danger-zone">
     <p>Sync-Code: <strong id="currentCodeDisplay">—</strong></p>
     <button class="btn-logout" onclick="logout()">Anderen Code verwenden</button>
@@ -412,8 +425,306 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script>
-const DAY_NAMES = ['Mo','Di','Mi','Do','Fr','Sa','So'];
-const MONTH_NAMES = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+// ── i18n TRANSLATIONS ──
+const I18N = {
+  de: {
+    days: ['Mo','Di','Mi','Do','Fr','Sa','So'],
+    months: ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'],
+    setupTitle: 'Verbindung einrichten',
+    setupDesc: 'Gib einen gemeinsamen Code ein, damit beide Handys dieselben Daten sehen.',
+    setupConnect: 'Verbinden',
+    setupOr: 'oder',
+    setupGenerate: 'Neuen Code generieren',
+    setupMinChars: 'Mindestens 4 Zeichen eingeben.',
+    setupPlaceholder: 'Code',
+    defaultTitle: 'Meine Aufgaben',
+    defaultSub: 'Tippen zum Bearbeiten',
+    earned: 'Verdient',
+    deduction: 'Abzug',
+    total: 'Gesamt',
+    weekReward: '🎁 Wochenbelohnung',
+    points: 'Punkte',
+    remarks: 'Bemerkungen',
+    remarksPlaceholder: 'Optionale Bemerkungen zur Woche...',
+    monthOverview: 'Monatsübersicht',
+    monthSub: 'Zusammenfassung & Auswertung',
+    refresh: '🔄 Aktualisieren',
+    monthTotalLabel: 'Gesamtpunkte im Monat',
+    weeks: 'Wochen',
+    rewards: 'Belohnungen',
+    reward1Label: 'Eine Belohnung',
+    reward2Label: 'Ein Wunsch',
+    weeksDetail: 'Wochen im Detail',
+    taskBreakdown: 'Aufgaben-Auswertung',
+    monthWhatsApp: 'Monat per WhatsApp',
+    monthEmail: 'Monat per E-Mail',
+    history: 'Verlauf',
+    historySub: 'Vergangene Wochen & Monate',
+    histWeeks: '📅 Wochen',
+    histMonths: '📆 Monate',
+    settingsTitle: 'Aufgaben verwalten',
+    settingsSub: 'Hinzufügen, bearbeiten, löschen',
+    addTask: '+ Neue Aufgabe hinzufügen',
+    save: 'Speichern',
+    saved: 'Gespeichert ✓',
+    goalTitle: 'Zielpunkte',
+    goalWeek: 'Wochenziel',
+    goalWeekSub: 'Belohnung pro Woche',
+    goalMonth1: 'Monats-Belohnung',
+    goalMonth1Sub: 'Erste Stufe im Monat',
+    goalMonth2: 'Monats-Wunsch',
+    goalMonth2Sub: 'Zweite Stufe im Monat',
+    syncCode: 'Sync-Code:',
+    logout: 'Anderen Code verwenden',
+    logoutConfirm: 'Sync-Verbindung trennen?',
+    close: 'Schließen',
+    navWeek: 'Woche',
+    navMonth: 'Monat',
+    navHistory: 'Verlauf',
+    navSettings: 'Aufgaben',
+    syncActive: 'Sync aktiv',
+    offline: 'Offline',
+    noTasks: 'Keine Aufgaben definiert',
+    noHistory: 'Noch keine Verlaufsdaten',
+    noMonthHistory: 'Noch keine Monatsdaten',
+    weekReport: 'Wochenbericht',
+    result: 'Ergebnis',
+    monthReport: 'Monatsbericht',
+    totalPoints: 'Gesamtpunkte',
+    wishEarned: '⭐ Ein Wunsch verdient!',
+    rewardEarned: '🎁 Eine Belohnung verdient!',
+    forReward: 'für Belohnung',
+    tasksLabel: 'Aufgaben',
+    weeksLabel: 'Wochen',
+    plusPoints: '+ Punkte',
+    minusPoints: '- Punkte',
+    deleteBtn: 'Löschen',
+    newTask: 'Neue Aufgabe',
+    deleteConfirm: 'Aufgabe wirklich löschen?',
+    taskPlaceholder: 'Aufgabe',
+    language: 'Sprache',
+    fromPoints: 'ab',
+  },
+  en: {
+    days: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+    months: ['January','February','March','April','May','June','July','August','September','October','November','December'],
+    setupTitle: 'Set up connection',
+    setupDesc: 'Enter a shared code so both phones see the same data.',
+    setupConnect: 'Connect',
+    setupOr: 'or',
+    setupGenerate: 'Generate new code',
+    setupMinChars: 'Enter at least 4 characters.',
+    setupPlaceholder: 'Code',
+    defaultTitle: 'My Duties',
+    defaultSub: 'Tap to edit',
+    earned: 'Earned',
+    deduction: 'Deduction',
+    total: 'Total',
+    weekReward: '🎁 Weekly Reward',
+    points: 'Points',
+    remarks: 'Remarks',
+    remarksPlaceholder: 'Optional remarks for the week...',
+    monthOverview: 'Monthly Overview',
+    monthSub: 'Summary & Evaluation',
+    refresh: '🔄 Refresh',
+    monthTotalLabel: 'Total Points this Month',
+    weeks: 'Weeks',
+    rewards: 'Rewards',
+    reward1Label: 'A Reward',
+    reward2Label: 'A Wish',
+    weeksDetail: 'Weeks in Detail',
+    taskBreakdown: 'Task Breakdown',
+    monthWhatsApp: 'Month via WhatsApp',
+    monthEmail: 'Month via E-Mail',
+    history: 'History',
+    historySub: 'Past Weeks & Months',
+    histWeeks: '📅 Weeks',
+    histMonths: '📆 Months',
+    settingsTitle: 'Manage Tasks',
+    settingsSub: 'Add, edit, delete',
+    addTask: '+ Add new task',
+    save: 'Save',
+    saved: 'Saved ✓',
+    goalTitle: 'Target Points',
+    goalWeek: 'Weekly Target',
+    goalWeekSub: 'Reward per week',
+    goalMonth1: 'Monthly Reward',
+    goalMonth1Sub: 'First tier per month',
+    goalMonth2: 'Monthly Wish',
+    goalMonth2Sub: 'Second tier per month',
+    syncCode: 'Sync Code:',
+    logout: 'Use different code',
+    logoutConfirm: 'Disconnect sync?',
+    close: 'Close',
+    navWeek: 'Week',
+    navMonth: 'Month',
+    navHistory: 'History',
+    navSettings: 'Tasks',
+    syncActive: 'Sync active',
+    offline: 'Offline',
+    noTasks: 'No tasks defined',
+    noHistory: 'No history data yet',
+    noMonthHistory: 'No monthly data yet',
+    weekReport: 'Weekly Report',
+    result: 'Result',
+    monthReport: 'Monthly Report',
+    totalPoints: 'Total Points',
+    wishEarned: '⭐ A Wish earned!',
+    rewardEarned: '🎁 A Reward earned!',
+    forReward: 'for reward',
+    tasksLabel: 'Tasks',
+    weeksLabel: 'Weeks',
+    plusPoints: '+ Points',
+    minusPoints: '- Points',
+    deleteBtn: 'Delete',
+    newTask: 'New Task',
+    deleteConfirm: 'Really delete task?',
+    taskPlaceholder: 'Task',
+    language: 'Language',
+    fromPoints: 'from',
+  }
+};
+
+let currentLang = localStorage.getItem('pflichten_lang') || 'de';
+function t(key) { return (I18N[currentLang] && I18N[currentLang][key]) || I18N.de[key] || key; }
+let DAY_NAMES = I18N[currentLang].days;
+let MONTH_NAMES = I18N[currentLang].months;
+
+function setLanguage(lang) {
+  currentLang = lang;
+  DAY_NAMES = I18N[lang].days;
+  MONTH_NAMES = I18N[lang].months;
+  try { localStorage.setItem('pflichten_lang', lang); } catch(e) {}
+  applyLanguage();
+  render();
+  if (document.getElementById('page-month').classList.contains('active')) renderMonth();
+  if (document.getElementById('page-history').classList.contains('active')) renderHistory();
+}
+
+function applyLanguage() {
+  // Setup screen
+  const setupH2 = document.querySelector('#setupScreen h2');
+  const setupP = document.querySelector('#setupScreen p');
+  if (setupH2) setupH2.textContent = t('setupTitle');
+  if (setupP) setupP.textContent = t('setupDesc');
+  const setupBtn = document.querySelector('.setup-btn');
+  const setupSec = document.querySelector('.setup-btn-sec');
+  const setupDiv = document.querySelector('.setup-divider');
+  if (setupBtn) setupBtn.textContent = t('setupConnect');
+  if (setupSec) setupSec.textContent = t('setupGenerate');
+  if (setupDiv) setupDiv.textContent = t('setupOr');
+  const setupInput = document.getElementById('setupCodeInput');
+  if (setupInput) setupInput.placeholder = t('setupPlaceholder');
+
+  // Score labels
+  document.querySelectorAll('.score-item.score-pos .lbl').forEach(el => el.textContent = t('earned'));
+  document.querySelectorAll('.score-item.score-neg .lbl').forEach(el => el.textContent = t('deduction'));
+  document.querySelectorAll('.score-item.score-total .lbl').forEach(el => el.textContent = t('total'));
+
+  // Week reward
+  const wrTitle = document.querySelector('.week-reward-title span:first-child');
+  if (wrTitle) wrTitle.textContent = t('weekReward');
+
+  // Remarks
+  const remLabel = document.querySelector('.remarks-area label');
+  const remText = document.getElementById('remarks');
+  if (remLabel) remLabel.textContent = t('remarks');
+  if (remText) remText.placeholder = t('remarksPlaceholder');
+
+  // Month page
+  const monthH1 = document.querySelector('#page-month .header h1');
+  const monthSub = document.querySelector('#page-month .header .sub');
+  if (monthH1) monthH1.textContent = t('monthOverview');
+  if (monthSub) monthSub.innerHTML = t('monthSub');
+  const monthTotalLbl = document.querySelector('.month-total-label');
+  if (monthTotalLbl) monthTotalLbl.textContent = t('monthTotalLabel');
+  document.querySelectorAll('.month-stat .stat-lbl').forEach((el, i) => {
+    if (i === 0) el.textContent = t('earned');
+    if (i === 1) el.textContent = t('deduction');
+    if (i === 2) el.textContent = t('weeks');
+  });
+  const rewardTitle = document.querySelector('.reward-title');
+  if (rewardTitle) rewardTitle.textContent = t('rewards');
+  const rewardLabels = document.querySelectorAll('.reward-label');
+  if (rewardLabels[0]) rewardLabels[0].textContent = t('reward1Label');
+  if (rewardLabels[1]) rewardLabels[1].textContent = t('reward2Label');
+  const refreshBtn = document.querySelector('#page-month button[onclick="forceRefreshMonth()"]');
+  if (refreshBtn) refreshBtn.textContent = t('refresh');
+
+  // Section titles
+  const sections = document.querySelectorAll('.section-title');
+  sections.forEach(s => {
+    if (s.textContent.match(/Wochen im Detail|Weeks in Detail/)) s.textContent = t('weeksDetail');
+    if (s.textContent.match(/Aufgaben-Auswertung|Task Breakdown/)) s.textContent = t('taskBreakdown');
+    if (s.textContent.match(/Zielpunkte|Target Points/)) s.textContent = t('goalTitle');
+  });
+
+  // Month send buttons
+  const monthWA = document.querySelector('#page-month .btn-whatsapp');
+  const monthEM = document.querySelector('#page-month .btn-email');
+  if (monthWA) { const svg = monthWA.querySelector('svg'); monthWA.textContent = ''; if(svg) monthWA.appendChild(svg); monthWA.append(' ' + t('monthWhatsApp')); }
+  if (monthEM) { const svg = monthEM.querySelector('svg'); monthEM.textContent = ''; if(svg) monthEM.appendChild(svg); monthEM.append(' ' + t('monthEmail')); }
+
+  // History page
+  const histH1 = document.querySelector('#page-history .header h1');
+  const histSub = document.querySelector('#page-history .header .sub');
+  if (histH1) histH1.textContent = t('history');
+  if (histSub) histSub.innerHTML = t('historySub');
+  document.getElementById('histToggleWeek').textContent = t('histWeeks');
+  document.getElementById('histToggleMonth').textContent = t('histMonths');
+
+  // Settings page
+  const setH1 = document.querySelector('#page-settings .header h1');
+  const setSub = document.querySelector('#page-settings .header .sub');
+  if (setH1) setH1.textContent = t('settingsTitle');
+  if (setSub) setSub.textContent = t('settingsSub');
+  const addBtn = document.querySelector('.btn-add');
+  if (addBtn) addBtn.textContent = t('addTask');
+  const saveBtn = document.querySelector('.btn-save');
+  if (saveBtn) saveBtn.textContent = t('save');
+
+  // Goals
+  const goalLabels = document.querySelectorAll('.goal-label');
+  const goalSubs = document.querySelectorAll('.goal-sub');
+  if (goalLabels[0]) goalLabels[0].textContent = t('goalWeek');
+  if (goalSubs[0]) goalSubs[0].textContent = t('goalWeekSub');
+  if (goalLabels[1]) goalLabels[1].textContent = t('goalMonth1');
+  if (goalSubs[1]) goalSubs[1].textContent = t('goalMonth1Sub');
+  if (goalLabels[2]) goalLabels[2].textContent = t('goalMonth2');
+  if (goalSubs[2]) goalSubs[2].textContent = t('goalMonth2Sub');
+
+  // Danger zone
+  const syncLabel = document.querySelector('.danger-zone p');
+  if (syncLabel) syncLabel.innerHTML = t('syncCode') + ' <strong id="currentCodeDisplay">' + (syncCode || '—') + '</strong>';
+  const logoutBtn = document.querySelector('.btn-logout');
+  if (logoutBtn) logoutBtn.textContent = t('logout');
+
+  // Modal
+  const modalClose = document.querySelector('.modal-close');
+  if (modalClose) modalClose.textContent = t('close');
+
+  // Nav
+  const navTexts = document.querySelectorAll('.nav-btn');
+  navTexts.forEach(btn => {
+    const id = btn.id;
+    const svg = btn.querySelector('svg');
+    if (id === 'nav-week') { btn.textContent = ''; btn.appendChild(svg); btn.append('\n    ' + t('navWeek') + '\n  '); }
+    if (id === 'nav-month') { btn.textContent = ''; btn.appendChild(svg); btn.append('\n    ' + t('navMonth') + '\n  '); }
+    if (id === 'nav-history') { btn.textContent = ''; btn.appendChild(svg); btn.append('\n    ' + t('navHistory') + '\n  '); }
+    if (id === 'nav-settings') { btn.textContent = ''; btn.appendChild(svg); btn.append('\n    ' + t('navSettings') + '\n  '); }
+  });
+
+  // Language selector
+  const langDE = document.getElementById('langDE');
+  const langEN = document.getElementById('langEN');
+  if (langDE) langDE.classList.toggle('active', currentLang === 'de');
+  if (langEN) langEN.classList.toggle('active', currentLang === 'en');
+  const langLabel = document.getElementById('langLabel');
+  if (langLabel) langLabel.textContent = t('language');
+
+  // Update html lang attribute
+  document.documentElement.lang = currentLang;
+}
 
 const DEFAULT_TASKS = [];
 
@@ -453,13 +764,13 @@ function generateCode() {
 
 function connectWithCode() {
   const raw = document.getElementById('setupCodeInput').value.trim().toUpperCase().replace(/[^A-Z0-9]/g,'');
-  if (raw.length < 4) { document.getElementById('setupError').textContent = 'Mindestens 4 Zeichen eingeben.'; return; }
+  if (raw.length < 4) { document.getElementById('setupError').textContent = t('setupMinChars'); return; }
   document.getElementById('setupError').textContent = '';
   initSync(raw);
 }
 
 function logout() {
-  if (!confirm('Sync-Verbindung trennen?')) return;
+  if (!confirm(t('logoutConfirm'))) return;
   if (currentRef) currentRef.off();
   try { localStorage.removeItem('pflichten_sync_code_2'); } catch(e) {}
   syncCode = null;
@@ -586,7 +897,7 @@ function setSyncStatus(state) {
 }
 function setConnStatus(online) {
   document.getElementById('connDot').className = 'conn-dot ' + (online ? 'online' : 'offline');
-  document.getElementById('connLabel').textContent = online ? 'Sync aktiv' : 'Offline';
+  document.getElementById('connLabel').textContent = online ? t('syncActive') : t('offline');
 }
 window.addEventListener('online', () => setConnStatus(true));
 window.addEventListener('offline', () => setConnStatus(false));
@@ -678,7 +989,7 @@ function calcMonthData(year, month) {
   const weeks = getMonthWeeks(year, month);
   let totalPos = 0, totalNeg = 0, weekScores = [];
   const taskTotals = {};
-  tasks.forEach(t => { taskTotals[t.id] = { pos:0, neg:0 }; });
+  tasks.forEach(tk => { taskTotals[tk.id] = { pos:0, neg:0 }; });
   for (const w of weeks) {
     const wd = weekData[w.key] || { days:{}, remarks:'' };
     const sc = calcWeekScore(wd);
@@ -687,10 +998,10 @@ function calcMonthData(year, month) {
     if (!wd.days) continue;
     for (let di = 0; di < 7; di++) {
       const de = wd.days[di] || wd.days[String(di)] || {};
-      for (const t of tasks) {
-        const sv = de[t.id] !== undefined ? de[t.id] : de[String(t.id)];
-        if (sv === 'done') taskTotals[t.id].pos += t.plus;
-        else if (sv === 'missed') taskTotals[t.id].neg += t.minus;
+      for (const tk of tasks) {
+        const sv = de[tk.id] !== undefined ? de[tk.id] : de[String(tk.id)];
+        if (sv === 'done') taskTotals[tk.id].pos += tk.plus;
+        else if (sv === 'missed') taskTotals[tk.id].neg += tk.minus;
       }
     }
   }
@@ -715,25 +1026,25 @@ function render() {
 
   const list = document.getElementById('taskList');
   if (!tasks.length) {
-    list.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg><p>Keine Aufgaben definiert</p></div>';
+    list.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg><p>' + t('noTasks') + '</p></div>';
     return;
   }
 
   const dayEntries = (wd.days && (wd.days[selectedDay] || wd.days[String(selectedDay)])) || {};
   list.innerHTML = '';
-  tasks.forEach(t => {
-    const status = dayEntries[t.id] || dayEntries[String(t.id)] || '';
+  tasks.forEach(tk => {
+    const status = dayEntries[tk.id] || dayEntries[String(tk.id)] || '';
     const icon = status === 'done' ? '✓' : status === 'missed' ? '✗' : status === 'na' ? 'N/A' : '';
     const div = document.createElement('div');
     div.className = 'task-card';
     div.innerHTML = `
       <div class="task-main">
-        <div class="task-nr">${t.id}</div>
+        <div class="task-nr">${tk.id}</div>
         <div class="task-info">
-          <div class="task-name">${t.name}</div>
-          <div class="task-points">+${t.plus} / -${t.minus}</div>
+          <div class="task-name">${tk.name}</div>
+          <div class="task-points">+${tk.plus} / -${tk.minus}</div>
         </div>
-        <button class="task-status ${status}" onclick="cycleStatus(${t.id})">${icon}</button>
+        <button class="task-status ${status}" onclick="cycleStatus(${tk.id})">${icon}</button>
       </div>`;
     list.appendChild(div);
   });
@@ -756,7 +1067,7 @@ function updateScores() {
   const lblEl = document.getElementById('weekRewardLabel');
   const chkEl = document.getElementById('weekRewardCheck');
   if (barEl) barEl.style.width = pct + '%';
-  if (lblEl) lblEl.textContent = clamped + ' / ' + goalWeek + ' Punkte';
+  if (lblEl) lblEl.textContent = clamped + ' / ' + goalWeek + ' ' + t('points');
   if (chkEl) chkEl.textContent = clamped >= goalWeek ? '✅' : '';
 }
 
@@ -784,8 +1095,8 @@ function renderMonth() {
   // Update dynamic labels
   const sub1 = document.querySelector('#reward1Bar')?.closest('.reward-row')?.querySelector('.reward-sub');
   const sub2 = document.querySelector('#reward2Bar')?.closest('.reward-row')?.querySelector('.reward-sub');
-  if (sub1) sub1.textContent = 'ab ' + goalMonth1 + ' Punkte';
-  if (sub2) sub2.textContent = 'ab ' + goalMonth2 + ' Punkte';
+  if (sub1) sub1.textContent = t('fromPoints') + ' ' + goalMonth1 + ' ' + t('points');
+  if (sub2) sub2.textContent = t('fromPoints') + ' ' + goalMonth2 + ' ' + t('points');
 
   const fmt = d => String(d.getDate()).padStart(2,'0') + '.' + String(d.getMonth()+1).padStart(2,'0') + '.';
   const maxPossible = tasks.reduce((s,t) => s + t.plus, 0) * 7;
@@ -807,17 +1118,17 @@ function renderMonth() {
   }
 
   const breakdown = document.getElementById('monthTaskBreakdown');
-  const maxNet = Math.max(1, ...tasks.map(t => { const td = data.taskTotals[t.id]; return td ? Math.abs(td.pos - td.neg) : 0; }));
+  const maxNet = Math.max(1, ...tasks.map(tk => { const td = data.taskTotals[tk.id]; return td ? Math.abs(td.pos - td.neg) : 0; }));
   breakdown.innerHTML = '';
-  for (const t of tasks) {
-    const td = data.taskTotals[t.id];
+  for (const tk of tasks) {
+    const td = data.taskTotals[tk.id];
     const net = td ? td.pos - td.neg : 0;
     const color = net >= 0 ? 'var(--green)' : 'var(--red)';
     const pct = (Math.abs(net) / maxNet) * 100;
     const row = document.createElement('div');
     row.className = 'month-task-row';
     row.innerHTML = `
-      <div class="month-task-name">${t.name}</div>
+      <div class="month-task-name">${tk.name}</div>
       <div class="month-task-bar-wrap"><div class="month-task-bar"><div class="month-task-bar-fill" style="width:${pct}%;background:${color}"></div></div></div>
       <div class="month-task-score" style="color:${color}">${net > 0 ? '+' : ''}${net}</div>`;
     breakdown.appendChild(row);
@@ -842,7 +1153,7 @@ function renderHistory() {
     return wd && wd.days && Object.values(wd.days).some(d => d && Object.keys(d).length > 0);
   });
   if (!keys.length) {
-    container.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg><p>Noch keine Verlaufsdaten</p></div>';
+    container.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg><p>' + t('noHistory') + '</p></div>';
     return;
   }
   container.innerHTML = '';
@@ -894,7 +1205,7 @@ function renderMonthHistory(container) {
   });
   const months = Object.keys(monthMap).sort().reverse();
   if (!months.length) {
-    container.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg><p>Noch keine Monatsdaten</p></div>';
+    container.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg><p>' + t('noMonthHistory') + '</p></div>';
     return;
   }
   container.innerHTML = '';
@@ -914,9 +1225,9 @@ function renderMonthHistory(container) {
       </div>
       <div class="month-history-bar"><div class="month-history-bar-fill" style="width:${pct}%;background:${color}"></div></div>
       <div class="month-history-sub">
-        <span>✅ +${data.pos} Verdient</span>
-        <span>${data.weekScores.length} Wochen</span>
-        <span>❌ -${data.neg} Abzug</span>
+        <span>✅ +${data.pos} ${t('earned')}</span>
+        <span>${data.weekScores.length} ${t('weeks')}</span>
+        <span>❌ -${data.neg} ${t('deduction')}</span>
       </div>`;
     container.appendChild(card);
   }
@@ -962,10 +1273,10 @@ function saveHeaderText() {
 function loadHeaderText(data) {
   const titleEl = document.getElementById('headerTitle');
   const subEl = document.getElementById('headerSub');
-  const t = (data && data.headerTitle) || localStorage.getItem('pflichten_headerTitle');
-  const s = (data && data.headerSub) || localStorage.getItem('pflichten_headerSub');
-  if (t && titleEl && !titleEl.matches(':focus')) titleEl.textContent = t;
-  if (s && subEl && !subEl.matches(':focus')) subEl.textContent = s;
+  const ht = (data && data.headerTitle) || localStorage.getItem('pflichten_headerTitle');
+  const hs = (data && data.headerSub) || localStorage.getItem('pflichten_headerSub');
+  if (ht && titleEl && !titleEl.matches(':focus')) titleEl.textContent = ht;
+  if (hs && subEl && !subEl.matches(':focus')) subEl.textContent = hs;
 }
 
 // ── GOALS ──
@@ -1020,7 +1331,7 @@ function saveRemarks() {
 function buildSummary() {
   const wd = getWeekData();
   const range = getWeekRange(currentWeekOffset);
-  let lines = ['📋 *Wochenbericht: ' + range + '*', ''];
+  let lines = ['📋 *' + t('weekReport') + ': ' + range + '*', ''];
   let totalPos = 0, totalNeg = 0;
   for (const task of tasks) {
     let taskLine = '*' + task.id + '. ' + task.name + '*\n';
@@ -1036,53 +1347,53 @@ function buildSummary() {
     lines.push(taskLine + dayResults.join('  '));
     lines.push('');
   }
-  lines.push('📊 *Ergebnis: +' + totalPos + ' / -' + totalNeg + ' = ' + (totalPos-totalNeg) + ' Punkte*');
+  lines.push('📊 *' + t('result') + ': +' + totalPos + ' / -' + totalNeg + ' = ' + (totalPos-totalNeg) + ' ' + t('points') + '*');
   if (wd.remarks) lines.push('\n📝 ' + wd.remarks);
   return lines.join('\n');
 }
 
 function sendWhatsApp() { window.open('https://wa.me/?text=' + encodeURIComponent(buildSummary()), '_blank'); }
-function sendEmail() { window.location.href = 'mailto:?subject=' + encodeURIComponent('Wochenbericht: ' + getWeekRange(currentWeekOffset)) + '&body=' + encodeURIComponent(buildSummary()); }
+function sendEmail() { window.location.href = 'mailto:?subject=' + encodeURIComponent(t('weekReport') + ': ' + getWeekRange(currentWeekOffset)) + '&body=' + encodeURIComponent(buildSummary()); }
 
 function buildMonthSummary() {
   const year = currentMonthDate.getFullYear();
   const month = currentMonthDate.getMonth();
   const data = calcMonthData(year, month);
   const fmt = d => String(d.getDate()).padStart(2,'0') + '.' + String(d.getMonth()+1).padStart(2,'0') + '.';
-  let lines = ['📅 *Monatsbericht: ' + MONTH_NAMES[month] + ' ' + year + '*', ''];
+  let lines = ['📅 *' + t('monthReport') + ': ' + MONTH_NAMES[month] + ' ' + year + '*', ''];
   const pts = Math.max(0, data.total);
-  lines.push('📊 Gesamtpunkte: *' + data.total + '*  (+' + data.pos + ' / -' + data.neg + ')');
+  lines.push('📊 ' + t('totalPoints') + ': *' + data.total + '*  (+' + data.pos + ' / -' + data.neg + ')');
   lines.push('');
-  if (pts >= goalMonth2) lines.push('⭐ Ein Wunsch verdient!');
-  else if (pts >= goalMonth1) lines.push('🎁 Eine Belohnung verdient!');
-  else lines.push('📈 ' + pts + '/' + goalMonth1 + ' für Belohnung');
-  lines.push('', '*Wochen:*');
+  if (pts >= goalMonth2) lines.push(t('wishEarned'));
+  else if (pts >= goalMonth1) lines.push(t('rewardEarned'));
+  else lines.push('📈 ' + pts + '/' + goalMonth1 + ' ' + t('forReward'));
+  lines.push('', '*' + t('weeksLabel') + ':*');
   for (const w of data.weekScores) lines.push((w.total >= 0 ? '📈' : '📉') + ' ' + fmt(w.start) + '–' + fmt(w.end) + ': ' + (w.total > 0 ? '+' : '') + w.total);
-  lines.push('', '*Aufgaben:*');
-  for (const t of tasks) {
-    const td = data.taskTotals[t.id];
+  lines.push('', '*' + t('tasksLabel') + ':*');
+  for (const tk of tasks) {
+    const td = data.taskTotals[tk.id];
     const net = td ? td.pos - td.neg : 0;
-    lines.push((net > 0 ? '✅' : net < 0 ? '❌' : '⬜') + ' ' + t.name + ': ' + (net > 0 ? '+' : '') + net);
+    lines.push((net > 0 ? '✅' : net < 0 ? '❌' : '⬜') + ' ' + tk.name + ': ' + (net > 0 ? '+' : '') + net);
   }
   return lines.join('\n');
 }
 
 function sendMonthWhatsApp() { window.open('https://wa.me/?text=' + encodeURIComponent(buildMonthSummary()), '_blank'); }
-function sendMonthEmail() { window.location.href = 'mailto:?subject=' + encodeURIComponent('Monatsbericht: ' + MONTH_NAMES[currentMonthDate.getMonth()] + ' ' + currentMonthDate.getFullYear()) + '&body=' + encodeURIComponent(buildMonthSummary()); }
+function sendMonthEmail() { window.location.href = 'mailto:?subject=' + encodeURIComponent(t('monthReport') + ': ' + MONTH_NAMES[currentMonthDate.getMonth()] + ' ' + currentMonthDate.getFullYear()) + '&body=' + encodeURIComponent(buildMonthSummary()); }
 
 // ── EDIT TASKS ──
 function renderEditList() {
   const container = document.getElementById('editList');
   container.innerHTML = '';
-  tasks.forEach((t, idx) => {
+  tasks.forEach((tk, idx) => {
     const card = document.createElement('div');
     card.className = 'edit-task-card';
     card.innerHTML = `
-      <input type="text" data-idx="${idx}" data-field="name" value="${t.name.replace(/"/g,'&quot;')}" placeholder="Aufgabe">
+      <input type="text" data-idx="${idx}" data-field="name" value="${tk.name.replace(/"/g,'&quot;')}" placeholder="${t('taskPlaceholder')}">
       <div class="edit-row">
-        <div class="edit-field"><label class="edit-label">+ Punkte</label><input type="number" data-idx="${idx}" data-field="plus" value="${t.plus}" placeholder="0" min="0" max="99"></div>
-        <div class="edit-field"><label class="edit-label">- Punkte</label><input type="number" data-idx="${idx}" data-field="minus" value="${t.minus}" placeholder="0" min="0" max="99"></div>
-        <button class="btn-delete" onclick="deleteTask(${idx})">Löschen</button>
+        <div class="edit-field"><label class="edit-label">${t('plusPoints')}</label><input type="number" data-idx="${idx}" data-field="plus" value="${tk.plus}" placeholder="0" min="0" max="99"></div>
+        <div class="edit-field"><label class="edit-label">${t('minusPoints')}</label><input type="number" data-idx="${idx}" data-field="minus" value="${tk.minus}" placeholder="0" min="0" max="99"></div>
+        <button class="btn-delete" onclick="deleteTask(${idx})">${t('deleteBtn')}</button>
       </div>`;
     container.appendChild(card);
   });
@@ -1090,12 +1401,12 @@ function renderEditList() {
 
 function addTask() {
   const maxId = tasks.reduce((m,t) => Math.max(m, t.id), 0);
-  tasks.push({ id: maxId+1, name:'Neue Aufgabe', plus:1, minus:1 });
+  tasks.push({ id: maxId+1, name: t('newTask'), plus:1, minus:1 });
   renderEditList();
 }
 
 function deleteTask(idx) {
-  if (!confirm('Aufgabe wirklich löschen?')) return;
+  if (!confirm(t('deleteConfirm'))) return;
   tasks.splice(idx, 1);
   renderEditList();
 }
@@ -1109,7 +1420,7 @@ function saveTasks() {
   });
   saveData();
   render();
-  alert('Gespeichert ✓');
+  alert(t('saved'));
 }
 
 // ── NAVIGATION ──
@@ -1129,6 +1440,8 @@ function showPage(page) {
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js').catch(e => console.log('SW:', e));
 }
+
+applyLanguage();
 
 const savedCode = getSavedCode();
 if (savedCode) {
