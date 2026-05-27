@@ -102,6 +102,14 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif
 
 .edit-task-card { background:var(--surface); border-radius:var(--radius); padding:14px; margin-bottom:8px; }
 .edit-task-card input { width:100%; padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:var(--bg); color:var(--text); font-size:14px; margin-bottom:8px; color-scheme:dark; }
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button { -webkit-appearance:none; margin:0; }
+input[type="number"] { -moz-appearance:textfield; }
+.spin-wrap { position:relative; display:flex; align-items:center; }
+.spin-wrap input { flex:1; padding-right:28px; }
+.spin-btns { position:absolute; right:4px; display:flex; flex-direction:column; gap:1px; }
+.spin-btn { background:none; border:none; color:var(--text); cursor:pointer; font-size:10px; line-height:1; padding:2px 4px; opacity:0.7; }
+.spin-btn:hover { opacity:1; }
 .edit-row { display:flex; gap:8px; align-items:flex-end; }
 .edit-row input { flex:1; }
 .edit-field { flex:1; }
@@ -177,7 +185,11 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif
 .goal-icon { font-size:22px; }
 .goal-label { font-size:14px; font-weight:500; }
 .goal-sub { font-size:11px; color:var(--text2); margin-top:1px; }
-.goal-input { width:70px; padding:8px 6px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:var(--bg); color:var(--yellow); font-size:18px; font-weight:700; text-align:center; color-scheme:dark; }
+.goal-input { width:70px; padding:8px 6px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:var(--bg); color:var(--yellow); font-size:18px; font-weight:700; text-align:center; }
+.goal-spin { display:flex; align-items:center; gap:0; position:relative; }
+.goal-spin .goal-input { padding-right:22px; }
+.goal-spin .spin-btns { position:absolute; right:2px; }
+.goal-spin .spin-btn { font-size:9px; padding:1px 3px; }
 .goal-input:focus { outline:none; border-color:var(--accent); }
 
 .danger-zone { margin:16px 16px 0; padding:12px; border:1px solid rgba(233,69,96,0.3); border-radius:var(--radius); }
@@ -247,7 +259,7 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif
     <div class="week-reward-bar-wrap">
       <div class="week-reward-bar-fill" id="weekRewardBar" style="width:0%"></div>
     </div>
-    <div class="week-reward-label" id="weekRewardLabel">0 / 25 Punkte</div>
+    <div class="week-reward-label" id="weekRewardLabel">0 / 0 Punkte</div>
   </div>
   <div class="day-tabs" id="dayTabs"></div>
   <div class="task-list" id="taskList"></div>
@@ -296,9 +308,9 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif
       <div class="reward-icon">🎁</div>
       <div class="reward-info">
         <div class="reward-label">Eine Belohnung</div>
-        <div class="reward-sub">ab 25 Punkte</div>
+        <div class="reward-sub">ab 0 Punkte</div>
         <div class="reward-progress"><div class="reward-progress-fill" id="reward1Bar" style="width:0%"></div></div>
-        <div class="reward-progress-label" id="reward1Label">0 / 25</div>
+        <div class="reward-progress-label" id="reward1Label">0 / 0</div>
       </div>
       <div class="reward-check" id="reward1Check"></div>
     </div>
@@ -306,9 +318,9 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif
       <div class="reward-icon">⭐</div>
       <div class="reward-info">
         <div class="reward-label">Ein Wunsch</div>
-        <div class="reward-sub">ab 50 Punkte</div>
+        <div class="reward-sub">ab 0 Punkte</div>
         <div class="reward-progress"><div class="reward-progress-fill" id="reward2Bar" style="width:0%"></div></div>
-        <div class="reward-progress-label" id="reward2Label">0 / 50</div>
+        <div class="reward-progress-label" id="reward2Label">0 / 0</div>
       </div>
       <div class="reward-check" id="reward2Check"></div>
     </div>
@@ -362,21 +374,21 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif
         <span class="goal-icon">🎯</span>
         <div><div class="goal-label">Wochenziel</div><div class="goal-sub">Belohnung pro Woche</div></div>
       </div>
-      <input type="number" class="goal-input" id="goalWeekInput" value="0" min="0" max="999" onchange="saveGoals()" onfocus="this.dataset.old=this.value;this.value=''" onblur="if(!this.value)this.value=this.dataset.old">
+      <div class="goal-spin"><input type="number" class="goal-input" id="goalWeekInput" value="0" min="0" max="999" onchange="saveGoals()" onfocus="this.dataset.old=this.value;this.value=''" onblur="if(!this.value)this.value=this.dataset.old"><div class="spin-btns"><button class="spin-btn" onclick="spinVal(this,1)" type="button">▲</button><button class="spin-btn" onclick="spinVal(this,-1)" type="button">▼</button></div></div>
     </div>
     <div class="goal-row">
       <div class="goal-info">
         <span class="goal-icon">🎁</span>
         <div><div class="goal-label">Monats-Belohnung</div><div class="goal-sub">Erste Stufe im Monat</div></div>
       </div>
-      <input type="number" class="goal-input" id="goalMonth1Input" value="0" min="0" max="999" onchange="saveGoals()" onfocus="this.dataset.old=this.value;this.value=''" onblur="if(!this.value)this.value=this.dataset.old">
+      <div class="goal-spin"><input type="number" class="goal-input" id="goalMonth1Input" value="0" min="0" max="999" onchange="saveGoals()" onfocus="this.dataset.old=this.value;this.value=''" onblur="if(!this.value)this.value=this.dataset.old"><div class="spin-btns"><button class="spin-btn" onclick="spinVal(this,1)" type="button">▲</button><button class="spin-btn" onclick="spinVal(this,-1)" type="button">▼</button></div></div>
     </div>
     <div class="goal-row">
       <div class="goal-info">
         <span class="goal-icon">⭐</span>
         <div><div class="goal-label">Monats-Wunsch</div><div class="goal-sub">Zweite Stufe im Monat</div></div>
       </div>
-      <input type="number" class="goal-input" id="goalMonth2Input" value="0" min="0" max="999" onchange="saveGoals()" onfocus="this.dataset.old=this.value;this.value=''" onblur="if(!this.value)this.value=this.dataset.old">
+      <div class="goal-spin"><input type="number" class="goal-input" id="goalMonth2Input" value="0" min="0" max="999" onchange="saveGoals()" onfocus="this.dataset.old=this.value;this.value=''" onblur="if(!this.value)this.value=this.dataset.old"><div class="spin-btns"><button class="spin-btn" onclick="spinVal(this,1)" type="button">▲</button><button class="spin-btn" onclick="spinVal(this,-1)" type="button">▼</button></div></div>
     </div>
   </div>
   <div class="lang-card">
@@ -1400,8 +1412,8 @@ function renderEditList() {
     card.innerHTML = `
       <input type="text" data-idx="${idx}" data-field="name" value="${tk.name.replace(/"/g,'&quot;')}" placeholder="${t('taskPlaceholder')}">
       <div class="edit-row">
-        <div class="edit-field"><label class="edit-label">${t('plusPoints')}</label><input type="number" data-idx="${idx}" data-field="plus" value="${tk.plus}" placeholder="0" min="0" max="99" onfocus="this.dataset.old=this.value;this.value=''" onblur="if(!this.value)this.value=this.dataset.old"></div>
-        <div class="edit-field"><label class="edit-label">${t('minusPoints')}</label><input type="number" data-idx="${idx}" data-field="minus" value="${tk.minus}" placeholder="0" min="0" max="99" onfocus="this.dataset.old=this.value;this.value=''" onblur="if(!this.value)this.value=this.dataset.old"></div>
+        <div class="edit-field"><label class="edit-label">${t('plusPoints')}</label><div class="spin-wrap"><input type="number" data-idx="${idx}" data-field="plus" value="${tk.plus}" placeholder="0" min="0" max="99" onfocus="this.dataset.old=this.value;this.value=''" onblur="if(!this.value)this.value=this.dataset.old"><div class="spin-btns"><button class="spin-btn" onclick="spinVal(this,1)" type="button">▲</button><button class="spin-btn" onclick="spinVal(this,-1)" type="button">▼</button></div></div></div>
+        <div class="edit-field"><label class="edit-label">${t('minusPoints')}</label><div class="spin-wrap"><input type="number" data-idx="${idx}" data-field="minus" value="${tk.minus}" placeholder="0" min="0" max="99" onfocus="this.dataset.old=this.value;this.value=''" onblur="if(!this.value)this.value=this.dataset.old"><div class="spin-btns"><button class="spin-btn" onclick="spinVal(this,1)" type="button">▲</button><button class="spin-btn" onclick="spinVal(this,-1)" type="button">▼</button></div></div></div>
         <button class="btn-delete" onclick="deleteTask(${idx})">${t('deleteBtn')}</button>
       </div>`;
     container.appendChild(card);
@@ -1430,6 +1442,14 @@ function saveTasks() {
   saveData();
   render();
   alert(t('saved'));
+}
+
+function spinVal(btn, dir) {
+  const inp = btn.closest('.spin-wrap').querySelector('input');
+  let v = parseInt(inp.value) || 0;
+  v = Math.max(parseInt(inp.min)||0, Math.min(parseInt(inp.max)||999, v + dir));
+  inp.value = v;
+  inp.dispatchEvent(new Event('change'));
 }
 
 // ── NAVIGATION ──
