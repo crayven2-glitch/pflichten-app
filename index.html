@@ -297,7 +297,7 @@ input[type="number"] { -moz-appearance:textfield; }
 
 <!-- ── Splash Screen ── -->
 <div id="splashScreen" style="position:fixed;inset:0;z-index:9999;background:#1a1a2e;transition:opacity .5s;">
-  <img src="devotion-splash-final.png" alt="Devotion" style="width:100%;height:100%;object-fit:contain;">
+  <img src="devotion-splash-final.png" alt="Devotion" style="width:100%;height:100%;object-fit:cover;">
 </div>
 
 <div class="sync-bar" id="syncBar"></div>
@@ -326,7 +326,7 @@ input[type="number"] { -moz-appearance:textfield; }
 
 <!-- ONBOARDING -->
 <div class="setup-screen hidden" id="onboardScreen1">
-  <div style="margin-bottom:16px;"><img src="devotion-triskele.png" alt="Devotion" style="width:200px;"></div>
+  <div style="margin-bottom:8px;"><img src="devotion-triskele.png" alt="Devotion" style="width:100%;max-width:320px;"></div>
   <h2>Willkommen bei Devotion</h2>
   <p>Die App für Paare, die ihre D/s-Dynamik strukturieren möchten. Erstelle Aufgaben, vergib Punkte und verfolge den Fortschritt — sicher und diskret.</p>
   <button class="setup-btn" onclick="showOnboard2()">Weiter</button>
@@ -337,7 +337,7 @@ input[type="number"] { -moz-appearance:textfield; }
 </div>
 
 <div class="setup-screen hidden" id="onboardScreen2">
-  <div style="margin-bottom:16px;"><img src="devotion-triskele.png" alt="Devotion" style="width:200px;"></div>
+  <div style="margin-bottom:8px;"><img src="devotion-triskele.png" alt="Devotion" style="width:100%;max-width:320px;"></div>
   <h2>Gemeinsam verbunden</h2>
   <p>Beide Partner nutzen denselben Code, um Aufgaben, Punkte und Belohnungen in Echtzeit zu teilen. Alles bleibt privat zwischen euch.</p>
   <button class="setup-btn" onclick="finishOnboarding()">Los geht's</button>
