@@ -36,7 +36,7 @@ self.addEventListener('notificationclick', e => {
 });
 
 // ── Cache (PWA offline) ──
-const CACHE_NAME = 'pflichten-v32';
+const CACHE_NAME = 'pflichten-v33';
 const ASSETS = [
   './',
   './index.html',

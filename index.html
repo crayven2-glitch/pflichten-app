@@ -47,9 +47,9 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif
 .conn-dot.offline { background:var(--red); }
 
 .bottom-nav { position:fixed; bottom:0; left:0; right:0; background:var(--surface); display:flex; justify-content:space-around; padding:18px 0 calc(env(safe-area-inset-bottom,0px) + 32px); border-top:1px solid rgba(255,255,255,0.08); z-index:100; }
-.nav-btn { background:none; border:none; color:var(--text2); display:flex; flex-direction:column; align-items:center; font-size:10px; gap:2px; padding:4px 8px; cursor:pointer; transition:color .2s; }
+.nav-btn { background:none; border:none; color:var(--text2); display:flex; flex-direction:column; align-items:center; font-size:9px; gap:2px; padding:4px 4px; cursor:pointer; transition:color .2s; min-width:0; }
 .nav-btn.active { color:var(--accent); }
-.nav-btn svg { width:22px; height:22px; }
+.nav-btn svg { width:20px; height:20px; }
 
 .header { background:linear-gradient(135deg,var(--surface) 0%,var(--surface2) 100%); padding:24px 16px 16px; text-align:center; }
 .header h1 { font-size:20px; font-weight:700; outline:none; }
@@ -224,6 +224,18 @@ input[type="number"] { -moz-appearance:textfield; }
 .proof-btn:active { background:var(--surface2); }
 .proof-note { width:100%; height:80px; padding:12px; border-radius:var(--radius); border:1px solid rgba(255,255,255,0.1); background:var(--bg); color:var(--text); font-size:14px; resize:vertical; }
 .proof-note:focus { outline:none; border-color:var(--accent); }
+.stats-toggle { display:flex; gap:4px; padding:0 16px; margin-bottom:16px; }
+.stats-toggle button { flex:1; padding:8px; font-size:13px; border-radius:var(--radius); border:1px solid rgba(255,255,255,0.1); background:var(--surface); color:var(--text2); cursor:pointer; font-weight:600; transition:all .2s; }
+.stats-toggle button.active { background:var(--green); color:#fff; border-color:var(--green); }
+.stats-cards { display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:0 16px; margin-bottom:16px; }
+.stat-card { background:var(--surface); border-radius:var(--radius); padding:14px; text-align:center; }
+.stat-card .stat-num { font-size:24px; font-weight:700; }
+.stat-card .stat-lbl { font-size:11px; color:var(--text2); margin-top:2px; }
+.stats-section { padding:0 16px; margin-bottom:20px; }
+.stats-section-title { font-size:13px; font-weight:600; color:var(--text2); margin-bottom:10px; display:flex; align-items:center; gap:6px; }
+.stats-legend { display:flex; flex-wrap:wrap; gap:12px; margin-bottom:10px; font-size:12px; color:var(--text2); }
+.stats-legend-dot { width:10px; height:10px; border-radius:2px; display:inline-block; }
+.stats-chart-wrap { position:relative; width:100%; }
 .feedback-card { margin:12px 16px; background:var(--surface); border-radius:var(--radius); padding:16px; }
 .feedback-header { font-size:14px; font-weight:600; margin-bottom:12px; }
 .feedback-sent-badge { display:inline-block; background:var(--green); color:#fff; font-size:12px; font-weight:600; padding:3px 10px; border-radius:20px; margin-left:8px; }
@@ -452,6 +464,34 @@ input[type="number"] { -moz-appearance:textfield; }
   <div id="historyList"></div>
 </div>
 
+<!-- PAGE: STATISTIK -->
+<div id="page-stats" class="page">
+  <div class="header">
+    <h1 id="statsH1">Statistik</h1>
+    <div class="sub" id="statsSub">Fortschritt & Auswertung</div>
+  </div>
+  <div class="stats-toggle" id="statsToggle">
+    <button class="active" onclick="setStatsRange(4)">4 Wo.</button>
+    <button onclick="setStatsRange(8)">8 Wo.</button>
+    <button onclick="setStatsRange(12)">12 Wo.</button>
+  </div>
+  <div class="stats-cards" id="statsCards"></div>
+  <div class="stats-section">
+    <div class="stats-section-title" id="statsTaskTitle">📊 Aufgaben-Erfolgsrate</div>
+    <div class="stats-legend" id="statsBarLegend"></div>
+    <div class="stats-chart-wrap" id="statsBarWrap" style="height:40px;">
+      <canvas id="statsBarChart"></canvas>
+    </div>
+  </div>
+  <div class="stats-section">
+    <div class="stats-section-title" id="statsPieTitle">📈 Gesamt-Verteilung</div>
+    <div class="stats-legend" id="statsPieLegend"></div>
+    <div class="stats-chart-wrap" style="height:220px;">
+      <canvas id="statsPieChart"></canvas>
+    </div>
+  </div>
+</div>
+
 <!-- PAGE: EINSTELLUNGEN -->
 <div id="page-settings" class="page">
   <div class="header">
@@ -578,6 +618,10 @@ input[type="number"] { -moz-appearance:textfield; }
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>
     Verlauf
   </button>
+  <button class="nav-btn" id="nav-stats" onclick="showPage('stats')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+    Statistik
+  </button>
   <button class="nav-btn" id="nav-settings" onclick="showPage('settings')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
     Einstellungen
@@ -589,6 +633,7 @@ input[type="number"] { -moz-appearance:textfield; }
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
 // ── i18n TRANSLATIONS ──
 const I18N = {
@@ -643,7 +688,23 @@ const I18N = {
     navWeek: 'Woche',
     navMonth: 'Monat',
     navHistory: 'Verlauf',
+    navStats: 'Statistik',
     navSettings: 'Einstellungen',
+    statsTitle: 'Statistik',
+    statsSub: 'Fortschritt & Auswertung',
+    statsTotal: 'Gesamt',
+    statsRate: 'Erfolgsrate',
+    statsWeeks: 'Wochen',
+    statsBest: 'Beste Woche',
+    statsTaskRate: 'Aufgaben-Erfolgsrate',
+    statsOverall: 'Gesamt-Verteilung',
+    statsDone: 'Erledigt',
+    statsMissed: 'Verpasst',
+    statsNA: 'N/A',
+    statsOpen: 'Offen',
+    stats4w: '4 Wo.',
+    stats8w: '8 Wo.',
+    stats12w: '12 Wo.',
     syncActive: 'Sync aktiv',
     offline: 'Offline',
     noTasks: 'Keine Aufgaben definiert',
@@ -785,7 +846,23 @@ const I18N = {
     navWeek: 'Week',
     navMonth: 'Month',
     navHistory: 'History',
+    navStats: 'Stats',
     navSettings: 'Settings',
+    statsTitle: 'Statistics',
+    statsSub: 'Progress & analysis',
+    statsTotal: 'Total',
+    statsRate: 'Success rate',
+    statsWeeks: 'Weeks',
+    statsBest: 'Best week',
+    statsTaskRate: 'Task success rate',
+    statsOverall: 'Overall distribution',
+    statsDone: 'Done',
+    statsMissed: 'Missed',
+    statsNA: 'N/A',
+    statsOpen: 'Open',
+    stats4w: '4 wk',
+    stats8w: '8 wk',
+    stats12w: '12 wk',
     syncActive: 'Sync active',
     offline: 'Offline',
     noTasks: 'No tasks defined',
@@ -1033,6 +1110,7 @@ function applyLanguage() {
     if (id === 'nav-week') { btn.textContent = ''; btn.appendChild(svg); btn.append('\n    ' + t('navWeek') + '\n  '); }
     if (id === 'nav-month') { btn.textContent = ''; btn.appendChild(svg); btn.append('\n    ' + t('navMonth') + '\n  '); }
     if (id === 'nav-history') { btn.textContent = ''; btn.appendChild(svg); btn.append('\n    ' + t('navHistory') + '\n  '); }
+    if (id === 'nav-stats') { btn.textContent = ''; btn.appendChild(svg); btn.append('\n    ' + t('navStats') + '\n  '); }
     if (id === 'nav-settings') { btn.textContent = ''; btn.appendChild(svg); btn.append('\n    ' + t('navSettings') + '\n  '); }
   });
 
@@ -2595,6 +2673,171 @@ function showPage(page) {
   if (page === 'history') renderHistory();
   if (page === 'week') render();
   if (page === 'month') { renderMonth(); setTimeout(renderMonth, 800); }
+  if (page === 'stats') renderStats();
+}
+
+// ── STATISTIK ──
+let statsRange = 4;
+let statsBarChart = null;
+let statsPieChart = null;
+
+function setStatsRange(weeks) {
+  statsRange = weeks;
+  document.querySelectorAll('.stats-toggle button').forEach((btn, i) => {
+    btn.classList.toggle('active', [4,8,12][i] === weeks);
+  });
+  renderStats();
+}
+
+function getStatsData(numWeeks) {
+  const weeks = [];
+  for (let w = -(numWeeks - 1); w <= 0; w++) {
+    const key = getWeekKey(w + currentWeekOffset);
+    const wd = weekData[key] || { days:{} };
+    weeks.push({ key, wd, offset: w });
+  }
+
+  let totalDone = 0, totalMissed = 0, totalNA = 0, totalOpen = 0;
+  const taskStats = {};
+  tasks.forEach(tk => { taskStats[tk.id] = { name: tk.name, done: 0, missed: 0, na: 0, open: 0 }; });
+
+  let bestWeek = 0;
+
+  weeks.forEach(({ wd }) => {
+    let weekPts = 0;
+    for (let di = 0; di < 7; di++) {
+      const de = (wd.days && (wd.days[di] || wd.days[String(di)])) || {};
+      tasks.forEach(tk => {
+        if (!isTaskActiveOnDay(tk, di)) return;
+        const s = de[tk.id] || de[String(tk.id)] || '';
+        if (s === 'done') { totalDone++; taskStats[tk.id].done++; weekPts += tk.plus; }
+        else if (s === 'missed') { totalMissed++; taskStats[tk.id].missed++; }
+        else if (s === 'na') { totalNA++; taskStats[tk.id].na++; }
+        else { totalOpen++; taskStats[tk.id].open++; }
+      });
+    }
+    if (weekPts > bestWeek) bestWeek = weekPts;
+  });
+
+  const totalAll = totalDone + totalMissed + totalNA + totalOpen;
+  const rate = totalAll > 0 ? Math.round(totalDone / totalAll * 100) : 0;
+
+  return { totalDone, totalMissed, totalNA, totalOpen, totalAll, rate, bestWeek, taskStats, numWeeks };
+}
+
+function renderStats() {
+  const data = getStatsData(statsRange);
+
+  // Update translations
+  document.getElementById('statsH1').textContent = t('statsTitle');
+  document.getElementById('statsSub').textContent = t('statsSub');
+  document.getElementById('statsTaskTitle').textContent = '📊 ' + t('statsTaskRate');
+  document.getElementById('statsPieTitle').textContent = '📈 ' + t('statsOverall');
+
+  // Toggle button labels
+  const toggleBtns = document.querySelectorAll('.stats-toggle button');
+  if (toggleBtns.length >= 3) {
+    toggleBtns[0].textContent = t('stats4w');
+    toggleBtns[1].textContent = t('stats8w');
+    toggleBtns[2].textContent = t('stats12w');
+  }
+
+  // Summary cards
+  document.getElementById('statsCards').innerHTML = `
+    <div class="stat-card"><div class="stat-num" style="color:var(--green);">${data.rate}%</div><div class="stat-lbl">${t('statsRate')}</div></div>
+    <div class="stat-card"><div class="stat-num">${data.bestWeek}</div><div class="stat-lbl">${t('statsBest')}</div></div>
+    <div class="stat-card"><div class="stat-num">${data.totalDone}</div><div class="stat-lbl">${t('statsDone')}</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--red);">${data.totalMissed}</div><div class="stat-lbl">${t('statsMissed')}</div></div>
+  `;
+
+  // Bar legend
+  document.getElementById('statsBarLegend').innerHTML = `
+    <span style="display:flex;align-items:center;gap:4px;"><span class="stats-legend-dot" style="background:#4ecca3;"></span>${t('statsDone')}</span>
+    <span style="display:flex;align-items:center;gap:4px;"><span class="stats-legend-dot" style="background:#e94560;"></span>${t('statsMissed')}</span>
+    <span style="display:flex;align-items:center;gap:4px;"><span class="stats-legend-dot" style="background:#888;"></span>${t('statsNA')}</span>
+  `;
+
+  // Build bar chart data
+  const taskIds = Object.keys(data.taskStats);
+  const labels = taskIds.map(id => data.taskStats[id].name);
+  const doneData = taskIds.map(id => {
+    const s = data.taskStats[id];
+    const tot = s.done + s.missed + s.na + s.open;
+    return tot > 0 ? Math.round(s.done / tot * 100) : 0;
+  });
+  const missedData = taskIds.map(id => {
+    const s = data.taskStats[id];
+    const tot = s.done + s.missed + s.na + s.open;
+    return tot > 0 ? Math.round(s.missed / tot * 100) : 0;
+  });
+  const naData = taskIds.map(id => {
+    const s = data.taskStats[id];
+    const tot = s.done + s.missed + s.na + s.open;
+    return tot > 0 ? Math.round(s.na / tot * 100) : 0;
+  });
+
+  // Dynamic bar chart height
+  const barH = Math.max(120, labels.length * 40 + 40);
+  document.getElementById('statsBarWrap').style.height = barH + 'px';
+
+  // Destroy old charts
+  if (statsBarChart) { statsBarChart.destroy(); statsBarChart = null; }
+  if (statsPieChart) { statsPieChart.destroy(); statsPieChart = null; }
+
+  // Bar chart
+  statsBarChart = new Chart(document.getElementById('statsBarChart'), {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [
+        { label: t('statsDone'), data: doneData, backgroundColor: '#4ecca3' },
+        { label: t('statsMissed'), data: missedData, backgroundColor: '#e94560' },
+        { label: t('statsNA'), data: naData, backgroundColor: '#888' }
+      ]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { stacked: true, max: 100, ticks: { callback: v => v + '%', color: '#aaa', font: { size: 11 } }, grid: { color: 'rgba(255,255,255,0.05)' } },
+        y: { stacked: true, grid: { display: false }, ticks: { color: '#ddd', font: { size: 11 } } }
+      }
+    }
+  });
+
+  // Pie legend
+  const pieTotal = data.totalDone + data.totalMissed + data.totalNA + data.totalOpen;
+  const pDone = pieTotal > 0 ? Math.round(data.totalDone / pieTotal * 100) : 0;
+  const pMissed = pieTotal > 0 ? Math.round(data.totalMissed / pieTotal * 100) : 0;
+  const pNA = pieTotal > 0 ? Math.round(data.totalNA / pieTotal * 100) : 0;
+  const pOpen = pieTotal > 0 ? Math.round(data.totalOpen / pieTotal * 100) : 0;
+  document.getElementById('statsPieLegend').innerHTML = `
+    <span style="display:flex;align-items:center;gap:4px;"><span class="stats-legend-dot" style="background:#4ecca3;"></span>${t('statsDone')} ${pDone}%</span>
+    <span style="display:flex;align-items:center;gap:4px;"><span class="stats-legend-dot" style="background:#e94560;"></span>${t('statsMissed')} ${pMissed}%</span>
+    <span style="display:flex;align-items:center;gap:4px;"><span class="stats-legend-dot" style="background:#888;"></span>${t('statsNA')} ${pNA}%</span>
+    <span style="display:flex;align-items:center;gap:4px;"><span class="stats-legend-dot" style="background:#444;"></span>${t('statsOpen')} ${pOpen}%</span>
+  `;
+
+  // Pie chart
+  statsPieChart = new Chart(document.getElementById('statsPieChart'), {
+    type: 'doughnut',
+    data: {
+      labels: [t('statsDone'), t('statsMissed'), t('statsNA'), t('statsOpen')],
+      datasets: [{
+        data: [data.totalDone, data.totalMissed, data.totalNA, data.totalOpen],
+        backgroundColor: ['#4ecca3', '#e94560', '#888', '#444'],
+        borderWidth: 0
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      cutout: '55%'
+    }
+  });
 }
 
 // ── INIT ──
