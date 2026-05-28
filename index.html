@@ -306,14 +306,55 @@ input[type="number"] { -moz-appearance:textfield; }
   <span id="connLabel"></span>
 </div>
 
+<!-- AGE CHECK -->
+<div class="setup-screen" id="ageCheckScreen">
+  <div class="setup-logo"><img src="icon-192.png" alt="Devotion" style="width:72px;height:72px;border-radius:16px;"></div>
+  <h2>Altersverifizierung</h2>
+  <p>Diese App enthält Inhalte für Erwachsene. Bitte bestätige dein Alter, um fortzufahren.</p>
+  <div class="setup-error" id="ageError"></div>
+  <div style="display:flex;gap:8px;width:100%;max-width:320px;margin-bottom:12px;">
+    <input class="setup-input" id="ageBirthDay" type="number" placeholder="TT" min="1" max="31" style="flex:1;letter-spacing:0;">
+    <input class="setup-input" id="ageBirthMonth" type="number" placeholder="MM" min="1" max="12" style="flex:1;letter-spacing:0;">
+    <input class="setup-input" id="ageBirthYear" type="number" placeholder="JJJJ" min="1900" max="2026" style="flex:2;letter-spacing:0;">
+  </div>
+  <label style="display:flex;align-items:flex-start;gap:10px;width:100%;max-width:320px;margin-bottom:16px;text-align:left;cursor:pointer;">
+    <input type="checkbox" id="ageConfirmCheck" style="margin-top:3px;width:20px;height:20px;accent-color:var(--accent);flex-shrink:0;">
+    <span style="font-size:13px;color:var(--text2);line-height:1.4;">Ich bestätige, dass ich mindestens 18 Jahre alt bin und den Zugang zu Inhalten für Erwachsene wünsche.</span>
+  </label>
+  <button class="setup-btn" onclick="verifyAge()">Bestätigen</button>
+</div>
+
+<!-- ONBOARDING -->
+<div class="setup-screen hidden" id="onboardScreen1">
+  <div style="font-size:48px;margin-bottom:16px;">🔥</div>
+  <h2>Willkommen bei Devotion</h2>
+  <p>Die App für Paare, die ihre D/s-Dynamik strukturieren möchten. Erstelle Aufgaben, vergib Punkte und verfolge den Fortschritt — sicher und diskret.</p>
+  <button class="setup-btn" onclick="showOnboard2()">Weiter</button>
+  <div style="display:flex;gap:8px;margin-top:16px;">
+    <div style="width:10px;height:10px;border-radius:50%;background:var(--accent);"></div>
+    <div style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.2);"></div>
+  </div>
+</div>
+
+<div class="setup-screen hidden" id="onboardScreen2">
+  <div style="font-size:48px;margin-bottom:16px;">🔗</div>
+  <h2>Gemeinsam verbunden</h2>
+  <p>Beide Partner nutzen denselben Code, um Aufgaben, Punkte und Belohnungen in Echtzeit zu teilen. Alles bleibt privat zwischen euch.</p>
+  <button class="setup-btn" onclick="finishOnboarding()">Los geht's</button>
+  <div style="display:flex;gap:8px;margin-top:16px;">
+    <div style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.2);"></div>
+    <div style="width:10px;height:10px;border-radius:50%;background:var(--accent);"></div>
+  </div>
+</div>
+
 <!-- SETUP -->
-<div class="setup-screen" id="setupScreen">
+<div class="setup-screen hidden" id="setupScreen">
   <div class="setup-lang-toggle">
     <button id="setupLangDE" class="active" onclick="setLanguage('de')">DE</button>
     <button id="setupLangEN" onclick="setLanguage('en')">EN</button>
   </div>
-  <div class="setup-app-title" id="setupAppTitle">Sub Pflichten</div>
-  <div class="setup-logo"><img src="icon-192.png" alt="Sub Pflichten" style="width:72px;height:72px;border-radius:16px;"></div>
+  <div class="setup-app-title" id="setupAppTitle">Devotion</div>
+  <div class="setup-logo"><img src="icon-192.png" alt="Devotion" style="width:72px;height:72px;border-radius:16px;"></div>
   <h2>Verbindung einrichten</h2>
   <p>Gib einen gemeinsamen Code ein, damit beide Handys dieselben Daten sehen.</p>
   <div class="setup-error" id="setupError"></div>
@@ -3112,13 +3153,62 @@ if ('serviceWorker' in navigator) {
 applyLanguage();
 
 
-const savedCode = getSavedCode();
-if (savedCode) {
-  document.getElementById('setupScreen').classList.add('hidden');
-  initSync(savedCode);
-} else {
+// ── Age Check & Onboarding ──
+function verifyAge() {
+  const d = parseInt(document.getElementById('ageBirthDay').value);
+  const m = parseInt(document.getElementById('ageBirthMonth').value);
+  const y = parseInt(document.getElementById('ageBirthYear').value);
+  const checked = document.getElementById('ageConfirmCheck').checked;
+  const errEl = document.getElementById('ageError');
+
+  if (!d || !m || !y || d < 1 || d > 31 || m < 1 || m > 12 || y < 1900 || y > 2026) {
+    errEl.textContent = 'Bitte gib ein gültiges Geburtsdatum ein.'; return;
+  }
+  if (!checked) {
+    errEl.textContent = 'Bitte bestätige, dass du 18+ bist.'; return;
+  }
+  const birth = new Date(y, m - 1, d);
+  const now = new Date();
+  let age = now.getFullYear() - birth.getFullYear();
+  const mDiff = now.getMonth() - birth.getMonth();
+  if (mDiff < 0 || (mDiff === 0 && now.getDate() < birth.getDate())) age--;
+  if (age < 18) {
+    errEl.textContent = 'Du musst mindestens 18 Jahre alt sein.'; return;
+  }
+  localStorage.setItem('devotion_age_verified', '1');
+  document.getElementById('ageCheckScreen').classList.add('hidden');
+  document.getElementById('onboardScreen1').classList.remove('hidden');
+}
+
+function showOnboard2() {
+  document.getElementById('onboardScreen1').classList.add('hidden');
+  document.getElementById('onboardScreen2').classList.remove('hidden');
+}
+
+function finishOnboarding() {
+  localStorage.setItem('devotion_onboarded', '1');
+  document.getElementById('onboardScreen2').classList.add('hidden');
   document.getElementById('setupScreen').classList.remove('hidden');
 }
+
+// ── App Start Logic ──
+const savedCode = getSavedCode();
+const ageVerified = localStorage.getItem('devotion_age_verified');
+
+if (savedCode) {
+  // Already connected — hide everything, go to app
+  document.getElementById('ageCheckScreen').classList.add('hidden');
+  document.getElementById('setupScreen').classList.add('hidden');
+  initSync(savedCode);
+} else if (ageVerified) {
+  // Age verified but not connected — show setup
+  document.getElementById('ageCheckScreen').classList.add('hidden');
+  document.getElementById('setupScreen').classList.remove('hidden');
+} else {
+  // First time — show age check
+  document.getElementById('ageCheckScreen').classList.remove('hidden');
+}
+
 // ── Splash Screen ausblenden ──
 setTimeout(() => {
   const splash = document.getElementById('splashScreen');
