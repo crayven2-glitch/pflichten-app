@@ -197,6 +197,10 @@ input[type="number"] { -moz-appearance:textfield; }
 .reward-name-input::placeholder { color:var(--text2); opacity:0.5; }
 .notif-btn { padding:6px 16px; border-radius:20px; border:1px solid var(--accent); background:transparent; color:var(--accent); font-size:13px; cursor:pointer; transition:all .2s; }
 .notif-btn:hover { background:var(--accent); color:#000; }
+.day-toggles { display:flex; gap:4px; margin-top:8px; flex-wrap:wrap; }
+.day-toggle { width:34px; height:30px; border-radius:6px; border:1px solid rgba(255,255,255,0.15); background:none; color:var(--text2); font-size:11px; cursor:pointer; transition:all .2s; }
+.day-toggle.active { background:var(--accent); border-color:var(--accent); color:#fff; }
+.day-toggle-label { font-size:11px; color:var(--text2); margin-top:8px; margin-bottom:2px; display:block; }
 .notif-btn.active { background:var(--green); border-color:var(--green); color:#000; cursor:default; }
 .notif-btn.blocked { background:transparent; border-color:var(--red); color:var(--red); cursor:default; }
 
@@ -534,6 +538,8 @@ const I18N = {
     newTask: 'Neue Aufgabe',
     deleteConfirm: 'Aufgabe wirklich löschen?',
     taskPlaceholder: 'Aufgabe',
+    daysLabel: 'Tage',
+    allDays: 'Alle Tage',
     language: 'Sprache',
     fromPoints: 'ab',
     appTitle: 'Sub Pflichten',
@@ -619,6 +625,8 @@ const I18N = {
     newTask: 'New Task',
     deleteConfirm: 'Really delete task?',
     taskPlaceholder: 'Task',
+    daysLabel: 'Days',
+    allDays: 'All days',
     language: 'Language',
     fromPoints: 'from',
     appTitle: 'Sub Duties',
@@ -1049,6 +1057,7 @@ function calcWeekScore(wd) {
   for (let di = 0; di < 7; di++) {
     const de = wd.days[di] || wd.days[String(di)] || {};
     for (const task of tasks) {
+      if (!isTaskActiveOnDay(task, di)) continue;
       const s = de[task.id] !== undefined ? de[task.id] : de[String(task.id)];
       if (s === 'done') pos += task.plus;
       else if (s === 'missed') neg += task.minus;
@@ -1109,6 +1118,7 @@ function calcMonthData(year, month) {
     for (let di = 0; di < 7; di++) {
       const de = wd.days[di] || wd.days[String(di)] || {};
       for (const tk of tasks) {
+        if (!isTaskActiveOnDay(tk, di)) continue;
         const sv = de[tk.id] !== undefined ? de[tk.id] : de[String(tk.id)];
         if (sv === 'done') taskTotals[tk.id].pos += tk.plus;
         else if (sv === 'missed') taskTotals[tk.id].neg += tk.minus;
@@ -1116,6 +1126,11 @@ function calcMonthData(year, month) {
     }
   }
   return { total: totalPos - totalNeg, pos: totalPos, neg: totalNeg, weekScores, taskTotals };
+}
+
+function isTaskActiveOnDay(task, dayIndex) {
+  if (!task.days || task.days.length === 0) return true; // no days set = every day
+  return task.days.includes(dayIndex);
 }
 
 // ── RENDER WEEK ──
@@ -1142,7 +1157,11 @@ function render() {
 
   const dayEntries = (wd.days && (wd.days[selectedDay] || wd.days[String(selectedDay)])) || {};
   list.innerHTML = '';
-  tasks.forEach(tk => {
+  const activeTasks = tasks.filter(tk => isTaskActiveOnDay(tk, selectedDay));
+  if (activeTasks.length === 0 && tasks.length > 0) {
+    list.innerHTML = '<div class="empty-state"><p style="opacity:0.5">—</p></div>';
+  }
+  activeTasks.forEach(tk => {
     const status = dayEntries[tk.id] || dayEntries[String(tk.id)] || '';
     const icon = status === 'done' ? '✓' : status === 'missed' ? '✗' : status === 'na' ? 'N/A' : '';
     const div = document.createElement('div');
@@ -1586,20 +1605,46 @@ function renderEditList() {
   tasks.forEach((tk, idx) => {
     const card = document.createElement('div');
     card.className = 'edit-task-card';
+    const activeDays = tk.days || [];
+    const allActive = activeDays.length === 0 || activeDays.length === 7;
+    let dayBtns = '';
+    for (let d = 0; d < 7; d++) {
+      const isOn = allActive || activeDays.includes(d);
+      dayBtns += `<button type="button" class="day-toggle${isOn ? ' active' : ''}" data-idx="${idx}" data-day="${d}" onclick="toggleDay(${idx},${d})">${DAY_NAMES[d]}</button>`;
+    }
     card.innerHTML = `
       <input type="text" data-idx="${idx}" data-field="name" value="${tk.name.replace(/"/g,'&quot;')}" placeholder="${t('taskPlaceholder')}">
       <div class="edit-row">
         <div class="edit-field"><label class="edit-label">${t('plusPoints')}</label><div class="spin-wrap"><input type="number" data-idx="${idx}" data-field="plus" value="${tk.plus}" placeholder="0" min="0" max="99" onfocus="this.dataset.old=this.value;this.value=''" onblur="if(!this.value)this.value=this.dataset.old"><div class="spin-btns"><button class="spin-btn" onclick="spinVal(this,1)" type="button">▲</button><button class="spin-btn" onclick="spinVal(this,-1)" type="button">▼</button></div></div></div>
         <div class="edit-field"><label class="edit-label">${t('minusPoints')}</label><div class="spin-wrap"><input type="number" data-idx="${idx}" data-field="minus" value="${tk.minus}" placeholder="0" min="0" max="99" onfocus="this.dataset.old=this.value;this.value=''" onblur="if(!this.value)this.value=this.dataset.old"><div class="spin-btns"><button class="spin-btn" onclick="spinVal(this,1)" type="button">▲</button><button class="spin-btn" onclick="spinVal(this,-1)" type="button">▼</button></div></div></div>
         <button class="btn-delete" onclick="deleteTask(${idx})">${t('deleteBtn')}</button>
-      </div>`;
+      </div>
+      <span class="day-toggle-label">${t('daysLabel')}</span>
+      <div class="day-toggles">${dayBtns}</div>`;
     container.appendChild(card);
   });
 }
 
+function toggleDay(idx, day) {
+  if (!tasks[idx].days || tasks[idx].days.length === 0) {
+    // Currently "all days" → switch to all except clicked day
+    tasks[idx].days = [0,1,2,3,4,5,6].filter(d => d !== day);
+  } else if (tasks[idx].days.includes(day)) {
+    tasks[idx].days = tasks[idx].days.filter(d => d !== day);
+    // If no days left, reset to all days
+    if (tasks[idx].days.length === 0) tasks[idx].days = [];
+  } else {
+    tasks[idx].days.push(day);
+    tasks[idx].days.sort();
+    // If all 7 selected, reset to empty (= all days)
+    if (tasks[idx].days.length === 7) tasks[idx].days = [];
+  }
+  renderEditList();
+}
+
 function addTask() {
   const maxId = tasks.reduce((m,t) => Math.max(m, t.id), 0);
-  tasks.push({ id: maxId+1, name: t('newTask'), plus:0, minus:0 });
+  tasks.push({ id: maxId+1, name: t('newTask'), plus:0, minus:0, days:[] });
   renderEditList();
 }
 
@@ -1614,8 +1659,9 @@ function saveTasks() {
     const idx = parseInt(inp.dataset.idx);
     const field = inp.dataset.field;
     if (field === 'name') tasks[idx].name = inp.value;
-    else tasks[idx][field] = parseInt(inp.value) || 0;
+    else if (field === 'plus' || field === 'minus') tasks[idx][field] = parseInt(inp.value) || 0;
   });
+  // days are already saved via toggleDay()
   saveData();
   render();
   alert(t('saved'));
