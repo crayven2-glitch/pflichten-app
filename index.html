@@ -313,8 +313,8 @@ input[type="number"] { -moz-appearance:textfield; }
   <p>Diese App enthält Inhalte für Erwachsene. Bitte bestätige dein Alter, um fortzufahren.</p>
   <div class="setup-error" id="ageError"></div>
   <div style="display:flex;gap:8px;width:100%;max-width:320px;margin-bottom:12px;">
-    <input class="setup-input" id="ageBirthDay" type="number" placeholder="TT" min="1" max="31" style="flex:1;letter-spacing:0;">
-    <input class="setup-input" id="ageBirthMonth" type="number" placeholder="MM" min="1" max="12" style="flex:1;letter-spacing:0;">
+    <input class="setup-input" id="ageBirthDay" type="number" placeholder="TT" min="1" max="31" style="flex:1;letter-spacing:0;" oninput="if(this.value.length>=2)document.getElementById('ageBirthMonth').focus()">
+    <input class="setup-input" id="ageBirthMonth" type="number" placeholder="MM" min="1" max="12" style="flex:1;letter-spacing:0;" oninput="if(this.value.length>=2)document.getElementById('ageBirthYear').focus()">
     <input class="setup-input" id="ageBirthYear" type="number" placeholder="JJJJ" min="1900" max="2026" style="flex:2;letter-spacing:0;">
   </div>
   <label style="display:flex;align-items:flex-start;gap:10px;width:100%;max-width:320px;margin-bottom:16px;text-align:left;cursor:pointer;">
