@@ -6,10 +6,11 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#1a1a2e">
-<title>Sub Pflichten</title>
+<title>Devotion</title>
 <link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="64x64" href="favicon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
 <meta name="mobile-web-app-capable" content="yes">
 <style>
 :root {
@@ -293,6 +294,11 @@ input[type="number"] { -moz-appearance:textfield; }
 </style>
 </head>
 <body>
+
+<!-- ── Splash Screen ── -->
+<div id="splashScreen" style="position:fixed;inset:0;z-index:9999;background:#1a1a2e;display:flex;align-items:center;justify-content:center;transition:opacity .5s;">
+  <img src="devotion-splash-final.png" alt="Devotion" style="max-width:80%;max-height:80%;object-fit:contain;">
+</div>
 
 <div class="sync-bar" id="syncBar"></div>
 <div class="conn-status">
@@ -3113,6 +3119,11 @@ if (savedCode) {
 } else {
   document.getElementById('setupScreen').classList.remove('hidden');
 }
+// ── Splash Screen ausblenden ──
+setTimeout(() => {
+  const splash = document.getElementById('splashScreen');
+  if (splash) { splash.style.opacity = '0'; setTimeout(() => splash.remove(), 500); }
+}, 1800);
 </script>
 </body>
 </html>
