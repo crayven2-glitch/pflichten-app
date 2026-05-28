@@ -92,11 +92,12 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif
 .task-status.missed { background:var(--red); border-color:var(--red); color:#fff; }
 .task-status.na { background:var(--surface2); border-color:var(--text2); color:var(--text2); font-size:11px; }
 
-.send-bar { padding:12px 16px; display:flex; gap:8px; }
-.send-bar button { flex:1; padding:14px; border:none; border-radius:var(--radius); font-size:15px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:transform .1s; touch-action:manipulation; }
+.send-bar { padding:12px 16px; display:flex; gap:8px; flex-wrap:wrap; }
+.send-bar button { flex:1; min-width:90px; padding:12px 8px; border:none; border-radius:var(--radius); font-size:13px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; transition:transform .1s; touch-action:manipulation; }
 .send-bar button:active { transform:scale(0.97); }
 .btn-whatsapp { background:#25d366; color:#fff; }
 .btn-email { background:var(--surface2); color:var(--text); }
+.btn-pdf { background:#e94560; color:#fff; }
 
 .page { display:none; }
 .page.active { display:block; }
@@ -201,6 +202,40 @@ input[type="number"] { -moz-appearance:textfield; }
 .day-toggle { width:34px; height:30px; border-radius:6px; border:1px solid rgba(255,255,255,0.15); background:none; color:var(--text2); font-size:11px; cursor:pointer; transition:all .2s; }
 .day-toggle.active { background:var(--accent); border-color:var(--accent); color:#fff; }
 .day-toggle-label { font-size:11px; color:var(--text2); margin-top:8px; margin-bottom:2px; display:block; }
+.proof-upload-btn { width:44px; height:44px; border-radius:10px; border:2px solid var(--text2); background:none; font-size:18px; cursor:pointer; flex-shrink:0; transition:all .2s; display:flex; align-items:center; justify-content:center; }
+.proof-upload-btn.done { border-color:var(--green); background:rgba(78,204,163,0.15); }
+.proof-upload-btn.missing { border-color:var(--red); background:rgba(233,69,96,0.15); animation:proofPulse 1.5s infinite; }
+@keyframes proofPulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+.proof-toggle-row { margin-top:10px; display:flex; align-items:center; gap:8px; }
+.proof-toggle-label { font-size:13px; color:var(--text2); white-space:nowrap; }
+.proof-select { padding:6px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.15); background:var(--surface2); color:var(--text); font-size:13px; cursor:pointer; flex:1; }
+.reminder-row { margin-top:8px; display:flex; align-items:center; gap:8px; }
+.reminder-label { font-size:13px; color:var(--text2); white-space:nowrap; }
+.reminder-time { padding:6px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.15); background:var(--surface2); color:var(--text); font-size:13px; cursor:pointer; flex:1; }
+.reminder-clear { background:none; border:1px solid rgba(255,255,255,0.15); color:var(--text2); border-radius:8px; padding:6px 10px; font-size:12px; cursor:pointer; }
+.pin-digit { width:48px; height:56px; border-radius:var(--radius); border:2px solid rgba(255,255,255,0.15); background:var(--bg); color:var(--text); font-size:24px; font-weight:700; text-align:center; caret-color:var(--accent); }
+.pin-digit:focus { outline:none; border-color:var(--accent); }
+.proof-indicator { font-size:13px; color:var(--yellow); margin-top:3px; display:flex; align-items:center; gap:4px; font-weight:600; }
+.proof-photo-wrap { position:relative; margin-bottom:12px; }
+.proof-photo-wrap img { width:100%; border-radius:var(--radius); max-height:240px; object-fit:cover; }
+.proof-photo-remove { position:absolute; top:8px; right:8px; width:28px; height:28px; border-radius:50%; background:rgba(0,0,0,0.6); border:none; color:#fff; font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.proof-btns { display:flex; gap:8px; margin-bottom:12px; }
+.proof-btn { flex:1; padding:12px; border:2px dashed rgba(255,255,255,0.15); border-radius:var(--radius); background:none; color:var(--text2); font-size:13px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; }
+.proof-btn:active { background:var(--surface2); }
+.proof-note { width:100%; height:80px; padding:12px; border-radius:var(--radius); border:1px solid rgba(255,255,255,0.1); background:var(--bg); color:var(--text); font-size:14px; resize:vertical; }
+.proof-note:focus { outline:none; border-color:var(--accent); }
+.feedback-card { margin:12px 16px; background:var(--surface); border-radius:var(--radius); padding:16px; }
+.feedback-header { font-size:14px; font-weight:600; margin-bottom:12px; }
+.feedback-locked { text-align:center; }
+.feedback-unlock-btn { background:none; border:1px solid rgba(255,255,255,0.15); border-radius:var(--radius); color:var(--text2); padding:12px 24px; font-size:14px; cursor:pointer; }
+.feedback-unlock-btn:active { background:var(--surface2); }
+.feedback-label { font-size:12px; color:var(--text2); margin-bottom:6px; }
+.feedback-moods { display:flex; gap:8px; margin-bottom:14px; }
+.mood-btn { width:44px; height:44px; border-radius:50%; border:2px solid rgba(255,255,255,0.1); background:none; font-size:24px; cursor:pointer; transition:all .2s; }
+.mood-btn.active { border-color:var(--yellow); background:rgba(240,192,64,0.15); transform:scale(1.15); }
+.feedback-stars { display:flex; gap:4px; margin-bottom:14px; }
+.star-btn { background:none; border:none; font-size:28px; color:rgba(255,255,255,0.15); cursor:pointer; transition:color .2s; padding:0 2px; }
+.star-btn.active { color:var(--yellow); }
 .notif-btn.active { background:var(--green); border-color:var(--green); color:#000; cursor:default; }
 .notif-btn.blocked { background:transparent; border-color:var(--red); color:var(--red); cursor:default; }
 
@@ -287,8 +322,40 @@ input[type="number"] { -moz-appearance:textfield; }
   <div class="day-tabs" id="dayTabs"></div>
   <div class="task-list" id="taskList"></div>
   <div class="remarks-area">
-    <label>Bemerkungen</label>
-    <textarea id="remarks" placeholder="Optionale Bemerkungen zur Woche..." oninput="saveRemarks()"></textarea>
+    <label id="remarksLabel">Bemerkung zum Tag</label>
+    <textarea id="remarks" placeholder="Optionale Bemerkung zum Tag..." oninput="saveRemarks()"></textarea>
+  </div>
+  <!-- FEEDBACK -->
+  <div class="feedback-card" id="feedbackCard" style="display:none;">
+    <div class="feedback-header" id="feedbackHeader">📬 Wochen-Feedback</div>
+    <div class="feedback-locked" id="feedbackLocked" style="display:none;">
+      <button class="feedback-unlock-btn" onclick="unlockFeedback()">🔒 <span id="feedbackUnlockText">Feedback öffnen</span></button>
+    </div>
+    <div class="feedback-content" id="feedbackContent" style="display:none;">
+      <div class="feedback-label" id="feedbackMoodLabel">Stimmung</div>
+      <div class="feedback-moods" id="feedbackMoods">
+        <button class="mood-btn" data-mood="1" onclick="setMood(1)">😢</button>
+        <button class="mood-btn" data-mood="2" onclick="setMood(2)">😕</button>
+        <button class="mood-btn" data-mood="3" onclick="setMood(3)">😐</button>
+        <button class="mood-btn" data-mood="4" onclick="setMood(4)">🙂</button>
+        <button class="mood-btn" data-mood="5" onclick="setMood(5)">😊</button>
+      </div>
+      <div class="feedback-label" id="feedbackRatingLabel">Bewertung</div>
+      <div class="feedback-stars" id="feedbackStars">
+        <button class="star-btn" onclick="setRating(1)">★</button>
+        <button class="star-btn" onclick="setRating(2)">★</button>
+        <button class="star-btn" onclick="setRating(3)">★</button>
+        <button class="star-btn" onclick="setRating(4)">★</button>
+        <button class="star-btn" onclick="setRating(5)">★</button>
+      </div>
+      <textarea class="proof-note" id="feedbackText" placeholder="Wie war die Woche?..." oninput="saveFeedback()"></textarea>
+      <div class="send-bar" style="padding:8px 0 0;">
+        <button class="btn-whatsapp" onclick="sendFeedbackWhatsApp()" style="font-size:13px;padding:10px;">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.111.546 4.1 1.508 5.832L0 24l6.336-1.469A11.95 11.95 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75c-1.883 0-3.651-.508-5.168-1.395l-.363-.215-3.762.987 1.004-3.668-.24-.378A9.717 9.717 0 012.25 12 9.75 9.75 0 0112 2.25 9.75 9.75 0 0121.75 12 9.75 9.75 0 0112 21.75z"/></svg>
+          <span id="feedbackSendLabel">Senden</span>
+        </button>
+      </div>
+    </div>
   </div>
   <div class="send-bar">
     <button class="btn-whatsapp" onclick="sendWhatsApp()">
@@ -298,6 +365,10 @@ input[type="number"] { -moz-appearance:textfield; }
     <button class="btn-email" onclick="sendEmail()">
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 4L12 13 2 4"/></svg>
       E-Mail
+    </button>
+    <button class="btn-pdf" onclick="exportWeekPDF()">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zM6 20V4h7v5h5v11H6zm2-6h8v1.5H8V14zm0 3h8v1.5H8V17zm0-6h5v1.5H8V11z"/></svg>
+      PDF
     </button>
   </div>
 </div>
@@ -350,6 +421,10 @@ input[type="number"] { -moz-appearance:textfield; }
     <button class="btn-email" onclick="sendMonthEmail()">
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 4L12 13 2 4"/></svg>
       Monat per E-Mail
+    </button>
+    <button class="btn-pdf" onclick="exportMonthPDF()">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zM6 20V4h7v5h5v11H6zm2-6h8v1.5H8V14zm0 3h8v1.5H8V17zm0-6h5v1.5H8V11z"/></svg>
+      PDF
     </button>
   </div>
 </div>
@@ -425,9 +500,48 @@ input[type="number"] { -moz-appearance:textfield; }
       <button id="langEN" onclick="setLanguage('en')">EN</button>
     </div>
   </div>
+  <div class="lang-card" id="pinSettingsCard">
+    <div class="lang-label">🔒 <span id="pinSettingsLabel">PIN</span></div>
+    <div style="display:flex;gap:8px;">
+      <button class="notif-btn" id="pinChangeBtn" onclick="startPinChange()">Ändern</button>
+      <button class="notif-btn" id="pinRemoveBtn" onclick="removePin()" style="border-color:var(--red);color:var(--red);">Entfernen</button>
+    </div>
+  </div>
   <div class="danger-zone">
     <p>Sync-Code: <strong id="currentCodeDisplay">—</strong></p>
     <button class="btn-logout" onclick="logout()">Ausloggen</button>
+  </div>
+</div>
+
+<!-- PROOF MODAL -->
+<div class="modal-overlay" id="proofModal">
+  <div class="modal">
+    <h3 id="proofTitle"></h3>
+    <div id="proofPhotoArea"></div>
+    <div class="proof-btns" id="proofPhotoBtnWrap">
+      <button class="proof-btn" onclick="takeProofPhoto()">📷 <span id="proofPhotoBtn">Foto</span></button>
+      <input type="file" id="proofFileInput" accept="image/*" capture="environment" style="display:none" onchange="handleProofPhoto(event)">
+    </div>
+    <textarea class="proof-note" id="proofNote" placeholder="Notiz..."></textarea>
+    <button class="btn-save" onclick="saveProof()" id="proofSaveBtn" style="margin-top:12px;">Speichern</button>
+    <button class="modal-close" onclick="closeProofModal()" id="proofCloseBtn">Schließen</button>
+  </div>
+</div>
+
+<!-- PIN MODAL -->
+<div class="modal-overlay" id="pinModal">
+  <div class="modal" style="text-align:center; padding-top:28px;">
+    <div style="font-size:36px; margin-bottom:8px;">🔒</div>
+    <h3 id="pinTitle">PIN eingeben</h3>
+    <p id="pinSubtitle" style="font-size:13px; color:var(--text2); margin-bottom:16px;"></p>
+    <div style="display:flex; gap:10px; justify-content:center; margin-bottom:8px;">
+      <input type="tel" maxlength="1" class="pin-digit" id="pin1" oninput="pinNext(1)" onkeydown="pinBack(event,1)" autocomplete="off">
+      <input type="tel" maxlength="1" class="pin-digit" id="pin2" oninput="pinNext(2)" onkeydown="pinBack(event,2)" autocomplete="off">
+      <input type="tel" maxlength="1" class="pin-digit" id="pin3" oninput="pinNext(3)" onkeydown="pinBack(event,3)" autocomplete="off">
+      <input type="tel" maxlength="1" class="pin-digit" id="pin4" oninput="pinNext(4)" onkeydown="pinBack(event,4)" autocomplete="off">
+    </div>
+    <div id="pinError" style="color:var(--red); font-size:13px; min-height:20px; margin-bottom:8px;"></div>
+    <button class="modal-close" onclick="closePinModal()">Abbrechen</button>
   </div>
 </div>
 
@@ -456,7 +570,7 @@ input[type="number"] { -moz-appearance:textfield; }
   </button>
   <button class="nav-btn" id="nav-settings" onclick="showPage('settings')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
-    Aufgaben
+    Einstellungen
   </button>
 </nav>
 
@@ -464,6 +578,7 @@ input[type="number"] { -moz-appearance:textfield; }
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
 // ── i18n TRANSLATIONS ──
 const I18N = {
@@ -484,8 +599,8 @@ const I18N = {
     total: 'Gesamt',
     weekReward: '🎁 Wochenbelohnung',
     points: 'Punkte',
-    remarks: 'Bemerkungen',
-    remarksPlaceholder: 'Optionale Bemerkungen zur Woche...',
+    remarks: 'Bemerkung zum Tag',
+    remarksPlaceholder: 'Optionale Bemerkung zum Tag...',
     monthOverview: 'Monatsübersicht',
     monthSub: 'Zusammenfassung & Auswertung',
     refresh: '🔄 Aktualisieren',
@@ -518,7 +633,7 @@ const I18N = {
     navWeek: 'Woche',
     navMonth: 'Monat',
     navHistory: 'Verlauf',
-    navSettings: 'Aufgaben',
+    navSettings: 'Einstellungen',
     syncActive: 'Sync aktiv',
     offline: 'Offline',
     noTasks: 'Keine Aufgaben definiert',
@@ -540,6 +655,59 @@ const I18N = {
     taskPlaceholder: 'Aufgabe',
     daysLabel: 'Tage',
     allDays: 'Alle Tage',
+    proofRequired: 'Beweis erforderlich',
+    proofMissing: 'Beweis fehlt!',
+    proofNeeded: 'Beweis nötig',
+    proofOff: 'Aus',
+    proofOnlyPhoto: 'Nur Foto',
+    proofOnlyText: 'Nur Text',
+    proofBoth: 'Foto + Text',
+    exportPdf: 'PDF Export',
+    pdfWeekTitle: 'Wochenbericht',
+    pdfMonthTitle: 'Monatsbericht',
+    pdfTask: 'Aufgabe',
+    pdfStatus: 'Status',
+    pdfPoints: 'Punkte',
+    pdfRemarks: 'Bemerkungen',
+    pdfDone: 'Erledigt',
+    pdfMissed: 'Verpasst',
+    pdfNA: 'N/A',
+    pdfOpen: 'Offen',
+    pdfTotal: 'Gesamt',
+    pdfEarned: 'Verdient',
+    pdfDeducted: 'Abzug',
+    pdfWeek: 'Woche',
+    pdfFeedback: 'Feedback',
+    pdfMood: 'Stimmung',
+    pdfRating: 'Bewertung',
+    reminderLabel: 'Erinnerung',
+    reminderOff: 'Aus',
+    reminderNotifTitle: 'Erinnerung',
+    reminderNotifBody: 'nicht vergessen!',
+    pinEnter: 'PIN eingeben',
+    pinSet: 'PIN festlegen',
+    pinSetSub: 'Erstelle eine 4-stellige PIN um die Einstellungen zu schützen.',
+    pinEnterSub: 'Gib deine 4-stellige PIN ein.',
+    pinWrong: 'Falsche PIN!',
+    pinCancel: 'Abbrechen',
+    pinChange: 'PIN ändern',
+    pinRemove: 'PIN entfernen',
+    pinRemoveConfirm: 'PIN-Schutz wirklich entfernen?',
+    pinChanged: 'PIN wurde geändert.',
+    proofTitle: 'Beweis',
+    proofPhoto: 'Foto',
+    proofNotePlaceholder: 'Notiz hinzufügen...',
+    proofSave: 'Speichern',
+    proofClose: 'Schließen',
+    proofHasNote: 'Notiz',
+    proofHasPhoto: 'Foto',
+    feedbackTitle: '📬 Wochen-Feedback',
+    feedbackUnlock: 'Feedback öffnen',
+    feedbackMood: 'Stimmung',
+    feedbackRating: 'Bewertung',
+    feedbackPlaceholder: 'Wie war die Woche?...',
+    feedbackSend: 'Senden',
+    feedbackReport: 'Wochen-Feedback',
     language: 'Sprache',
     fromPoints: 'ab',
     appTitle: 'Sub Pflichten',
@@ -571,8 +739,8 @@ const I18N = {
     total: 'Total',
     weekReward: '🎁 Weekly Reward',
     points: 'Points',
-    remarks: 'Remarks',
-    remarksPlaceholder: 'Optional remarks for the week...',
+    remarks: 'Remark for the day',
+    remarksPlaceholder: 'Optional remark for the day...',
     monthOverview: 'Monthly Overview',
     monthSub: 'Summary & Evaluation',
     refresh: '🔄 Refresh',
@@ -605,7 +773,7 @@ const I18N = {
     navWeek: 'Week',
     navMonth: 'Month',
     navHistory: 'History',
-    navSettings: 'Tasks',
+    navSettings: 'Settings',
     syncActive: 'Sync active',
     offline: 'Offline',
     noTasks: 'No tasks defined',
@@ -627,6 +795,59 @@ const I18N = {
     taskPlaceholder: 'Task',
     daysLabel: 'Days',
     allDays: 'All days',
+    proofRequired: 'Proof required',
+    proofMissing: 'Proof missing!',
+    proofNeeded: 'Proof needed',
+    proofOff: 'Off',
+    proofOnlyPhoto: 'Photo only',
+    proofOnlyText: 'Text only',
+    proofBoth: 'Photo + Text',
+    exportPdf: 'PDF Export',
+    pdfWeekTitle: 'Weekly Report',
+    pdfMonthTitle: 'Monthly Report',
+    pdfTask: 'Task',
+    pdfStatus: 'Status',
+    pdfPoints: 'Points',
+    pdfRemarks: 'Remarks',
+    pdfDone: 'Done',
+    pdfMissed: 'Missed',
+    pdfNA: 'N/A',
+    pdfOpen: 'Open',
+    pdfTotal: 'Total',
+    pdfEarned: 'Earned',
+    pdfDeducted: 'Deducted',
+    pdfWeek: 'Week',
+    pdfFeedback: 'Feedback',
+    pdfMood: 'Mood',
+    pdfRating: 'Rating',
+    reminderLabel: 'Reminder',
+    reminderOff: 'Off',
+    reminderNotifTitle: 'Reminder',
+    reminderNotifBody: 'don\'t forget!',
+    pinEnter: 'Enter PIN',
+    pinSet: 'Set PIN',
+    pinSetSub: 'Create a 4-digit PIN to protect settings.',
+    pinEnterSub: 'Enter your 4-digit PIN.',
+    pinWrong: 'Wrong PIN!',
+    pinCancel: 'Cancel',
+    pinChange: 'Change PIN',
+    pinRemove: 'Remove PIN',
+    pinRemoveConfirm: 'Really remove PIN protection?',
+    pinChanged: 'PIN has been changed.',
+    proofTitle: 'Proof',
+    proofPhoto: 'Photo',
+    proofNotePlaceholder: 'Add a note...',
+    proofSave: 'Save',
+    proofClose: 'Close',
+    proofHasNote: 'Note',
+    proofHasPhoto: 'Photo',
+    feedbackTitle: '📬 Weekly Feedback',
+    feedbackUnlock: 'Open feedback',
+    feedbackMood: 'Mood',
+    feedbackRating: 'Rating',
+    feedbackPlaceholder: 'How was the week?...',
+    feedbackSend: 'Send',
+    feedbackReport: 'Weekly Feedback',
     language: 'Language',
     fromPoints: 'from',
     appTitle: 'Sub Duties',
@@ -697,7 +918,7 @@ function applyLanguage() {
   if (wrTitle) wrTitle.textContent = rewardWeekName ? '🎁 ' + rewardWeekName : t('weekReward');
 
   // Remarks
-  const remLabel = document.querySelector('.remarks-area label');
+  const remLabel = document.getElementById('remarksLabel');
   const remText = document.getElementById('remarks');
   if (remLabel) remLabel.textContent = t('remarks');
   if (remText) remText.placeholder = t('remarksPlaceholder');
@@ -813,6 +1034,9 @@ function applyLanguage() {
   const langLabel = document.getElementById('langLabel');
   if (langLabel) langLabel.textContent = t('language');
 
+  // PIN settings
+  updatePinSettingsCard();
+
   // Update html lang attribute
   document.documentElement.lang = currentLang;
 }
@@ -901,6 +1125,7 @@ function initSync(code) {
     if (data) {
       const rawTasks = data.tasks;
       tasks = Array.isArray(rawTasks) ? rawTasks : (rawTasks ? Object.values(rawTasks) : JSON.parse(JSON.stringify(DEFAULT_TASKS)));
+      tasks.forEach(migrateProofRequired);
       weekData = data.weekData || {};
       normalizeWeekData();
       render();
@@ -921,6 +1146,7 @@ function initSync(code) {
   document.getElementById('setupScreen').classList.add('hidden');
   loadHeaderText(null);
   loadGoals(null);
+  loadPin();
   render();
   // Auto-setup push if already granted
   if ('Notification' in window && Notification.permission === 'granted') {
@@ -992,6 +1218,7 @@ function forceRefreshMonth() {
       if (data) {
         const rawTasks = data.tasks;
         tasks = Array.isArray(rawTasks) ? rawTasks : (rawTasks ? Object.values(rawTasks) : JSON.parse(JSON.stringify(DEFAULT_TASKS)));
+        tasks.forEach(migrateProofRequired);
         weekData = data.weekData || {};
         normalizeWeekData();
       }
@@ -1164,6 +1391,32 @@ function render() {
   activeTasks.forEach(tk => {
     const status = dayEntries[tk.id] || dayEntries[String(tk.id)] || '';
     const icon = status === 'done' ? '✓' : status === 'missed' ? '✗' : status === 'na' ? 'N/A' : '';
+    const proof = getProof(getWeekKey(currentWeekOffset), selectedDay, tk.id);
+    const pType = tk.proofRequired; // 'photo','text','both', or false
+    const hasPhoto = proof && proof.photo;
+    const hasNote = proof && proof.note;
+    const needsPhoto = pType === 'photo' || pType === 'both';
+    const needsText = pType === 'text' || pType === 'both';
+    const hasProof = (needsPhoto && hasPhoto) || (needsText && hasNote) || (hasPhoto || hasNote);
+    const proofComplete = pType && ((!needsPhoto || hasPhoto) && (!needsText || hasNote));
+    let proofHtml = '';
+    if (hasPhoto || hasNote) {
+      const parts = [];
+      if (hasPhoto) parts.push('📷 ' + t('proofHasPhoto'));
+      if (hasNote) parts.push('📝 ' + t('proofHasNote'));
+      proofHtml = `<div class="proof-indicator" style="color:${proofComplete ? 'var(--green)' : 'var(--yellow)'};">${parts.join(' · ')}</div>`;
+    } else if (pType && status === 'done') {
+      proofHtml = `<div class="proof-indicator" style="color:var(--red);">⚠ ${t('proofMissing')}</div>`;
+    } else if (pType) {
+      const label = pType === 'photo' ? '📷 ' + t('proofOnlyPhoto') : pType === 'text' ? '📝 ' + t('proofOnlyText') : '📷📝 ' + t('proofBoth');
+      proofHtml = `<div class="proof-indicator" style="color:var(--text2);">${label}</div>`;
+    }
+    let proofBtn = '';
+    if (pType) {
+      const btnClass = proofComplete ? 'proof-upload-btn done' : (status === 'done' && !proofComplete) ? 'proof-upload-btn missing' : 'proof-upload-btn';
+      const btnIcon = pType === 'both' ? '📷📝' : pType === 'text' ? '📝' : '📷';
+      proofBtn = `<button class="${btnClass}" onclick="event.stopPropagation();openProofModal(${tk.id})">${btnIcon}</button>`;
+    }
     const div = document.createElement('div');
     div.className = 'task-card';
     div.innerHTML = `
@@ -1171,15 +1424,19 @@ function render() {
         <div class="task-nr">${tk.id}</div>
         <div class="task-info">
           <div class="task-name">${tk.name}</div>
-          <div class="task-points">+${tk.plus} / -${tk.minus}</div>
+          <div class="task-points">+${tk.plus} / -${tk.minus}${tk.reminderTime ? ' · ⏰ ' + tk.reminderTime : ''}</div>
+          ${proofHtml}
         </div>
-        <button class="task-status ${status}" onclick="cycleStatus(${tk.id})">${icon}</button>
+        ${proofBtn}
+        <button class="task-status ${status}" onclick="event.stopPropagation();cycleStatus(${tk.id})">${icon}</button>
       </div>`;
     list.appendChild(div);
   });
 
-  document.getElementById('remarks').value = wd.remarks || '';
+  const dayRemark = (wd.dayRemarks && (wd.dayRemarks[selectedDay] || wd.dayRemarks[String(selectedDay)])) || '';
+  document.getElementById('remarks').value = dayRemark;
   updateScores();
+  renderFeedback();
 }
 
 function updateScores() {
@@ -1379,7 +1636,28 @@ function showHistoryDetail(key) {
     }
     html += '</div></div>';
   }
-  if (wd.remarks) html += '<div style="margin-top:12px;font-size:13px;color:var(--text2);border-top:1px solid rgba(255,255,255,0.08);padding-top:12px">📝 ' + wd.remarks + '</div>';
+  // Show day remarks in history detail
+  if (wd.dayRemarks) {
+    const dayRemarksHtml = [];
+    for (let di = 0; di < 7; di++) {
+      const dr = wd.dayRemarks[di] || wd.dayRemarks[String(di)];
+      if (dr) dayRemarksHtml.push('<span style="font-size:12px"><strong>' + DAY_NAMES[di] + ':</strong> ' + dr + '</span>');
+    }
+    if (dayRemarksHtml.length) {
+      html += '<div style="margin-top:12px;font-size:13px;color:var(--text2);border-top:1px solid rgba(255,255,255,0.08);padding-top:12px">📝 ' + dayRemarksHtml.join('<br>') + '</div>';
+    }
+  }
+  // Legacy: show old week-level remarks
+  if (wd.remarks) html += '<div style="margin-top:8px;font-size:13px;color:var(--text2)">📝 ' + wd.remarks + '</div>';
+  // Show feedback in history
+  if (wd.feedback && (wd.feedback.mood || wd.feedback.rating || wd.feedback.text)) {
+    html += '<div style="margin-top:12px;border-top:1px solid rgba(255,255,255,0.08);padding-top:12px">';
+    html += '<div style="font-size:13px;font-weight:600;margin-bottom:6px">📬 ' + t('feedbackReport') + '</div>';
+    if (wd.feedback.mood) html += '<div style="font-size:13px;color:var(--text2)">' + t('feedbackMood') + ': ' + MOOD_EMOJIS[wd.feedback.mood] + '</div>';
+    if (wd.feedback.rating) html += '<div style="font-size:13px;color:var(--text2)">' + t('feedbackRating') + ': ' + '★'.repeat(wd.feedback.rating) + '☆'.repeat(5 - wd.feedback.rating) + '</div>';
+    if (wd.feedback.text) html += '<div style="font-size:13px;color:var(--text2);margin-top:4px">' + wd.feedback.text + '</div>';
+    html += '</div>';
+  }
   document.getElementById('modalContent').innerHTML = html;
   document.getElementById('historyModal').classList.add('open');
 }
@@ -1536,7 +1814,10 @@ function cycleStatus(taskId) {
 function saveRemarks() {
   const key = getWeekKey(currentWeekOffset);
   if (!weekData[key]) weekData[key] = { days:{}, remarks:'' };
-  weekData[key].remarks = document.getElementById('remarks').value;
+  if (!weekData[key].dayRemarks) weekData[key].dayRemarks = {};
+  const val = document.getElementById('remarks').value;
+  if (val) weekData[key].dayRemarks[selectedDay] = val;
+  else delete weekData[key].dayRemarks[selectedDay];
   saveData();
 }
 
@@ -1566,7 +1847,17 @@ function buildSummary() {
     const rwName = rewardWeekName || t('weekReward').replace('🎁 ','');
     lines.push(weekNet >= goalWeek ? '✅ ' + rwName + '!' : '📈 ' + weekNet + '/' + goalWeek + ' ' + t('forReward'));
   }
-  if (wd.remarks) lines.push('\n📝 ' + wd.remarks);
+  // Day remarks
+  if (wd.dayRemarks) {
+    const drLines = [];
+    for (let di = 0; di < 7; di++) {
+      const dr = wd.dayRemarks[di] || wd.dayRemarks[String(di)];
+      if (dr) drLines.push(DAY_NAMES[di] + ': ' + dr);
+    }
+    if (drLines.length) lines.push('\n📝 ' + drLines.join('\n'));
+  }
+  // Legacy week remarks
+  if (wd.remarks) lines.push('📝 ' + wd.remarks);
   return lines.join('\n');
 }
 
@@ -1598,6 +1889,181 @@ function buildMonthSummary() {
 function sendMonthWhatsApp() { window.open('https://wa.me/?text=' + encodeURIComponent(buildMonthSummary()), '_blank'); }
 function sendMonthEmail() { window.location.href = 'mailto:?subject=' + encodeURIComponent(t('monthReport') + ': ' + MONTH_NAMES[currentMonthDate.getMonth()] + ' ' + currentMonthDate.getFullYear()) + '&body=' + encodeURIComponent(buildMonthSummary()); }
 
+// ── PDF EXPORT ──
+function pdfAddHeader(doc, title, subtitle, y) {
+  doc.setFontSize(20);
+  doc.setTextColor(233, 69, 96);
+  doc.text(title, 105, y, { align: 'center' });
+  y += 8;
+  doc.setFontSize(11);
+  doc.setTextColor(120, 120, 120);
+  doc.text(subtitle, 105, y, { align: 'center' });
+  y += 4;
+  doc.setDrawColor(233, 69, 96);
+  doc.setLineWidth(0.5);
+  doc.line(20, y, 190, y);
+  return y + 8;
+}
+
+function pdfCheckPage(doc, y, needed) {
+  if (y + needed > 275) {
+    doc.addPage();
+    return 20;
+  }
+  return y;
+}
+
+function pdfAddTable(doc, headers, rows, y, colWidths) {
+  const startX = 20;
+  const rowH = 7;
+  y = pdfCheckPage(doc, y, rowH * (rows.length + 1) + 4);
+  // Header
+  doc.setFillColor(30, 30, 60);
+  doc.rect(startX, y - 5, 170, rowH, 'F');
+  doc.setFontSize(9);
+  doc.setTextColor(255, 255, 255);
+  let x = startX + 2;
+  headers.forEach((h, i) => {
+    doc.text(h, x, y);
+    x += colWidths[i];
+  });
+  y += rowH;
+  // Rows
+  rows.forEach((row, ri) => {
+    y = pdfCheckPage(doc, y, rowH);
+    if (ri % 2 === 0) {
+      doc.setFillColor(245, 245, 250);
+      doc.rect(startX, y - 5, 170, rowH, 'F');
+    }
+    doc.setTextColor(40, 40, 40);
+    doc.setFontSize(9);
+    x = startX + 2;
+    row.forEach((cell, i) => {
+      const txt = String(cell).substring(0, 40);
+      doc.text(txt, x, y);
+      x += colWidths[i];
+    });
+    y += rowH;
+  });
+  return y + 4;
+}
+
+function exportWeekPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  const range = getWeekRange(currentWeekOffset);
+  let y = pdfAddHeader(doc, t('pdfWeekTitle'), range, 22);
+
+  const wd = getWeekData();
+  const score = calcWeekScore(wd);
+
+  // Score summary
+  doc.setFontSize(12);
+  doc.setTextColor(40, 40, 40);
+  doc.text(t('pdfEarned') + ': +' + score.pos + '   ' + t('pdfDeducted') + ': -' + score.neg + '   ' + t('pdfTotal') + ': ' + score.total, 105, y, { align: 'center' });
+  y += 10;
+
+  // Table per day
+  for (let di = 0; di < 7; di++) {
+    const de = (wd.days && (wd.days[di] || wd.days[String(di)])) || {};
+    const activeTasks = tasks.filter(tk => isTaskActiveOnDay(tk, di));
+    if (activeTasks.length === 0) continue;
+
+    y = pdfCheckPage(doc, y, 20);
+    doc.setFontSize(11);
+    doc.setTextColor(233, 69, 96);
+    doc.text(DAY_NAMES[di], 20, y);
+    y += 6;
+
+    const rows = activeTasks.map(tk => {
+      const s = de[tk.id] || de[String(tk.id)] || '';
+      const statusText = s === 'done' ? t('pdfDone') : s === 'missed' ? t('pdfMissed') : s === 'na' ? t('pdfNA') : t('pdfOpen');
+      const pts = s === 'done' ? '+' + tk.plus : s === 'missed' ? '-' + tk.minus : '0';
+      return [tk.id + '. ' + tk.name, statusText, pts];
+    });
+
+    y = pdfAddTable(doc, [t('pdfTask'), t('pdfStatus'), t('pdfPoints')], rows, y, [110, 35, 25]);
+
+    // Day remark
+    const dr = wd.dayRemarks && (wd.dayRemarks[di] || wd.dayRemarks[String(di)]);
+    if (dr) {
+      y = pdfCheckPage(doc, y, 10);
+      doc.setFontSize(9);
+      doc.setTextColor(100, 100, 100);
+      doc.text(t('pdfRemarks') + ': ' + dr.substring(0, 80), 22, y);
+      y += 8;
+    }
+  }
+
+  // Feedback
+  if (wd.feedback && (wd.feedback.mood || wd.feedback.rating || wd.feedback.text)) {
+    y = pdfCheckPage(doc, y, 25);
+    doc.setFontSize(11);
+    doc.setTextColor(233, 69, 96);
+    doc.text(t('pdfFeedback'), 20, y);
+    y += 7;
+    doc.setFontSize(9);
+    doc.setTextColor(40, 40, 40);
+    if (wd.feedback.mood) { doc.text(t('pdfMood') + ': ' + MOOD_EMOJIS[wd.feedback.mood], 22, y); y += 6; }
+    if (wd.feedback.rating) { doc.text(t('pdfRating') + ': ' + String.fromCodePoint(11088).repeat(wd.feedback.rating), 22, y); y += 6; }
+    if (wd.feedback.text) {
+      const lines = doc.splitTextToSize(wd.feedback.text, 160);
+      lines.forEach(line => { y = pdfCheckPage(doc, y, 6); doc.text(line, 22, y); y += 5; });
+    }
+  }
+
+  doc.save(t('pdfWeekTitle') + '_' + range.replace(/[^a-zA-Z0-9]/g, '_') + '.pdf');
+}
+
+function exportMonthPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  const year = currentMonthDate.getFullYear();
+  const month = currentMonthDate.getMonth();
+  const data = calcMonthData(year, month);
+  const subtitle = MONTH_NAMES[month] + ' ' + year;
+  let y = pdfAddHeader(doc, t('pdfMonthTitle'), subtitle, 22);
+
+  // Score summary
+  doc.setFontSize(14);
+  doc.setTextColor(40, 40, 40);
+  doc.text(t('pdfTotal') + ': ' + data.total, 105, y, { align: 'center' });
+  y += 7;
+  doc.setFontSize(11);
+  doc.setTextColor(100, 100, 100);
+  doc.text(t('pdfEarned') + ': +' + data.pos + '   ' + t('pdfDeducted') + ': -' + data.neg, 105, y, { align: 'center' });
+  y += 12;
+
+  // Weeks overview
+  doc.setFontSize(11);
+  doc.setTextColor(233, 69, 96);
+  doc.text(t('weeksLabel'), 20, y);
+  y += 6;
+
+  const fmt = d => String(d.getDate()).padStart(2,'0') + '.' + String(d.getMonth()+1).padStart(2,'0') + '.';
+  const weekRows = data.weekScores.map(w => {
+    return [fmt(w.start) + ' - ' + fmt(w.end), '+' + w.pos, '-' + w.neg, String(w.total)];
+  });
+  y = pdfAddTable(doc, [t('pdfWeek'), t('pdfEarned'), t('pdfDeducted'), t('pdfTotal')], weekRows, y, [80, 30, 30, 30]);
+
+  // Task breakdown
+  y = pdfCheckPage(doc, y, 15);
+  doc.setFontSize(11);
+  doc.setTextColor(233, 69, 96);
+  doc.text(t('tasksLabel'), 20, y);
+  y += 6;
+
+  const taskRows = tasks.map(tk => {
+    const td = data.taskTotals[tk.id];
+    const pos = td ? td.pos : 0;
+    const neg = td ? td.neg : 0;
+    return [tk.id + '. ' + tk.name, '+' + pos, '-' + neg, String(pos - neg)];
+  });
+  y = pdfAddTable(doc, [t('pdfTask'), t('pdfEarned'), t('pdfDeducted'), t('pdfTotal')], taskRows, y, [80, 30, 30, 30]);
+
+  doc.save(t('pdfMonthTitle') + '_' + MONTH_NAMES[month] + '_' + year + '.pdf');
+}
+
 // ── EDIT TASKS ──
 function renderEditList() {
   const container = document.getElementById('editList');
@@ -1613,16 +2079,47 @@ function renderEditList() {
       dayBtns += `<button type="button" class="day-toggle${isOn ? ' active' : ''}" data-idx="${idx}" data-day="${d}" onclick="toggleDay(${idx},${d})">${DAY_NAMES[d]}</button>`;
     }
     card.innerHTML = `
-      <input type="text" data-idx="${idx}" data-field="name" value="${tk.name.replace(/"/g,'&quot;')}" placeholder="${t('taskPlaceholder')}">
+      <input type="text" data-idx="${idx}" data-field="name" value="${tk.name.replace(/"/g,'&quot;')}" placeholder="${t('taskPlaceholder')}" onfocus="this.select()">
       <div class="edit-row">
         <div class="edit-field"><label class="edit-label">${t('plusPoints')}</label><div class="spin-wrap"><input type="number" data-idx="${idx}" data-field="plus" value="${tk.plus}" placeholder="0" min="0" max="99" onfocus="this.dataset.old=this.value;this.value=''" onblur="if(!this.value)this.value=this.dataset.old"><div class="spin-btns"><button class="spin-btn" onclick="spinVal(this,1)" type="button">▲</button><button class="spin-btn" onclick="spinVal(this,-1)" type="button">▼</button></div></div></div>
         <div class="edit-field"><label class="edit-label">${t('minusPoints')}</label><div class="spin-wrap"><input type="number" data-idx="${idx}" data-field="minus" value="${tk.minus}" placeholder="0" min="0" max="99" onfocus="this.dataset.old=this.value;this.value=''" onblur="if(!this.value)this.value=this.dataset.old"><div class="spin-btns"><button class="spin-btn" onclick="spinVal(this,1)" type="button">▲</button><button class="spin-btn" onclick="spinVal(this,-1)" type="button">▼</button></div></div></div>
         <button class="btn-delete" onclick="deleteTask(${idx})">${t('deleteBtn')}</button>
       </div>
       <span class="day-toggle-label">${t('daysLabel')}</span>
-      <div class="day-toggles">${dayBtns}</div>`;
+      <div class="day-toggles">${dayBtns}</div>
+      <div class="proof-toggle-row">
+        <span class="proof-toggle-label">${t('proofRequired')}:</span>
+        <select class="proof-select" data-idx="${idx}" onchange="setProofType(${idx}, this.value)">
+          <option value="" ${!tk.proofRequired ? 'selected' : ''}>${t('proofOff')}</option>
+          <option value="photo" ${tk.proofRequired === 'photo' ? 'selected' : ''}>${t('proofOnlyPhoto')}</option>
+          <option value="text" ${tk.proofRequired === 'text' ? 'selected' : ''}>${t('proofOnlyText')}</option>
+          <option value="both" ${tk.proofRequired === 'both' ? 'selected' : ''}>${t('proofBoth')}</option>
+        </select>
+      </div>
+      <div class="reminder-row">
+        <span class="reminder-label">⏰ ${t('reminderLabel')}:</span>
+        <input type="time" class="reminder-time" value="${tk.reminderTime || ''}" onchange="setReminderTime(${idx}, this.value)">
+        ${tk.reminderTime ? `<button class="reminder-clear" onclick="clearReminder(${idx})" type="button">✕</button>` : ''}
+      </div>`;
     container.appendChild(card);
   });
+}
+
+function setProofType(idx, val) {
+  tasks[idx].proofRequired = val || false;
+}
+function setReminderTime(idx, val) {
+  tasks[idx].reminderTime = val || '';
+  renderEditList();
+}
+function clearReminder(idx) {
+  tasks[idx].reminderTime = '';
+  renderEditList();
+}
+// Migrate old boolean proofRequired to new format
+function migrateProofRequired(task) {
+  if (task.proofRequired === true) task.proofRequired = 'both';
+  else if (!task.proofRequired) task.proofRequired = false;
 }
 
 function toggleDay(idx, day) {
@@ -1675,13 +2172,365 @@ function spinVal(btn, dir) {
   inp.dispatchEvent(new Event('change'));
 }
 
+// ── PROOF / EVIDENCE ──
+let proofTaskId = null;
+let proofPhotoData = null;
+
+function getProof(weekKey, dayIdx, taskId) {
+  const wd = weekData[weekKey];
+  if (!wd || !wd.proofs) return null;
+  const dp = wd.proofs[dayIdx] || wd.proofs[String(dayIdx)];
+  if (!dp) return null;
+  return dp[taskId] || dp[String(taskId)] || null;
+}
+
+function openProofModal(taskId) {
+  proofTaskId = taskId;
+  const task = tasks.find(t => t.id === taskId);
+  if (!task) return;
+  const weekKey = getWeekKey(currentWeekOffset);
+  const proof = getProof(weekKey, selectedDay, taskId);
+  const pType = task.proofRequired || 'both';
+
+  document.getElementById('proofTitle').textContent = t('proofTitle') + ': ' + task.name;
+  document.getElementById('proofNote').placeholder = t('proofNotePlaceholder');
+  document.getElementById('proofNote').value = (proof && proof.note) || '';
+  document.getElementById('proofSaveBtn').textContent = t('proofSave');
+  document.getElementById('proofCloseBtn').textContent = t('proofClose');
+  document.getElementById('proofPhotoBtn').textContent = t('proofPhoto');
+
+  // Show/hide fields based on proof type
+  document.getElementById('proofPhotoBtnWrap').style.display = (pType === 'photo' || pType === 'both') ? '' : 'none';
+  document.getElementById('proofNote').style.display = (pType === 'text' || pType === 'both') ? '' : 'none';
+
+  proofPhotoData = (proof && proof.photo) || null;
+  renderProofPhoto();
+
+  document.getElementById('proofModal').classList.add('open');
+}
+
+function closeProofModal() {
+  document.getElementById('proofModal').classList.remove('open');
+  proofTaskId = null;
+  proofPhotoData = null;
+}
+
+function renderProofPhoto() {
+  const area = document.getElementById('proofPhotoArea');
+  if (proofPhotoData) {
+    area.innerHTML = `<div class="proof-photo-wrap"><img src="${proofPhotoData}" alt="Beweis"><button class="proof-photo-remove" onclick="removeProofPhoto()">✕</button></div>`;
+  } else {
+    area.innerHTML = '';
+  }
+}
+
+function takeProofPhoto() {
+  document.getElementById('proofFileInput').click();
+}
+
+function handleProofPhoto(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  compressImage(file, 800, 0.6, (dataUrl) => {
+    proofPhotoData = dataUrl;
+    renderProofPhoto();
+  });
+  e.target.value = '';
+}
+
+function compressImage(file, maxSize, quality, callback) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      let w = img.width, h = img.height;
+      if (w > maxSize || h > maxSize) {
+        if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
+        else { w = Math.round(w * maxSize / h); h = maxSize; }
+      }
+      canvas.width = w;
+      canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      callback(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeProofPhoto() {
+  proofPhotoData = null;
+  renderProofPhoto();
+}
+
+function saveProof() {
+  if (proofTaskId === null) return;
+  const weekKey = getWeekKey(currentWeekOffset);
+  if (!weekData[weekKey]) weekData[weekKey] = { days:{}, remarks:'' };
+  if (!weekData[weekKey].proofs) weekData[weekKey].proofs = {};
+  if (!weekData[weekKey].proofs[selectedDay]) weekData[weekKey].proofs[selectedDay] = {};
+
+  const note = document.getElementById('proofNote').value.trim();
+  if (!note && !proofPhotoData) {
+    // Remove proof if both empty
+    delete weekData[weekKey].proofs[selectedDay][proofTaskId];
+  } else {
+    weekData[weekKey].proofs[selectedDay][proofTaskId] = {};
+    if (note) weekData[weekKey].proofs[selectedDay][proofTaskId].note = note;
+    if (proofPhotoData) weekData[weekKey].proofs[selectedDay][proofTaskId].photo = proofPhotoData;
+  }
+
+  saveData();
+  render();
+  closeProofModal();
+}
+
+// ── WEEKLY FEEDBACK ──
+let feedbackUnlocked = false;
+const MOOD_EMOJIS = ['','😢','😕','😐','🙂','😊'];
+
+function renderFeedback() {
+  const card = document.getElementById('feedbackCard');
+  if (!card) return;
+  card.style.display = '';
+
+  document.getElementById('feedbackHeader').textContent = t('feedbackTitle');
+  document.getElementById('feedbackUnlockText').textContent = t('feedbackUnlock');
+  document.getElementById('feedbackMoodLabel').textContent = t('feedbackMood');
+  document.getElementById('feedbackRatingLabel').textContent = t('feedbackRating');
+  document.getElementById('feedbackText').placeholder = t('feedbackPlaceholder');
+  document.getElementById('feedbackSendLabel').textContent = t('feedbackSend');
+
+  const weekKey = getWeekKey(currentWeekOffset);
+  const fb = (weekData[weekKey] && weekData[weekKey].feedback) || {};
+
+  // Show locked or content based on PIN state
+  const hasPin = typeof settingsPin === 'string' && settingsPin.length === 4;
+  if (hasPin && !feedbackUnlocked) {
+    document.getElementById('feedbackLocked').style.display = '';
+    document.getElementById('feedbackContent').style.display = 'none';
+  } else {
+    document.getElementById('feedbackLocked').style.display = 'none';
+    document.getElementById('feedbackContent').style.display = '';
+    loadFeedbackData(fb);
+  }
+}
+
+function loadFeedbackData(fb) {
+  // Mood
+  document.querySelectorAll('.mood-btn').forEach(btn => {
+    btn.classList.toggle('active', parseInt(btn.dataset.mood) === (fb.mood || 0));
+  });
+  // Stars
+  const rating = fb.rating || 0;
+  document.querySelectorAll('.star-btn').forEach((btn, i) => {
+    btn.classList.toggle('active', i < rating);
+  });
+  // Text
+  document.getElementById('feedbackText').value = fb.text || '';
+}
+
+function unlockFeedback() {
+  const hasPin = typeof settingsPin === 'string' && settingsPin.length === 4;
+  if (!hasPin) {
+    feedbackUnlocked = true;
+    renderFeedback();
+    return;
+  }
+  // Use PIN modal to verify, then override mode to 'feedback'
+  openPinModal('feedback');
+}
+
+function setMood(val) {
+  const weekKey = getWeekKey(currentWeekOffset);
+  if (!weekData[weekKey]) weekData[weekKey] = { days:{}, remarks:'' };
+  if (!weekData[weekKey].feedback) weekData[weekKey].feedback = {};
+  weekData[weekKey].feedback.mood = val;
+  saveData();
+  renderFeedback();
+}
+
+function setRating(val) {
+  const weekKey = getWeekKey(currentWeekOffset);
+  if (!weekData[weekKey]) weekData[weekKey] = { days:{}, remarks:'' };
+  if (!weekData[weekKey].feedback) weekData[weekKey].feedback = {};
+  weekData[weekKey].feedback.rating = val;
+  saveData();
+  renderFeedback();
+}
+
+function saveFeedback() {
+  const weekKey = getWeekKey(currentWeekOffset);
+  if (!weekData[weekKey]) weekData[weekKey] = { days:{}, remarks:'' };
+  if (!weekData[weekKey].feedback) weekData[weekKey].feedback = {};
+  weekData[weekKey].feedback.text = document.getElementById('feedbackText').value;
+  saveData();
+}
+
+function buildFeedbackSummary() {
+  const weekKey = getWeekKey(currentWeekOffset);
+  const fb = (weekData[weekKey] && weekData[weekKey].feedback) || {};
+  const range = getWeekRange(currentWeekOffset);
+  let lines = ['📬 *' + t('feedbackReport') + ': ' + range + '*', ''];
+  if (fb.mood) lines.push(t('feedbackMood') + ': ' + MOOD_EMOJIS[fb.mood]);
+  if (fb.rating) lines.push(t('feedbackRating') + ': ' + '★'.repeat(fb.rating) + '☆'.repeat(5 - fb.rating));
+  if (fb.text) lines.push('', fb.text);
+  return lines.join('\n');
+}
+
+function sendFeedbackWhatsApp() {
+  window.open('https://wa.me/?text=' + encodeURIComponent(buildFeedbackSummary()), '_blank');
+}
+
+// ── PIN PROTECTION ──
+let settingsPin = undefined; // undefined=not loaded, null=no pin, string=has pin
+let pinMode = ''; // 'check', 'set', 'change'
+let pinCallback = null;
+
+function loadPin() {
+  if (!currentRef) return;
+  currentRef.child('settingsPin').on('value', snap => {
+    settingsPin = snap.val() || null;
+  });
+}
+
+function openPinModal(mode) {
+  pinMode = mode;
+  const modal = document.getElementById('pinModal');
+  const title = document.getElementById('pinTitle');
+  const sub = document.getElementById('pinSubtitle');
+  const cancel = modal.querySelector('.modal-close');
+  document.getElementById('pinError').textContent = '';
+  if (mode === 'set' || mode === 'change') {
+    title.textContent = t('pinSet');
+    sub.textContent = t('pinSetSub');
+  } else {
+    title.textContent = t('pinEnter');
+    sub.textContent = t('pinEnterSub');
+  }
+  cancel.textContent = t('pinCancel');
+  for (let i = 1; i <= 4; i++) { document.getElementById('pin' + i).value = ''; }
+  modal.classList.add('open');
+  setTimeout(() => document.getElementById('pin1').focus(), 100);
+}
+
+function closePinModal() {
+  document.getElementById('pinModal').classList.remove('open');
+  pinMode = '';
+  pinCallback = null;
+}
+
+function pinNext(pos) {
+  const inp = document.getElementById('pin' + pos);
+  // Only allow digits
+  inp.value = inp.value.replace(/[^0-9]/g, '');
+  if (inp.value && pos < 4) {
+    document.getElementById('pin' + (pos + 1)).focus();
+  }
+  if (pos === 4 && inp.value) {
+    const entered = document.getElementById('pin1').value + document.getElementById('pin2').value + document.getElementById('pin3').value + document.getElementById('pin4').value;
+    if (entered.length === 4) submitPin(entered);
+  }
+}
+
+function pinBack(e, pos) {
+  if (e.key === 'Backspace' && !document.getElementById('pin' + pos).value && pos > 1) {
+    document.getElementById('pin' + (pos - 1)).focus();
+  }
+}
+
+function submitPin(entered) {
+  if (pinMode === 'set' || pinMode === 'change') {
+    // Save the new PIN
+    if (currentRef) {
+      currentRef.child('settingsPin').set(entered);
+      settingsPin = entered;
+    }
+    closePinModal();
+    if (pinMode === 'change') {
+      alert(t('pinChanged'));
+    } else {
+      // First time setting PIN → open settings
+      doShowSettings();
+    }
+  } else if (pinMode === 'feedback') {
+    if (entered === settingsPin) {
+      closePinModal();
+      feedbackUnlocked = true;
+      renderFeedback();
+    } else {
+      document.getElementById('pinError').textContent = t('pinWrong');
+      for (let i = 1; i <= 4; i++) { document.getElementById('pin' + i).value = ''; }
+      document.getElementById('pin1').focus();
+    }
+  } else if (pinMode === 'check') {
+    if (entered === settingsPin) {
+      closePinModal();
+      doShowSettings();
+    } else {
+      document.getElementById('pinError').textContent = t('pinWrong');
+      for (let i = 1; i <= 4; i++) { document.getElementById('pin' + i).value = ''; }
+      document.getElementById('pin1').focus();
+    }
+  }
+}
+
+function startPinChange() {
+  openPinModal('change');
+}
+
+function removePin() {
+  if (!confirm(t('pinRemoveConfirm'))) return;
+  if (currentRef) currentRef.child('settingsPin').remove();
+  settingsPin = null;
+  updatePinSettingsCard();
+}
+
+function updatePinSettingsCard() {
+  const card = document.getElementById('pinSettingsCard');
+  const changeBtn = document.getElementById('pinChangeBtn');
+  const removeBtn = document.getElementById('pinRemoveBtn');
+  if (!card) return;
+  changeBtn.textContent = t('pinChange');
+  removeBtn.textContent = t('pinRemove');
+  if (settingsPin) {
+    removeBtn.style.display = '';
+  } else {
+    removeBtn.style.display = 'none';
+    changeBtn.textContent = t('pinSet');
+  }
+}
+
+function doShowSettings() {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-settings').classList.add('active');
+  document.getElementById('nav-settings').classList.add('active');
+  renderEditList(); loadGoals(null);
+  document.getElementById('currentCodeDisplay').textContent = syncCode || '—';
+  updatePinSettingsCard();
+}
+
 // ── NAVIGATION ──
 function showPage(page) {
+  if (page === 'settings') {
+    if (typeof settingsPin === 'string' && settingsPin.length === 4) {
+      // PIN exists → ask for it
+      openPinModal('check');
+      return;
+    } else if (settingsPin === null && currentRef) {
+      // No PIN set yet → ask to create one
+      openPinModal('set');
+      return;
+    }
+    // settingsPin === undefined → not loaded yet, let them in (fallback)
+  }
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('page-' + page).classList.add('active');
   document.getElementById('nav-' + page).classList.add('active');
-  if (page === 'settings') { renderEditList(); loadGoals(null); document.getElementById('currentCodeDisplay').textContent = syncCode || '—'; }
+  if (page === 'settings') doShowSettings();
   if (page === 'history') renderHistory();
   if (page === 'week') render();
   if (page === 'month') { renderMonth(); setTimeout(renderMonth, 800); }
@@ -1694,6 +2543,7 @@ if ('serviceWorker' in navigator) {
 }
 
 applyLanguage();
+
 
 const savedCode = getSavedCode();
 if (savedCode) {
