@@ -81,7 +81,20 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif
 .day-tab.has-data { border-bottom:2px solid var(--green); }
 
 .task-list { padding:8px 16px; }
-.task-card { background:var(--surface); border-radius:var(--radius); margin-bottom:8px; overflow:hidden; animation:fadeIn .3s ease; }
+.task-card { background:var(--surface); border-radius:var(--radius); margin-bottom:8px; overflow:hidden; animation:fadeIn .3s ease; border-left:4px solid transparent; }
+.cat-section { padding:0 16px; margin-bottom:12px; }
+.cat-card { background:var(--surface); border-radius:var(--radius); padding:10px 14px; margin-bottom:6px; display:flex; align-items:center; gap:10px; }
+.cat-dot { width:16px; height:16px; border-radius:50%; flex-shrink:0; cursor:pointer; border:2px solid transparent; }
+.cat-dot.sel { border-color:#fff; }
+.cat-name-input { flex:1; padding:6px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.15); background:var(--bg); color:var(--text); font-size:13px; }
+.cat-del { background:none; border:none; color:var(--red); font-size:16px; cursor:pointer; padding:4px; }
+.cat-add { width:100%; padding:10px; border:1px dashed rgba(255,255,255,0.2); border-radius:var(--radius); background:none; color:var(--text2); font-size:13px; cursor:pointer; margin-top:4px; }
+.cat-add:active { background:rgba(255,255,255,0.05); }
+.cat-color-row { display:flex; gap:6px; flex-wrap:wrap; padding:8px 0; }
+.cat-color-opt { width:28px; height:28px; border-radius:50%; cursor:pointer; border:2px solid transparent; transition:border-color .2s; }
+.cat-color-opt:hover { border-color:rgba(255,255,255,0.4); }
+.cat-color-opt.active { border-color:#fff; }
+.cat-select { padding:6px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.15); background:var(--surface2); color:var(--text); font-size:13px; cursor:pointer; flex:1; }
 .task-main { display:flex; align-items:center; padding:14px; gap:12px; }
 .task-nr { width:28px; height:28px; border-radius:50%; background:var(--surface2); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0; }
 .task-info { flex:1; min-width:0; }
@@ -515,6 +528,8 @@ input[type="number"] { -moz-appearance:textfield; }
   <div style="padding:0 16px 8px;">
     <button class="btn-save" onclick="saveTasks()">Speichern</button>
   </div>
+  <div class="section-title" id="catSectionTitle">Kategorien</div>
+  <div class="cat-section" id="catList"><button class="cat-add" onclick="addCat()">+ Kategorie hinzufügen</button></div>
   <div class="section-title">Zielpunkte</div>
   <div class="goals-card">
     <div class="goal-row">
@@ -739,6 +754,11 @@ const I18N = {
     deleteConfirm: 'Aufgabe wirklich löschen?',
     taskPlaceholder: 'Aufgabe',
     daysLabel: 'Tage',
+    catTitle: 'Kategorien',
+    catAdd: '+ Kategorie hinzufügen',
+    catNone: '-- Keine --',
+    catLabel: 'Kategorie:',
+    catNamePlaceholder: 'Name',
     allDays: 'Alle Tage',
     proofRequired: 'Beweis erforderlich',
     proofMissing: 'Beweis fehlt!',
@@ -901,6 +921,11 @@ const I18N = {
     deleteConfirm: 'Really delete task?',
     taskPlaceholder: 'Task',
     daysLabel: 'Days',
+    catTitle: 'Categories',
+    catAdd: '+ Add category',
+    catNone: '-- None --',
+    catLabel: 'Category:',
+    catNamePlaceholder: 'Name',
     allDays: 'All days',
     proofRequired: 'Proof required',
     proofMissing: 'Proof missing!',
@@ -1079,6 +1104,8 @@ function applyLanguage() {
   const setSub = document.querySelector('#page-settings .header .sub');
   if (setH1) setH1.textContent = t('settingsTitle');
   if (setSub) setSub.textContent = t('settingsSub');
+  const catTitle = document.getElementById('catSectionTitle');
+  if (catTitle) catTitle.textContent = t('catTitle');
   const addBtn = document.querySelector('.btn-add');
   if (addBtn) addBtn.textContent = t('addTask');
   const saveBtn = document.querySelector('.btn-save');
@@ -1176,6 +1203,8 @@ let goalWeek = 0;
 let goalMonth2 = 0;
 let rewardWeekName = '';
 let rewardMonth2Name = '';
+let categories = [];
+const CAT_COLORS = ['#e94560','#4ecca3','#6c5ce7','#0984e3','#fdcb6e','#e17055','#00cec9','#fd79a8','#636e72'];
 
 // ── PUSH NOTIFICATIONS ──
 let deviceId = (() => { try { let id = localStorage.getItem('pflichten_device_id'); if (!id) { id = 'dev_' + Math.random().toString(36).substr(2,9) + Date.now().toString(36); localStorage.setItem('pflichten_device_id', id); } return id; } catch(e) { return 'dev_' + Math.random().toString(36).substr(2,9); } })();
@@ -1236,6 +1265,7 @@ function initSync(code) {
       const rawTasks = data.tasks;
       tasks = Array.isArray(rawTasks) ? rawTasks : (rawTasks ? Object.values(rawTasks) : JSON.parse(JSON.stringify(DEFAULT_TASKS)));
       tasks.forEach(migrateProofRequired);
+      categories = data.categories || [];
       weekData = data.weekData || {};
       normalizeWeekData();
       render();
@@ -1243,7 +1273,7 @@ function initSync(code) {
       loadGoals(data);
       if (document.getElementById('page-month').classList.contains('active')) renderMonth();
       if (document.getElementById('page-history').classList.contains('active')) renderHistory();
-      if (document.getElementById('page-settings').classList.contains('active')) renderEditList();
+      if (document.getElementById('page-settings').classList.contains('active')) { renderEditList(); renderCatList(); }
     }
     setSyncStatus('synced');
     setConnStatus(true);
@@ -1288,7 +1318,7 @@ function saveData() {
   if (!db || !currentRef) return;
   setSyncStatus('syncing');
   localWriting = true;
-  const saveObj = { tasks, weekData, goals: { week: goalWeek, month2: goalMonth2 }, rewardNames: { week: rewardWeekName, month2: rewardMonth2Name } };
+  const saveObj = { tasks, weekData, categories, goals: { week: goalWeek, month2: goalMonth2 }, rewardNames: { week: rewardWeekName, month2: rewardMonth2Name } };
   // Debounce lastActivity to avoid push spam
   clearTimeout(window._lastActivityTimer);
   console.log('Push: debounce timer started');
@@ -1527,14 +1557,17 @@ function render() {
       const btnIcon = pType === 'both' ? '📷📝' : pType === 'text' ? '📝' : '📷';
       proofBtn = `<button class="${btnClass}" onclick="event.stopPropagation();openProofModal(${tk.id})">${btnIcon}</button>`;
     }
+    const catColor = tk.catId ? getCatColor(tk.catId) : 'transparent';
+    const catName = tk.catId ? getCatName(tk.catId) : '';
     const div = document.createElement('div');
     div.className = 'task-card';
+    div.style.borderLeftColor = catColor;
     div.innerHTML = `
       <div class="task-main">
         <div class="task-nr">${tk.id}</div>
         <div class="task-info">
           <div class="task-name">${tk.name}</div>
-          <div class="task-points">+${tk.plus} / -${tk.minus}${tk.reminderTime ? ' · ⏰ ' + tk.reminderTime : ''}</div>
+          <div class="task-points">+${tk.plus} / -${tk.minus}${catName ? ' · ' + catName : ''}${tk.reminderTime ? ' · ⏰ ' + tk.reminderTime : ''}</div>
           ${proofHtml}
         </div>
         ${proofBtn}
@@ -2224,7 +2257,14 @@ function renderEditList() {
         <span class="reminder-label">⏰ ${t('reminderLabel')}:</span>
         <input type="time" class="reminder-time" value="${tk.reminderTime || ''}" onchange="setReminderTime(${idx}, this.value)">
         ${tk.reminderTime ? `<button class="reminder-clear" onclick="clearReminder(${idx})" type="button">✕</button>` : ''}
-      </div>`;
+      </div>
+      ${categories.length > 0 ? `<div class="proof-toggle-row">
+        <span class="proof-toggle-label">${t('catLabel')}</span>
+        <select class="cat-select" onchange="setTaskCat(${idx}, this.value)">
+          <option value="" ${!tk.catId ? 'selected' : ''}>${t('catNone')}</option>
+          ${categories.map(c => `<option value="${c.id}" ${tk.catId === c.id ? 'selected' : ''}>${c.name || '...'}</option>`).join('')}
+        </select>
+      </div>` : ''}`;
     container.appendChild(card);
   });
 }
@@ -2244,6 +2284,67 @@ function clearReminder(idx) {
 function migrateProofRequired(task) {
   if (task.proofRequired === true) task.proofRequired = 'both';
   else if (!task.proofRequired) task.proofRequired = false;
+}
+
+// ── CATEGORIES ──
+function getCatColor(catId) {
+  const cat = categories.find(c => c.id === catId);
+  return cat ? cat.color : 'transparent';
+}
+function getCatName(catId) {
+  const cat = categories.find(c => c.id === catId);
+  return cat ? cat.name : '';
+}
+function renderCatList() {
+  const container = document.getElementById('catList');
+  if (!container) return;
+  let html = '';
+  categories.forEach((cat, i) => {
+    html += `<div class="cat-card">
+      <div class="cat-dot" style="background:${cat.color};" onclick="openCatColorPicker(${i})"></div>
+      <input type="text" class="cat-name-input" value="${(cat.name||'').replace(/"/g,'&quot;')}" placeholder="${t('catNamePlaceholder')}" data-catidx="${i}" onchange="updateCatName(${i}, this.value)">
+      <button class="cat-del" onclick="deleteCat(${i})">✕</button>
+    </div>`;
+    if (window._catColorPickerIdx === i) {
+      html += `<div class="cat-color-row">`;
+      CAT_COLORS.forEach(c => {
+        html += `<div class="cat-color-opt${cat.color === c ? ' active' : ''}" style="background:${c};" onclick="setCatColor(${i},'${c}')"></div>`;
+      });
+      html += `</div>`;
+    }
+  });
+  html += `<button class="cat-add" onclick="addCat()">${t('catAdd')}</button>`;
+  container.innerHTML = html;
+}
+function addCat() {
+  const maxId = categories.reduce((m, c) => Math.max(m, c.id || 0), 0);
+  const usedColors = categories.map(c => c.color);
+  const nextColor = CAT_COLORS.find(c => !usedColors.includes(c)) || CAT_COLORS[0];
+  categories.push({ id: maxId + 1, name: '', color: nextColor });
+  renderCatList();
+}
+function deleteCat(idx) {
+  const catId = categories[idx].id;
+  categories.splice(idx, 1);
+  // Remove category from tasks that used it
+  tasks.forEach(tk => { if (tk.catId === catId) tk.catId = null; });
+  renderCatList();
+  renderEditList();
+}
+function updateCatName(idx, name) {
+  categories[idx].name = name;
+}
+function openCatColorPicker(idx) {
+  window._catColorPickerIdx = window._catColorPickerIdx === idx ? null : idx;
+  renderCatList();
+}
+function setCatColor(idx, color) {
+  categories[idx].color = color;
+  window._catColorPickerIdx = null;
+  renderCatList();
+}
+function setTaskCat(idx, catId) {
+  tasks[idx].catId = catId ? parseInt(catId) : null;
 }
 
 function toggleDay(idx, day) {
@@ -2281,6 +2382,11 @@ function saveTasks() {
     const field = inp.dataset.field;
     if (field === 'name') tasks[idx].name = inp.value;
     else if (field === 'plus' || field === 'minus') tasks[idx][field] = parseInt(inp.value) || 0;
+  });
+  // Save category names from inputs
+  document.querySelectorAll('.cat-name-input').forEach(inp => {
+    const ci = parseInt(inp.dataset.catidx);
+    if (categories[ci]) categories[ci].name = inp.value;
   });
   // days are already saved via toggleDay()
   saveData();
@@ -2678,7 +2784,7 @@ function doShowSettings() {
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('page-settings').classList.add('active');
   document.getElementById('nav-settings').classList.add('active');
-  renderEditList(); loadGoals(null);
+  renderEditList(); renderCatList(); loadGoals(null);
   document.getElementById('currentCodeDisplay').textContent = syncCode || '—';
   updatePinSettingsCard();
 }
