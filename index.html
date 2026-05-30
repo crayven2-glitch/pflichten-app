@@ -12,6 +12,8 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
 <meta name="mobile-web-app-capable" content="yes">
+<!-- Google AdSense — Replace ca-pub-8203510215151522 with your AdSense publisher ID -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8203510215151522" crossorigin="anonymous"></script>
 <style>
 :root {
   --bg: #1a1a2e; --surface: #16213e; --surface2: #0f3460;
@@ -101,7 +103,7 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif
 .task-info { flex:1; min-width:0; }
 .task-name { font-size:14px; font-weight:500; }
 .task-points { font-size:11px; color:var(--text2); margin-top:2px; }
-.task-status { width:44px; height:44px; border-radius:10px; border:2px solid var(--text2); background:none; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; transition:all .2s; font-size:20px; color:transparent; touch-action:manipulation; }
+.task-status { width:44px; height:44px; border-radius:10px; border:2px solid var(--text2); background:none; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; transition:all .2s; font-size:11px; color:transparent; touch-action:manipulation; }
 .task-status.done { background:var(--green); border-color:var(--green); color:#fff; }
 .task-status.missed { background:var(--red); border-color:var(--red); color:#fff; }
 .task-status.na { background:var(--surface2); border-color:var(--text2); color:var(--text2); font-size:11px; }
@@ -167,7 +169,13 @@ input[type="number"] { -moz-appearance:textfield; }
 .reward-title { font-size:14px; font-weight:600; margin-bottom:12px; }
 .reward-row { display:flex; align-items:center; gap:12px; padding:8px 0; }
 .reward-row + .reward-row { border-top:1px solid rgba(255,255,255,0.05); }
-.reward-icon { font-size:24px; }
+.reward-icon { font-size:24px; display:flex;align-items:center;justify-content:center;width:32px;height:32px; }
+.reward-icon svg, .goal-icon svg { width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round; }
+.reward-icon svg { width:26px;height:26px; }
+.ico { display:inline-flex;align-items:center;vertical-align:middle; }
+.ico svg { width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round; }
+.ico-lg svg { width:20px;height:20px; }
+.ico-xl svg { width:36px;height:36px; }
 .reward-info { flex:1; }
 .reward-label { font-size:13px; }
 .reward-sub { font-size:11px; color:var(--text2); }
@@ -231,7 +239,7 @@ input[type="number"] { -moz-appearance:textfield; }
 .pin-digit:focus { outline:none; border-color:var(--accent); }
 .proof-indicator { font-size:13px; color:var(--yellow); margin-top:3px; display:flex; align-items:center; gap:4px; font-weight:600; }
 .proof-photo-wrap { position:relative; margin-bottom:12px; }
-.proof-photo-wrap img { width:100%; border-radius:var(--radius); max-height:240px; object-fit:cover; }
+.proof-photo-wrap img { width:100%; border-radius:var(--radius); max-height:70vh; object-fit:contain; }
 .proof-photo-remove { position:absolute; top:8px; right:8px; width:28px; height:28px; border-radius:50%; background:rgba(0,0,0,0.6); border:none; color:#fff; font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
 .proof-btns { display:flex; gap:8px; margin-bottom:12px; }
 .proof-btn { flex:1; padding:12px; border:2px dashed rgba(255,255,255,0.15); border-radius:var(--radius); background:none; color:var(--text2); font-size:13px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; }
@@ -291,6 +299,68 @@ input[type="number"] { -moz-appearance:textfield; }
 .lang-toggle { display:flex; background:var(--bg); border-radius:8px; overflow:hidden; }
 .lang-toggle button { padding:8px 16px; border:none; font-size:13px; font-weight:600; cursor:pointer; background:none; color:var(--text2); transition:all .2s; }
 .lang-toggle button.active { background:var(--accent); color:#fff; }
+
+/* ── SUBSCRIPTION / PRICING ── */
+.plan-badge { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:700; letter-spacing:.5px; text-transform:uppercase; }
+.plan-badge.trial { background:rgba(240,192,64,.15); color:var(--yellow); }
+.plan-badge.basic { background:rgba(78,204,163,.15); color:var(--green); }
+.plan-badge.premium { background:rgba(233,69,96,.15); color:var(--accent); }
+.plan-badge.expired { background:rgba(233,69,96,.15); color:var(--red); }
+
+.pricing-screen { position:fixed; inset:0; background:var(--bg); display:flex; flex-direction:column; align-items:center; padding:16px 16px 24px; z-index:450; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+.pricing-screen.hidden { display:none; }
+.pricing-header { text-align:center; margin-bottom:12px; padding-top:4px; flex-shrink:0; }
+.pricing-header h2 { font-size:20px; font-weight:800; margin-bottom:2px; }
+.pricing-header p { font-size:12px; color:var(--text2); max-width:320px; }
+.pricing-toggle { display:flex; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); border-radius:25px; margin-bottom:20px; padding:3px; flex-shrink:0; min-height:44px; }
+.pricing-toggle button { flex:1; padding:8px 20px; border:none; border-radius:22px; font-size:13px; font-weight:600; cursor:pointer; background:none; color:var(--text2); transition:all .2s; white-space:nowrap; }
+.pricing-toggle button.active { background:var(--accent); color:#fff; box-shadow:0 2px 12px rgba(233,69,96,0.3); }
+.pricing-cards { display:flex; flex-direction:column; gap:16px; width:100%; max-width:360px; }
+.pricing-card { background:var(--surface); border-radius:16px; padding:20px; border:2px solid transparent; transition:border-color .2s; position:relative; }
+.pricing-card.recommended { border-color:var(--accent); }
+.pricing-card-badge { position:absolute; top:-10px; left:50%; transform:translateX(-50%); background:var(--accent); color:#fff; font-size:11px; font-weight:700; padding:3px 14px; border-radius:20px; white-space:nowrap; }
+.pricing-card h3 { font-size:20px; font-weight:700; margin-bottom:4px; }
+.pricing-card .price { font-size:32px; font-weight:800; margin:8px 0 4px; }
+.pricing-card .price span { font-size:14px; font-weight:400; color:var(--text2); }
+.pricing-card .price-period { font-size:13px; color:var(--text2); margin-bottom:16px; }
+.pricing-card ul { list-style:none; margin-bottom:20px; }
+.pricing-card ul li { font-size:13px; color:var(--text2); padding:4px 0; display:flex; align-items:center; gap:8px; }
+.pricing-card ul li::before { content:'✓'; color:var(--green); font-weight:700; font-size:14px; }
+.pricing-card ul li.locked::before { content:'✗'; color:var(--text2); opacity:.4; }
+.pricing-card .pricing-btn { width:100%; padding:14px; border:none; border-radius:var(--radius); font-size:15px; font-weight:700; cursor:pointer; transition:all .2s; }
+.pricing-card .pricing-btn.primary { background:var(--accent); color:#fff; }
+.pricing-card .pricing-btn.secondary { background:rgba(255,255,255,.08); color:var(--text); border:1px solid rgba(255,255,255,.12); }
+.pricing-skip { margin-top:16px; background:none; border:none; color:var(--text2); font-size:13px; cursor:pointer; text-decoration:underline; padding:8px; }
+
+.sub-card { margin:12px 16px; background:linear-gradient(135deg, var(--surface2), var(--surface)); border-radius:var(--radius); padding:16px; }
+.sub-card-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+.sub-card-plan { font-size:15px; font-weight:700; }
+.sub-card-info { font-size:12px; color:var(--text2); margin-bottom:12px; }
+.sub-card-btns { display:flex; gap:8px; }
+.sub-card-btns button { flex:1; padding:10px; border-radius:var(--radius); font-size:13px; font-weight:600; cursor:pointer; border:none; }
+.sub-card-btn-upgrade { background:var(--accent); color:#fff; }
+.sub-card-btn-manage { background:rgba(255,255,255,.08); color:var(--text); border:1px solid rgba(255,255,255,.12) !important; }
+
+.premium-lock { position:relative; pointer-events:none; opacity:.5; }
+.premium-lock::after { content:''; position:absolute; inset:0; background:rgba(26,26,46,.6); border-radius:var(--radius); display:flex; align-items:center; justify-content:center; }
+.premium-badge-inline { display:inline-flex; align-items:center; gap:4px; background:rgba(233,69,96,.12); color:var(--accent); font-size:10px; font-weight:700; padding:2px 8px; border-radius:10px; margin-left:6px; vertical-align:middle; }
+
+/* ── ADS ── */
+.ad-banner-wrap { position:fixed; bottom:82px; left:0; right:0; z-index:90; display:none; justify-content:center; align-items:center; background:var(--bg); padding:4px 0; border-top:1px solid rgba(255,255,255,0.05); }
+.ad-banner-wrap.visible { display:flex; }
+.ad-banner-wrap ins { max-width:100%; }
+.ad-banner-label { position:absolute; top:-14px; right:8px; font-size:9px; color:var(--text2); opacity:.5; }
+body.has-ads { padding-bottom:200px; }
+
+.ad-interstitial-overlay { position:fixed; inset:0; background:rgba(0,0,0,.85); z-index:9999; display:none; flex-direction:column; align-items:center; justify-content:center; padding:24px; }
+.ad-interstitial-overlay.visible { display:flex; }
+.ad-interstitial-close { align-self:flex-end; background:none; border:1px solid rgba(255,255,255,0.3); color:var(--text2); font-size:13px; padding:6px 16px; border-radius:20px; cursor:pointer; margin-bottom:16px; }
+.ad-interstitial-close:disabled { opacity:.3; cursor:default; }
+.ad-interstitial-content { width:100%; max-width:360px; min-height:300px; display:flex; align-items:center; justify-content:center; }
+.ad-interstitial-content ins { max-width:100%; }
+.upgrade-banner { margin:8px 16px; background:linear-gradient(135deg, var(--accent2), var(--accent)); border-radius:var(--radius); padding:14px 16px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; }
+.upgrade-banner-text { font-size:13px; font-weight:600; color:#fff; }
+.upgrade-banner-btn { background:rgba(255,255,255,.2); color:#fff; border:none; padding:8px 16px; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer; }
 </style>
 </head>
 <body>
@@ -306,8 +376,23 @@ input[type="number"] { -moz-appearance:textfield; }
   <span id="connLabel"></span>
 </div>
 
+<!-- LANGUAGE SELECT -->
+<div class="setup-screen hidden" id="langSelectScreen">
+  <div style="margin-bottom:16px;"><img src="devotion-triskele.png" alt="Devotion" style="width:100%;max-width:280px;"></div>
+  <h2 style="margin-bottom:8px;">Sprache / Language</h2>
+  <p style="margin-bottom:32px;color:var(--text2);font-size:14px;">Wähle deine Sprache<br>Choose your language</p>
+  <div style="display:flex;flex-direction:column;gap:12px;width:100%;max-width:280px;">
+    <button class="setup-btn" onclick="selectLang('de')" style="display:flex;align-items:center;justify-content:center;gap:12px;font-size:17px;">
+      <span style="font-size:24px;">🇩🇪</span> Deutsch
+    </button>
+    <button class="setup-btn" onclick="selectLang('en')" style="background:transparent;border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;gap:12px;font-size:17px;">
+      <span style="font-size:24px;">🇬🇧</span> English
+    </button>
+  </div>
+</div>
+
 <!-- AGE CHECK -->
-<div class="setup-screen" id="ageCheckScreen">
+<div class="setup-screen hidden" id="ageCheckScreen">
   <div class="setup-logo"><img src="icon-192.png" alt="Devotion" style="width:72px;height:72px;border-radius:16px;"></div>
   <h2>Altersverifizierung</h2>
   <p>Diese App enthält Inhalte für Erwachsene. Bitte bestätige dein Alter, um fortzufahren.</p>
@@ -362,7 +447,60 @@ input[type="number"] { -moz-appearance:textfield; }
   <button class="setup-btn" onclick="connectWithCode()">Einloggen</button>
   <div class="setup-divider">oder</div>
   <button class="setup-btn-sec" onclick="generateCode()">Neuen Code generieren</button>
-  <div class="setup-version">v1.5</div>
+  <div class="setup-version">v2.0</div>
+</div>
+
+<!-- PRICING SCREEN -->
+<div class="pricing-screen hidden" id="pricingScreen">
+  <div class="pricing-header">
+    <h2 id="pricingTitle">Abo wählen</h2>
+    <p id="pricingDesc">Wähle deinen Plan und schalte alle Features frei.</p>
+  </div>
+  <div class="pricing-toggle">
+    <button id="pricingMonthBtn" class="active" onclick="setPricingPeriod('month')">Monat</button>
+    <button id="pricingYearBtn" onclick="setPricingPeriod('year')">Jahr <span style="font-size:10px;opacity:.7;">(spare ~17%)</span></button>
+  </div>
+  <div class="pricing-cards">
+    <!-- BASIC -->
+    <div class="pricing-card" id="pricingBasicCard">
+      <h3 id="pricingBasicTitle">Basic</h3>
+      <div class="price" id="pricingBasicPrice">6,99 €<span> / Monat</span></div>
+      <div class="price-period" id="pricingBasicPeriod"></div>
+      <ul id="pricingBasicFeatures">
+        <li>Unbegrenzte Aufgaben</li>
+        <li>Punkte-System</li>
+        <li>Unbegrenzte Belohnungen</li>
+        <li>Push-Benachrichtigungen</li>
+        <li>Wochentags-Filter</li>
+        <li>Wochen-Feedback</li>
+      </ul>
+      <button class="pricing-btn secondary" onclick="startCheckout('basic')">Basic wählen</button>
+    </div>
+    <!-- PREMIUM -->
+    <div class="pricing-card recommended" id="pricingPremiumCard">
+      <div class="pricing-card-badge" id="pricingBadge">Empfohlen</div>
+      <h3 id="pricingPremiumTitle">Premium</h3>
+      <div class="price" id="pricingPremiumPrice">11,99 €<span> / Monat</span></div>
+      <div class="price-period" id="pricingPremiumPeriod"></div>
+      <ul id="pricingPremiumFeatures">
+        <li>Alles aus Basic</li>
+        <li>Foto-Beweise</li>
+        <li>PIN-Schutz</li>
+        <li>Monatsübersicht</li>
+        <li>Detaillierte Charts</li>
+        <li>PDF Export</li>
+        <li>Prioritäts-Support</li>
+      </ul>
+      <button class="pricing-btn primary" onclick="startCheckout('premium')">Premium wählen</button>
+    </div>
+  </div>
+  <button class="pricing-skip" id="pricingSkipBtn" onclick="closePricing()" style="display:none;">Später entscheiden</button>
+  <div style="text-align:center;padding:12px 24px 0;font-size:12px;color:rgba(255,255,255,.4);">
+    <span id="pricingLegalNote">Mit dem Kauf akzeptierst du die</span>
+    <a href="./agb.html" target="_blank" style="color:rgba(233,69,96,.7);" id="pricingLegalTerms">AGB</a>
+    <span id="pricingLegalAnd">&</span>
+    <a href="./datenschutz.html" target="_blank" style="color:rgba(233,69,96,.7);" id="pricingLegalPrivacy">Datenschutzerklärung</a>
+  </div>
 </div>
 
 <!-- PAGE: WOCHE -->
@@ -370,6 +508,14 @@ input[type="number"] { -moz-appearance:textfield; }
   <div class="header">
     <h1 contenteditable="true" spellcheck="false" id="headerTitle" oninput="saveHeaderText()">Meine Aufgaben</h1>
     <div class="sub" contenteditable="true" spellcheck="false" id="headerSub" oninput="saveHeaderText()">Tippen zum Bearbeiten</div>
+  </div>
+  <!-- Trial Banner -->
+  <div class="upgrade-banner" id="trialBanner" style="display:none;" onclick="showPricing()">
+    <div>
+      <div class="upgrade-banner-text" id="trialBannerTitle">Alle Features freischalten</div>
+      <div style="font-size:11px;color:rgba(255,255,255,.7);margin-top:2px;" id="trialBannerSub">Ab 6,99 €/Monat</div>
+    </div>
+    <button class="upgrade-banner-btn" id="trialBannerBtn">Pläne ansehen</button>
   </div>
   <div class="week-selector">
     <button onclick="changeWeek(-1)">‹</button>
@@ -384,7 +530,7 @@ input[type="number"] { -moz-appearance:textfield; }
   <!-- WOCHENBALKEN -->
   <div class="week-reward-card">
     <div class="week-reward-title">
-      <span>🎁 Wochenbelohnung</span>
+      <span><span class="ico" style="color:var(--accent)"><svg viewBox="0 0 24 24"><path d="M20 12v10H4V12"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg></span> Wochenbelohnung</span>
       <span id="weekRewardCheck"></span>
     </div>
     <div class="week-reward-bar-wrap">
@@ -400,9 +546,9 @@ input[type="number"] { -moz-appearance:textfield; }
   </div>
   <!-- FEEDBACK -->
   <div class="feedback-card" id="feedbackCard" style="display:none;">
-    <div class="feedback-header" id="feedbackHeader">📬 Wochen-Feedback</div>
+    <div class="feedback-header" id="feedbackHeader" style="display:flex;align-items:center;gap:6px;"><span class="ico"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span> Wochen-Feedback</div>
     <div class="feedback-locked" id="feedbackLocked" style="display:none;">
-      <button class="feedback-unlock-btn" onclick="unlockFeedback()">🔒 <span id="feedbackUnlockText">Feedback öffnen</span></button>
+      <button class="feedback-unlock-btn" onclick="unlockFeedback()"><span class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span> <span id="feedbackUnlockText">Feedback öffnen</span></button>
     </div>
     <div class="feedback-content" id="feedbackContent" style="display:none;">
       <div class="feedback-label" id="feedbackMoodLabel">Stimmung</div>
@@ -467,7 +613,7 @@ input[type="number"] { -moz-appearance:textfield; }
     <button onclick="changeMonth(1)">›</button>
   </div>
   <div style="text-align:center;padding:4px 0 8px;">
-    <button onclick="forceRefreshMonth()" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:var(--text2);padding:6px 16px;border-radius:20px;font-size:12px;cursor:pointer;">🔄 Aktualisieren</button>
+    <button onclick="forceRefreshMonth()" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:var(--text2);padding:6px 16px;border-radius:20px;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;"><span class="ico"><svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></span> Aktualisieren</button>
   </div>
   <div class="month-score-card">
     <div class="month-total" id="monthTotal">0</div>
@@ -481,7 +627,7 @@ input[type="number"] { -moz-appearance:textfield; }
   <div class="reward-card">
     <div class="reward-title">Wunsch</div>
     <div class="reward-row">
-      <div class="reward-icon">⭐</div>
+      <div class="reward-icon" style="color:var(--yellow)"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="currentColor" stroke="currentColor"/></svg></div>
       <div class="reward-info">
         <div class="reward-label">Ein Wunsch</div>
         <div class="reward-sub">ab 0 Punkte</div>
@@ -518,8 +664,8 @@ input[type="number"] { -moz-appearance:textfield; }
     <div class="sub">Vergangene Wochen &amp; Monate</div>
   </div>
   <div class="history-toggle">
-    <button id="histToggleWeek" class="active" onclick="setHistoryView('week')">📅 Wochen</button>
-    <button id="histToggleMonth" onclick="setHistoryView('month')">📆 Monate</button>
+    <button id="histToggleWeek" class="active" onclick="setHistoryView('week')" style="display:inline-flex;align-items:center;gap:4px;"><span class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span> <span id="histWeekLabel">Wochen</span></button>
+    <button id="histToggleMonth" onclick="setHistoryView('month')" style="display:inline-flex;align-items:center;gap:4px;"><span class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><rect x="8" y="14" width="8" height="4" rx="1" fill="currentColor" opacity=".3"/></svg></span> <span id="histMonthLabel">Monate</span></button>
   </div>
   <div id="historyList"></div>
 </div>
@@ -537,14 +683,14 @@ input[type="number"] { -moz-appearance:textfield; }
   </div>
   <div class="stats-cards" id="statsCards"></div>
   <div class="stats-section">
-    <div class="stats-section-title" id="statsTaskTitle">📊 Aufgaben-Erfolgsrate</div>
+    <div class="stats-section-title" id="statsTaskTitle" style="display:flex;align-items:center;gap:6px;"><span class="ico ico-lg" style="color:var(--green)"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span> <span id="statsTaskText">Aufgaben-Erfolgsrate</span></div>
     <div class="stats-legend" id="statsBarLegend"></div>
     <div class="stats-chart-wrap" id="statsBarWrap" style="height:40px;">
       <canvas id="statsBarChart"></canvas>
     </div>
   </div>
   <div class="stats-section">
-    <div class="stats-section-title" id="statsPieTitle">📈 Gesamt-Verteilung</div>
+    <div class="stats-section-title" id="statsPieTitle" style="display:flex;align-items:center;gap:6px;"><span class="ico ico-lg" style="color:var(--accent)"><svg viewBox="0 0 24 24"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg></span> <span id="statsPieText">Gesamt-Verteilung</span></div>
     <div class="stats-legend" id="statsPieLegend"></div>
     <div class="stats-chart-wrap" style="height:220px;">
       <canvas id="statsPieChart"></canvas>
@@ -581,14 +727,14 @@ input[type="number"] { -moz-appearance:textfield; }
   <div class="goals-card">
     <div class="goal-row">
       <div class="goal-info">
-        <span class="goal-icon">🎯</span>
+        <span class="goal-icon" style="color:var(--accent)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span>
         <div><div class="goal-label">Wochenziel</div><div class="goal-sub">Belohnung pro Woche</div></div>
       </div>
       <div class="goal-spin"><input type="number" class="goal-input" id="goalWeekInput" value="0" min="0" max="999" onchange="saveGoals()" onfocus="this.dataset.old=this.value;this.value=''" onblur="if(!this.value)this.value=this.dataset.old"><div class="spin-btns"><button class="spin-btn" onclick="spinVal(this,1)" type="button">▲</button><button class="spin-btn" onclick="spinVal(this,-1)" type="button">▼</button></div></div>
     </div>
     <div class="goal-row">
       <div class="goal-info">
-        <span class="goal-icon">⭐</span>
+        <span class="goal-icon" style="color:var(--yellow)"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
         <div><div class="goal-label">Monats-Wunsch</div><div class="goal-sub">Ziel im Monat</div></div>
       </div>
       <div class="goal-spin"><input type="number" class="goal-input" id="goalMonth2Input" value="0" min="0" max="999" onchange="saveGoals()" onfocus="this.dataset.old=this.value;this.value=''" onblur="if(!this.value)this.value=this.dataset.old"><div class="spin-btns"><button class="spin-btn" onclick="spinVal(this,1)" type="button">▲</button><button class="spin-btn" onclick="spinVal(this,-1)" type="button">▼</button></div></div>
@@ -598,36 +744,51 @@ input[type="number"] { -moz-appearance:textfield; }
   <div class="goals-card">
     <div class="goal-row">
       <div class="goal-info">
-        <span class="goal-icon">🎁</span>
+        <span class="goal-icon" style="color:var(--accent)"><svg viewBox="0 0 24 24"><path d="M20 12v10H4V12"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg></span>
         <div><div class="goal-label" id="rwNameWeekLabel">Wochenbelohnung</div></div>
       </div>
       <input type="text" class="reward-name-input" id="rewardWeekNameInput" placeholder="z.B. Massage" oninput="saveRewardNames()">
     </div>
     <div class="goal-row">
       <div class="goal-info">
-        <span class="goal-icon">⭐</span>
+        <span class="goal-icon" style="color:var(--yellow)"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
         <div><div class="goal-label" id="rwNameMonth2Label">Monats-Wunsch</div></div>
       </div>
       <input type="text" class="reward-name-input" id="rewardMonth2NameInput" placeholder="z.B. Ausflug" oninput="saveRewardNames()">
     </div>
   </div>
   <div class="lang-card">
-    <div class="lang-label">🔔 <span id="notifLabel">Benachrichtigungen</span></div>
+    <div class="lang-label" style="display:flex;align-items:center;gap:6px;"><span class="ico" style="color:var(--yellow)"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></span> <span id="notifLabel">Benachrichtigungen</span></div>
     <button class="notif-btn" id="notifBtn" onclick="enablePush()">Push aktivieren</button>
   </div>
   <div class="lang-card">
-    <div class="lang-label">🌐 <span id="langLabel">Sprache</span></div>
+    <div class="lang-label" style="display:flex;align-items:center;gap:6px;"><span class="ico" style="color:var(--text2)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span> <span id="langLabel">Sprache</span></div>
     <div class="lang-toggle">
       <button id="langDE" class="active" onclick="setLanguage('de')">DE</button>
       <button id="langEN" onclick="setLanguage('en')">EN</button>
     </div>
   </div>
   <div class="lang-card" id="pinSettingsCard">
-    <div class="lang-label">🔒 <span id="pinSettingsLabel">PIN</span></div>
+    <div class="lang-label" style="display:flex;align-items:center;gap:6px;"><span class="ico" style="color:var(--text2)"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span> <span id="pinSettingsLabel">PIN</span></div>
     <div style="display:flex;gap:8px;">
       <button class="notif-btn" id="pinChangeBtn" onclick="startPinChange()">Ändern</button>
       <button class="notif-btn" id="pinRemoveBtn" onclick="removePin()" style="border-color:var(--red);color:var(--red);">Entfernen</button>
     </div>
+  </div>
+  <div class="sub-card" id="subCard">
+    <div class="sub-card-header">
+      <span class="sub-card-plan" id="subCardPlan">Free Trial</span>
+      <span class="plan-badge trial" id="subCardBadge">Trial</span>
+    </div>
+    <div class="sub-card-info" id="subCardInfo">Alle Features freischalten</div>
+    <div class="sub-card-btns" id="subCardBtns">
+      <button class="sub-card-btn-upgrade" onclick="showPricing()">Upgrade</button>
+    </div>
+  </div>
+  <div class="legal-links" style="display:flex;justify-content:center;gap:20px;padding:16px;font-size:13px;">
+    <a href="./datenschutz.html" target="_blank" style="color:var(--text2);text-decoration:none;" id="legalPrivacy">Datenschutz</a>
+    <a href="./impressum.html" target="_blank" style="color:var(--text2);text-decoration:none;" id="legalImprint">Impressum</a>
+    <a href="./agb.html" target="_blank" style="color:var(--text2);text-decoration:none;" id="legalTerms">AGB</a>
   </div>
   <div class="danger-zone">
     <p>Sync-Code: <strong id="currentCodeDisplay">—</strong></p>
@@ -641,7 +802,7 @@ input[type="number"] { -moz-appearance:textfield; }
     <h3 id="proofTitle"></h3>
     <div id="proofPhotoArea"></div>
     <div class="proof-btns" id="proofPhotoBtnWrap">
-      <button class="proof-btn" onclick="takeProofPhoto()">📷 <span id="proofPhotoBtn">Foto</span></button>
+      <button class="proof-btn" onclick="takeProofPhoto()" style="display:inline-flex;align-items:center;gap:4px;"><span class="ico"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span> <span id="proofPhotoBtn">Foto</span></button>
       <input type="file" id="proofFileInput" accept="image/*" capture="environment" style="display:none" onchange="handleProofPhoto(event)">
     </div>
     <textarea class="proof-note" id="proofNote" placeholder="Notiz..."></textarea>
@@ -653,7 +814,7 @@ input[type="number"] { -moz-appearance:textfield; }
 <!-- PIN MODAL -->
 <div class="modal-overlay" id="pinModal">
   <div class="modal" style="text-align:center; padding-top:28px;">
-    <div style="font-size:36px; margin-bottom:8px;">🔒</div>
+    <div class="ico ico-xl" style="margin-bottom:8px;color:var(--text2);justify-content:center;display:flex;"><svg viewBox="0 0 24 24" style="width:36px;height:36px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
     <h3 id="pinTitle">PIN eingeben</h3>
     <p id="pinSubtitle" style="font-size:13px; color:var(--text2); margin-bottom:16px;"></p>
     <div style="display:flex; gap:10px; justify-content:center; margin-bottom:8px;">
@@ -673,6 +834,30 @@ input[type="number"] { -moz-appearance:textfield; }
     <h3 id="modalTitle"></h3>
     <div id="modalContent"></div>
     <button class="modal-close" onclick="closeModal()">Schließen</button>
+  </div>
+</div>
+
+<!-- AD BANNER (above nav, free users only) -->
+<div class="ad-banner-wrap" id="adBannerWrap">
+  <span class="ad-banner-label">Anzeige</span>
+  <!-- Replace data-ad-slot with your AdSense ad unit ID -->
+  <ins class="adsbygoogle"
+       style="display:inline-block;width:320px;height:50px"
+       data-ad-client="ca-pub-8203510215151522"
+       data-ad-slot="XXXXXXXXXX"></ins>
+</div>
+
+<!-- AD INTERSTITIAL (after actions, free users only) -->
+<div class="ad-interstitial-overlay" id="adInterstitialOverlay">
+  <button class="ad-interstitial-close" id="adInterstitialClose" disabled onclick="closeInterstitialAd()">
+    Schliessen (5s)
+  </button>
+  <div class="ad-interstitial-content">
+    <!-- Replace data-ad-slot with your AdSense ad unit ID -->
+    <ins class="adsbygoogle"
+         style="display:inline-block;width:300px;height:250px"
+         data-ad-client="ca-pub-8203510215151522"
+         data-ad-slot="XXXXXXXXXX"></ins>
   </div>
 </div>
 
@@ -704,14 +889,49 @@ input[type="number"] { -moz-appearance:textfield; }
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
+// ── SVG ICON HELPERS ──
+const SVG = {
+  gift: '<span class="ico" style="color:var(--accent)"><svg viewBox="0 0 24 24"><path d="M20 12v10H4V12"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg></span>',
+  refresh: '<span class="ico"><svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></span>',
+  cal: '<span class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>',
+  calFill: '<span class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><rect x="8" y="14" width="8" height="4" rx="1" fill="currentColor" opacity=".3"/></svg></span>',
+  bar: '<span class="ico" style="color:var(--green)"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>',
+  pie: '<span class="ico" style="color:var(--accent)"><svg viewBox="0 0 24 24"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg></span>',
+  star: '<span class="ico" style="color:var(--yellow)"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>',
+  check: '<span class="ico" style="color:var(--green)"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span>',
+  x: '<span class="ico" style="color:var(--red)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></span>',
+  empty: '<span class="ico" style="color:var(--text2)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/></svg></span>',
+  cam: '<span class="ico"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span>',
+  note: '<span class="ico"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span>',
+  warn: '<span class="ico" style="color:var(--red)"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>',
+  clock: '<span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>',
+  clip: '<span class="ico"><svg viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></span>',
+  mail: '<span class="ico"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span>',
+  trendUp: '<span class="ico" style="color:var(--green)"><svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span>',
+  trendDown: '<span class="ico" style="color:var(--red)"><svg viewBox="0 0 24 24"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg></span>',
+};
 // ── i18n TRANSLATIONS ──
 const I18N = {
   de: {
     days: ['Mo','Di','Mi','Do','Fr','Sa','So'],
     months: ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'],
+    ageTitle: 'Altersverifizierung',
+    ageDesc: 'Diese App enthält Inhalte für Erwachsene. Bitte bestätige dein Alter, um fortzufahren.',
+    ageConfirm: 'Ich bestätige, dass ich mindestens 18 Jahre alt bin und den Zugang zu Inhalten für Erwachsene wünsche.',
+    ageBtn: 'Bestätigen',
+    ageErrDate: 'Bitte gib ein gültiges Geburtsdatum ein.',
+    ageErrCheck: 'Bitte bestätige, dass du 18+ bist.',
+    ageErrUnder: 'Du musst mindestens 18 Jahre alt sein.',
+    onboard1Title: 'Willkommen bei Devotion',
+    onboard1Desc: 'Die App für Paare, die ihre D/s-Dynamik strukturieren möchten. Erstelle Aufgaben, vergib Punkte und verfolge den Fortschritt — sicher und diskret.',
+    onboard1Btn: 'Weiter',
+    onboard2Title: 'Gemeinsam verbunden',
+    onboard2Desc: 'Beide Partner nutzen denselben Code, um Aufgaben, Punkte und Belohnungen in Echtzeit zu teilen. Alles bleibt privat zwischen euch.',
+    onboard2Btn: 'Los geht\'s',
     setupTitle: 'Einloggen',
     setupDesc: 'Gib einen gemeinsamen Code ein, damit beide Handys dieselben Daten sehen.',
     setupConnect: 'Einloggen',
@@ -724,13 +944,13 @@ const I18N = {
     earned: 'Verdient',
     deduction: 'Abzug',
     total: 'Gesamt',
-    weekReward: '🎁 Wochenbelohnung',
+    weekReward: 'Wochenbelohnung',
     points: 'Punkte',
     remarks: 'Bemerkung zum Tag',
     remarksPlaceholder: 'Optionale Bemerkung zum Tag...',
     monthOverview: 'Monatsübersicht',
     monthSub: 'Zusammenfassung & Auswertung',
-    refresh: '🔄 Aktualisieren',
+    refresh: 'Aktualisieren',
     monthTotalLabel: 'Gesamtpunkte im Monat',
     weeks: 'Wochen',
     rewards: 'Wunsch',
@@ -741,8 +961,8 @@ const I18N = {
     monthEmail: 'Monat per E-Mail',
     history: 'Verlauf',
     historySub: 'Vergangene Wochen & Monate',
-    histWeeks: '📅 Wochen',
-    histMonths: '📆 Monate',
+    histWeeks: 'Wochen',
+    histMonths: 'Monate',
     settingsTitle: 'Aufgaben verwalten',
     settingsSub: 'Hinzufügen, bearbeiten, löschen',
     addTask: '+ Neue Aufgabe hinzufügen',
@@ -790,7 +1010,7 @@ const I18N = {
     result: 'Ergebnis',
     monthReport: 'Monatsbericht',
     totalPoints: 'Gesamtpunkte',
-    wishEarned: '⭐ Ein Wunsch verdient!',
+    wishEarned: 'Ein Wunsch verdient!',
     forReward: 'für Belohnung',
     tasksLabel: 'Aufgaben',
     weeksLabel: 'Wochen',
@@ -853,7 +1073,7 @@ const I18N = {
     proofClose: 'Schließen',
     proofHasNote: 'Notiz',
     proofHasPhoto: 'Foto',
-    feedbackTitle: '📬 Wochen-Feedback',
+    feedbackTitle: 'Wochen-Feedback',
     feedbackUnlock: 'Feedback öffnen',
     feedbackMood: 'Stimmung',
     feedbackRating: 'Bewertung',
@@ -875,10 +1095,81 @@ const I18N = {
     notifActive: 'Push aktiv',
     notifBlocked: 'Im Browser blockiert',
     notifUpdate: 'Aufgabe aktualisiert',
+    // Subscription
+    subTrial: 'Free Trial',
+    subTrialDays: '{n} Tage verbleibend',
+    subTrialExpired: 'Trial abgelaufen',
+    subBasic: 'Basic',
+    subPremium: 'Premium',
+    subActive: 'Aktiv',
+    subCanceled: 'Gekündigt',
+    subPastDue: 'Zahlung ausstehend',
+    subManage: 'Verwalten',
+    subUpgrade: 'Upgrade',
+    subRenewsAt: 'Verlängert sich am {date}',
+    subEndsAt: 'Endet am {date}',
+    pricingTitle: 'Abo wählen',
+    pricingDesc: 'Wähle deinen Plan und schalte alle Features frei.',
+    pricingMonth: 'Monat',
+    pricingYear: 'Jahr',
+    pricingSave: '(spare ~17%)',
+    pricingBasicBtn: 'Basic wählen',
+    pricingPremiumBtn: 'Premium wählen',
+    pricingRecommended: 'Empfohlen',
+    pricingPerMonth: '/ Monat',
+    pricingPerYear: '/ Jahr',
+    pricingYearNote: '{price} / Jahr',
+    pricingSkip: 'Später entscheiden',
+    pricingBasicF1: 'Unbegrenzte Aufgaben',
+    pricingBasicF2: 'Punkte-System',
+    pricingBasicF3: 'Unbegrenzte Belohnungen',
+    pricingBasicF4: 'Push-Benachrichtigungen',
+    pricingBasicF5: 'Wochentags-Filter',
+    pricingBasicF6: 'Wochen-Feedback',
+    pricingPremiumF1: 'Alles aus Basic',
+    pricingPremiumF2: 'Foto-Beweise',
+    pricingPremiumF3: 'PIN-Schutz',
+    pricingPremiumF4: 'Monatsübersicht',
+    pricingPremiumF5: 'Detaillierte Charts',
+    pricingPremiumF6: 'PDF Export',
+    pricingPremiumF7: 'Prioritäts-Support',
+    pricingIntro: 'Erster Monat',
+    pricingIntroThen: 'danach',
+    pricingIntroBtnText: 'Jetzt für {price} testen',
+    premiumOnly: 'Premium',
+    adLabel: 'Anzeige',
+    adClose: 'Schliessen',
+    adUpgradeHint: 'Werbefrei mit Premium',
+    trialInfo: 'Alle Features freischalten',
+    trialExpiredTitle: 'Trial abgelaufen',
+    trialExpiredDesc: 'Dein kostenloser Test ist vorbei. Wähle einen Plan, um weiterzumachen.',
+    paymentSuccess: 'Zahlung erfolgreich! Dein Abo ist jetzt aktiv.',
+    paymentCancel: 'Zahlung abgebrochen.',
+    taskLimit: 'Max. 5 Aufgaben im Trial. Upgrade für unbegrenzte Aufgaben.',
+    rewardLimit: 'Max. 1 Belohnung im Trial.',
+    legalPrivacy: 'Datenschutz',
+    legalImprint: 'Impressum',
+    legalTerms: 'AGB',
+    pricingLegalNote: 'Mit dem Kauf akzeptierst du die',
+    pricingLegalTerms: 'AGB',
+    pricingLegalPrivacy: 'Datenschutzerklärung',
   },
   en: {
     days: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
     months: ['January','February','March','April','May','June','July','August','September','October','November','December'],
+    ageTitle: 'Age Verification',
+    ageDesc: 'This app contains adult content. Please confirm your age to continue.',
+    ageConfirm: 'I confirm that I am at least 18 years old and wish to access adult content.',
+    ageBtn: 'Confirm',
+    ageErrDate: 'Please enter a valid date of birth.',
+    ageErrCheck: 'Please confirm that you are 18+.',
+    ageErrUnder: 'You must be at least 18 years old.',
+    onboard1Title: 'Welcome to Devotion',
+    onboard1Desc: 'The app for couples who want to structure their D/s dynamic. Create tasks, assign points and track progress — safe and discreet.',
+    onboard1Btn: 'Next',
+    onboard2Title: 'Connected together',
+    onboard2Desc: 'Both partners use the same code to share tasks, points and rewards in real time. Everything stays private between you.',
+    onboard2Btn: 'Let\'s go',
     setupTitle: 'Log in',
     setupDesc: 'Enter a shared code so both phones see the same data.',
     setupConnect: 'Log in',
@@ -891,13 +1182,13 @@ const I18N = {
     earned: 'Earned',
     deduction: 'Deduction',
     total: 'Total',
-    weekReward: '🎁 Weekly Reward',
+    weekReward: 'Weekly Reward',
     points: 'Points',
     remarks: 'Remark for the day',
     remarksPlaceholder: 'Optional remark for the day...',
     monthOverview: 'Monthly Overview',
     monthSub: 'Summary & Evaluation',
-    refresh: '🔄 Refresh',
+    refresh: 'Refresh',
     monthTotalLabel: 'Total Points this Month',
     weeks: 'Weeks',
     rewards: 'Wish',
@@ -908,8 +1199,8 @@ const I18N = {
     monthEmail: 'Month via E-Mail',
     history: 'History',
     historySub: 'Past Weeks & Months',
-    histWeeks: '📅 Weeks',
-    histMonths: '📆 Months',
+    histWeeks: 'Weeks',
+    histMonths: 'Months',
     settingsTitle: 'Manage Tasks',
     settingsSub: 'Add, edit, delete',
     addTask: '+ Add new task',
@@ -957,7 +1248,7 @@ const I18N = {
     result: 'Result',
     monthReport: 'Monthly Report',
     totalPoints: 'Total Points',
-    wishEarned: '⭐ A Wish earned!',
+    wishEarned: 'A Wish earned!',
     forReward: 'for reward',
     tasksLabel: 'Tasks',
     weeksLabel: 'Weeks',
@@ -1020,7 +1311,7 @@ const I18N = {
     proofClose: 'Close',
     proofHasNote: 'Note',
     proofHasPhoto: 'Photo',
-    feedbackTitle: '📬 Weekly Feedback',
+    feedbackTitle: 'Weekly Feedback',
     feedbackUnlock: 'Open feedback',
     feedbackMood: 'Mood',
     feedbackRating: 'Rating',
@@ -1031,7 +1322,7 @@ const I18N = {
     feedbackReport: 'Weekly Feedback',
     language: 'Language',
     fromPoints: 'from',
-    appTitle: 'Sub Duties',
+    appTitle: 'Devotion',
     rewardNames: 'Name Rewards',
     weekRewardName: 'Weekly Reward',
     weekRewardPlaceholder: 'e.g. Massage',
@@ -1042,6 +1333,64 @@ const I18N = {
     notifActive: 'Push active',
     notifBlocked: 'Blocked in browser',
     notifUpdate: 'Task updated',
+    // Subscription
+    subTrial: 'Free Trial',
+    subTrialDays: '{n} days remaining',
+    subTrialExpired: 'Trial expired',
+    subBasic: 'Basic',
+    subPremium: 'Premium',
+    subActive: 'Active',
+    subCanceled: 'Canceled',
+    subPastDue: 'Payment due',
+    subManage: 'Manage',
+    subUpgrade: 'Upgrade',
+    subRenewsAt: 'Renews on {date}',
+    subEndsAt: 'Ends on {date}',
+    pricingTitle: 'Choose a Plan',
+    pricingDesc: 'Pick your plan and unlock all features.',
+    pricingMonth: 'Monthly',
+    pricingYear: 'Yearly',
+    pricingSave: '(save ~17%)',
+    pricingBasicBtn: 'Choose Basic',
+    pricingPremiumBtn: 'Choose Premium',
+    pricingRecommended: 'Recommended',
+    pricingPerMonth: '/ month',
+    pricingPerYear: '/ year',
+    pricingYearNote: '{price} / year',
+    pricingSkip: 'Decide later',
+    pricingBasicF1: 'Unlimited tasks',
+    pricingBasicF2: 'Points system',
+    pricingBasicF3: 'Unlimited rewards',
+    pricingBasicF4: 'Push notifications',
+    pricingBasicF5: 'Weekday filters',
+    pricingBasicF6: 'Weekly feedback',
+    pricingPremiumF1: 'Everything in Basic',
+    pricingPremiumF2: 'Photo proofs',
+    pricingPremiumF3: 'PIN protection',
+    pricingPremiumF4: 'Monthly overview',
+    pricingPremiumF5: 'Detailed charts',
+    pricingPremiumF6: 'PDF export',
+    pricingPremiumF7: 'Priority support',
+    pricingIntro: 'First month',
+    pricingIntroThen: 'then',
+    pricingIntroBtnText: 'Try for {price}',
+    premiumOnly: 'Premium',
+    adLabel: 'Ad',
+    adClose: 'Close',
+    adUpgradeHint: 'Go ad-free with Premium',
+    trialInfo: 'Unlock all features',
+    trialExpiredTitle: 'Trial expired',
+    trialExpiredDesc: 'Your free trial has ended. Choose a plan to continue.',
+    paymentSuccess: 'Payment successful! Your subscription is now active.',
+    paymentCancel: 'Payment canceled.',
+    taskLimit: 'Max. 5 tasks in trial. Upgrade for unlimited tasks.',
+    rewardLimit: 'Max. 1 reward in trial.',
+    legalPrivacy: 'Privacy Policy',
+    legalImprint: 'Legal Notice',
+    legalTerms: 'Terms',
+    pricingLegalNote: 'By purchasing you accept the',
+    pricingLegalTerms: 'Terms',
+    pricingLegalPrivacy: 'Privacy Policy',
   }
 };
 
@@ -1051,6 +1400,7 @@ let DAY_NAMES = I18N[currentLang].days;
 let MONTH_NAMES = I18N[currentLang].months;
 
 function setLanguage(lang) {
+  trackEvent('set_language', { language: lang });
   currentLang = lang;
   DAY_NAMES = I18N[lang].days;
   MONTH_NAMES = I18N[lang].months;
@@ -1060,6 +1410,9 @@ function setLanguage(lang) {
   setConnStatus(navigator.onLine && !!currentRef);
   if (document.getElementById('page-month').classList.contains('active')) renderMonth();
   if (document.getElementById('page-history').classList.contains('active')) renderHistory();
+  updateSubUI();
+  updatePricingDisplay();
+  applyFeatureGating();
 }
 
 function applyLanguage() {
@@ -1075,14 +1428,39 @@ function applyLanguage() {
   const setupAppTitle = document.getElementById('setupAppTitle');
   if (setupAppTitle) setupAppTitle.textContent = t('appTitle');
 
+  // Age check screen
+  const ageH2 = document.querySelector('#ageCheckScreen h2');
+  const ageP = document.querySelector('#ageCheckScreen p');
+  const ageChkLabel = document.querySelector('#ageConfirmCheck + span');
+  const ageBtn = document.querySelector('#ageCheckScreen .setup-btn');
+  if (ageH2) ageH2.textContent = t('ageTitle');
+  if (ageP) ageP.textContent = t('ageDesc');
+  if (ageChkLabel) ageChkLabel.textContent = t('ageConfirm');
+  if (ageBtn) ageBtn.textContent = t('ageBtn');
+
+  // Onboarding screens
+  const ob1H2 = document.querySelector('#onboardScreen1 h2');
+  const ob1P = document.querySelector('#onboardScreen1 p');
+  const ob1Btn = document.querySelector('#onboardScreen1 .setup-btn');
+  if (ob1H2) ob1H2.textContent = t('onboard1Title');
+  if (ob1P) ob1P.textContent = t('onboard1Desc');
+  if (ob1Btn) ob1Btn.textContent = t('onboard1Btn');
+
+  const ob2H2 = document.querySelector('#onboardScreen2 h2');
+  const ob2P = document.querySelector('#onboardScreen2 p');
+  const ob2Btn = document.querySelector('#onboardScreen2 .setup-btn');
+  if (ob2H2) ob2H2.textContent = t('onboard2Title');
+  if (ob2P) ob2P.textContent = t('onboard2Desc');
+  if (ob2Btn) ob2Btn.textContent = t('onboard2Btn');
+
   // Setup screen
   const setupH2 = document.querySelector('#setupScreen h2');
   const setupP = document.querySelector('#setupScreen p');
   if (setupH2) setupH2.textContent = t('setupTitle');
   if (setupP) setupP.textContent = t('setupDesc');
-  const setupBtn = document.querySelector('.setup-btn');
-  const setupSec = document.querySelector('.setup-btn-sec');
-  const setupDiv = document.querySelector('.setup-divider');
+  const setupBtn = document.querySelector('#setupScreen .setup-btn');
+  const setupSec = document.querySelector('#setupScreen .setup-btn-sec');
+  const setupDiv = document.querySelector('#setupScreen .setup-divider');
   if (setupBtn) setupBtn.textContent = t('setupConnect');
   if (setupSec) setupSec.textContent = t('setupGenerate');
   if (setupDiv) setupDiv.textContent = t('setupOr');
@@ -1096,7 +1474,7 @@ function applyLanguage() {
 
   // Week reward (custom name or default)
   const wrTitle = document.querySelector('.week-reward-title span:first-child');
-  if (wrTitle) wrTitle.textContent = rewardWeekName ? '🎁 ' + rewardWeekName : t('weekReward');
+  if (wrTitle) wrTitle.innerHTML = SVG.gift + ' ' + (rewardWeekName || t('weekReward'));
 
   // Remarks
   const remLabel = document.getElementById('remarksLabel');
@@ -1143,8 +1521,8 @@ function applyLanguage() {
   const histSub = document.querySelector('#page-history .header .sub');
   if (histH1) histH1.textContent = t('history');
   if (histSub) histSub.innerHTML = t('historySub');
-  document.getElementById('histToggleWeek').textContent = t('histWeeks');
-  document.getElementById('histToggleMonth').textContent = t('histMonths');
+  document.getElementById('histWeekLabel').textContent = t('histWeeks');
+  document.getElementById('histMonthLabel').textContent = t('histMonths');
 
   // Settings page
   const setH1 = document.querySelector('#page-settings .header h1');
@@ -1221,6 +1599,14 @@ function applyLanguage() {
   // PIN settings
   updatePinSettingsCard();
 
+  // Legal links
+  const lp = document.getElementById('legalPrivacy');
+  const li = document.getElementById('legalImprint');
+  const lt = document.getElementById('legalTerms');
+  if (lp) lp.textContent = t('legalPrivacy');
+  if (li) li.textContent = t('legalImprint');
+  if (lt) lt.textContent = t('legalTerms');
+
   // Update html lang attribute
   document.documentElement.lang = currentLang;
 }
@@ -1234,10 +1620,11 @@ const firebaseConfig = {
   projectId: "pflichten-app-f1ebe",
   storageBucket: "pflichten-app-f1ebe.firebasestorage.app",
   messagingSenderId: "83874401171",
-  appId: "1:83874401171:web:485509d6dc9d790978b666"
+  appId: "1:83874401171:web:485509d6dc9d790978b666",
+  measurementId: "G-HV6JBFC5KQ"
 };
 
-let app, db, currentRef = null;
+let app, db, analytics, currentRef = null;
 let syncCode = null;
 let tasks = JSON.parse(JSON.stringify(DEFAULT_TASKS));
 let weekData = {};
@@ -1253,8 +1640,41 @@ let rewardMonth2Name = '';
 let categories = [];
 const CAT_COLORS = ['#e94560','#4ecca3','#6c5ce7','#0984e3','#fdcb6e','#e17055','#00cec9','#fd79a8','#636e72'];
 
-// ── PUSH NOTIFICATIONS ──
+// ── ANALYTICS ──
+function trackEvent(name, params) {
+  try { if (analytics) firebase.analytics().logEvent(name, params || {}); } catch(e) {}
+}
+
+// ── DEVICE ID (localStorage + IndexedDB backup) ──
 let deviceId = (() => { try { let id = localStorage.getItem('pflichten_device_id'); if (!id) { id = 'dev_' + Math.random().toString(36).substr(2,9) + Date.now().toString(36); localStorage.setItem('pflichten_device_id', id); } return id; } catch(e) { return 'dev_' + Math.random().toString(36).substr(2,9); } })();
+
+// IndexedDB backup — harder to clear than localStorage
+(function initDeviceIdBackup() {
+  try {
+    const req = indexedDB.open('devotion_device', 1);
+    req.onupgradeneeded = (e) => { e.target.result.createObjectStore('meta'); };
+    req.onsuccess = (e) => {
+      const idb = e.target.result;
+      const tx = idb.transaction('meta', 'readwrite');
+      const store = tx.objectStore('meta');
+      const get = store.get('deviceId');
+      get.onsuccess = () => {
+        if (get.result) {
+          // IDB has a device ID — use it (it's the original one)
+          if (get.result !== deviceId) {
+            deviceId = get.result;
+            try { localStorage.setItem('pflichten_device_id', deviceId); } catch(e) {}
+          }
+        } else {
+          // First time — save current deviceId to IDB
+          store.put(deviceId, 'deviceId');
+        }
+      };
+    };
+  } catch(e) {}
+})();
+
+// ── PUSH NOTIFICATIONS ──
 let fcmToken = null;
 const VAPID_KEY = 'BA9_bL94woheLXHh5OiXcF-c3qUxPYky9De12ws6ryTFYMikvkUL8cOch7RsGx6RL1zkXjxN5KYfPKixcKstm7w';
 
@@ -1298,12 +1718,14 @@ function initSync(code) {
       app = firebase.app();
     }
     db = firebase.database(app);
+    try { analytics = firebase.analytics(app); } catch(e) { console.log('Analytics init skipped'); }
   } catch(e) {
     console.error('Firebase init error:', e);
   }
 
   if (currentRef) currentRef.off();
   currentRef = db.ref('pflichten/' + code);
+  trackEvent('login', { method: 'pair_code' });
 
   currentRef.on('value', (snapshot) => {
     if (localWriting) return;
@@ -1324,6 +1746,7 @@ function initSync(code) {
     }
     setSyncStatus('synced');
     setConnStatus(true);
+    loadSubscription(data);
   }, (err) => {
     setSyncStatus('error');
     setConnStatus(false);
@@ -1331,10 +1754,13 @@ function initSync(code) {
   });
 
   document.getElementById('setupScreen').classList.add('hidden');
+  // Save deviceId to pair code data
+  if (db) db.ref('pflichten/' + code + '/deviceId').set(deviceId);
   loadHeaderText(null);
   loadGoals(null);
   loadPin();
   render();
+  checkPaymentResult();
   // Auto-setup push if already granted
   if ('Notification' in window && Notification.permission === 'granted') {
     setupPush();
@@ -1577,7 +2003,7 @@ function render() {
   }
   activeTasks.forEach(tk => {
     const status = dayEntries[tk.id] || dayEntries[String(tk.id)] || '';
-    const icon = status === 'done' ? '✓' : status === 'missed' ? '✗' : status === 'na' ? 'N/A' : '';
+    const icon = status === 'done' ? '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' : status === 'missed' ? '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' : status === 'na' ? 'N/A' : '';
     const proof = getProof(getWeekKey(currentWeekOffset), selectedDay, tk.id);
     const pType = tk.proofRequired; // 'photo','text','both', or false
     const hasPhoto = proof && proof.photo;
@@ -1589,19 +2015,19 @@ function render() {
     let proofHtml = '';
     if (hasPhoto || hasNote) {
       const parts = [];
-      if (hasPhoto) parts.push('📷 ' + t('proofHasPhoto'));
-      if (hasNote) parts.push('📝 ' + t('proofHasNote'));
+      if (hasPhoto) parts.push(SVG.cam + ' ' + t('proofHasPhoto'));
+      if (hasNote) parts.push(SVG.note + ' ' + t('proofHasNote'));
       proofHtml = `<div class="proof-indicator" style="color:${proofComplete ? 'var(--green)' : 'var(--yellow)'};">${parts.join(' · ')}</div>`;
     } else if (pType && status === 'done') {
-      proofHtml = `<div class="proof-indicator" style="color:var(--red);">⚠ ${t('proofMissing')}</div>`;
+      proofHtml = `<div class="proof-indicator" style="color:var(--red);display:flex;align-items:center;gap:3px">${SVG.warn} ${t('proofMissing')}</div>`;
     } else if (pType) {
-      const label = pType === 'photo' ? '📷 ' + t('proofOnlyPhoto') : pType === 'text' ? '📝 ' + t('proofOnlyText') : '📷📝 ' + t('proofBoth');
+      const label = pType === 'photo' ? SVG.cam + ' ' + t('proofOnlyPhoto') : pType === 'text' ? SVG.note + ' ' + t('proofOnlyText') : SVG.cam + SVG.note + ' ' + t('proofBoth');
       proofHtml = `<div class="proof-indicator" style="color:var(--text2);">${label}</div>`;
     }
     let proofBtn = '';
     if (pType) {
       const btnClass = proofComplete ? 'proof-upload-btn done' : (status === 'done' && !proofComplete) ? 'proof-upload-btn missing' : 'proof-upload-btn';
-      const btnIcon = pType === 'both' ? '📷📝' : pType === 'text' ? '📝' : '📷';
+      const btnIcon = pType === 'both' ? SVG.cam : pType === 'text' ? SVG.note : SVG.cam;
       proofBtn = `<button class="${btnClass}" onclick="event.stopPropagation();openProofModal(${tk.id})">${btnIcon}</button>`;
     }
     const catColor = tk.catId ? getCatColor(tk.catId) : 'transparent';
@@ -1614,7 +2040,7 @@ function render() {
         <div class="task-nr">${tk.id}</div>
         <div class="task-info">
           <div class="task-name">${tk.name}</div>
-          <div class="task-points">+${tk.plus} / -${tk.minus}${catName ? ' · ' + catName : ''}${tk.reminderTime ? ' · ⏰ ' + tk.reminderTime : ''}</div>
+          <div class="task-points">+${tk.plus} / -${tk.minus}${catName ? ' · ' + catName : ''}${tk.reminderTime ? ' · ' + SVG.clock + ' ' + tk.reminderTime : ''}</div>
           ${proofHtml}
         </div>
         ${proofBtn}
@@ -1644,10 +2070,10 @@ function updateScores() {
   const chkEl = document.getElementById('weekRewardCheck');
   if (barEl) barEl.style.width = pct + '%';
   if (lblEl) lblEl.textContent = clamped + ' / ' + goalWeek + ' ' + t('points');
-  if (chkEl) chkEl.textContent = clamped >= goalWeek ? '✅' : '';
+  if (chkEl) chkEl.innerHTML = clamped >= goalWeek ? SVG.check : '';
   // Update week reward title with custom name
   const wrT = document.querySelector('.week-reward-title span:first-child');
-  if (wrT) wrT.textContent = rewardWeekName ? '🎁 ' + rewardWeekName : t('weekReward');
+  if (wrT) wrT.innerHTML = SVG.gift + ' ' + (rewardWeekName || t('weekReward'));
 }
 
 // ── RENDER MONTH ──
@@ -1667,7 +2093,7 @@ function renderMonth() {
   const pts = Math.max(0, data.total);
   document.getElementById('reward2Bar').style.width = Math.min(100, (pts/goalMonth2)*100) + '%';
   document.getElementById('reward2Label').textContent = pts + ' / ' + goalMonth2;
-  document.getElementById('reward2Check').textContent = pts >= goalMonth2 ? '✅' : '';
+  document.getElementById('reward2Check').innerHTML = pts >= goalMonth2 ? SVG.check : '';
   const sub2 = document.querySelector('#reward2Bar')?.closest('.reward-row')?.querySelector('.reward-sub');
   if (sub2) sub2.textContent = t('fromPoints') + ' ' + goalMonth2 + ' ' + t('points');
   // Update reward label with custom name
@@ -1801,9 +2227,9 @@ function renderMonthHistory(container) {
       </div>
       <div class="month-history-bar"><div class="month-history-bar-fill" style="width:${pct}%;background:${color}"></div></div>
       <div class="month-history-sub">
-        <span>✅ +${data.pos} ${t('earned')}</span>
+        <span>${SVG.check} +${data.pos} ${t('earned')}</span>
         <span>${data.weekScores.length} ${t('weeks')}</span>
-        <span>❌ -${data.neg} ${t('deduction')}</span>
+        <span>${SVG.x} -${data.neg} ${t('deduction')}</span>
       </div>`;
     container.appendChild(card);
   }
@@ -1821,8 +2247,8 @@ function showHistoryDetail(key) {
     for (let di = 0; di < 7; di++) {
       const de = (wd.days && (wd.days[di] || wd.days[String(di)])) || {};
       const s = de[task.id] || de[String(task.id)] || '';
-      const icon = s === 'done' ? '✅' : s === 'missed' ? '❌' : s === 'na' ? '⬜' : '—';
-      html += '<span style="font-size:12px;color:var(--text2)">' + DAY_NAMES[di] + ': ' + icon + '</span>';
+      const icon = s === 'done' ? SVG.check : s === 'missed' ? SVG.x : s === 'na' ? SVG.empty : '—';
+      html += '<span style="font-size:12px;color:var(--text2);display:inline-flex;align-items:center;gap:2px">' + DAY_NAMES[di] + ': ' + icon + '</span>';
     }
     html += '</div></div>';
   }
@@ -1834,15 +2260,15 @@ function showHistoryDetail(key) {
       if (dr) dayRemarksHtml.push('<span style="font-size:12px"><strong>' + DAY_NAMES[di] + ':</strong> ' + dr + '</span>');
     }
     if (dayRemarksHtml.length) {
-      html += '<div style="margin-top:12px;font-size:13px;color:var(--text2);border-top:1px solid rgba(255,255,255,0.08);padding-top:12px">📝 ' + dayRemarksHtml.join('<br>') + '</div>';
+      html += '<div style="margin-top:12px;font-size:13px;color:var(--text2);border-top:1px solid rgba(255,255,255,0.08);padding-top:12px">' + SVG.note + ' ' + dayRemarksHtml.join('<br>') + '</div>';
     }
   }
   // Legacy: show old week-level remarks
-  if (wd.remarks) html += '<div style="margin-top:8px;font-size:13px;color:var(--text2)">📝 ' + wd.remarks + '</div>';
+  if (wd.remarks) html += '<div style="margin-top:8px;font-size:13px;color:var(--text2)">' + SVG.note + ' ' + wd.remarks + '</div>';
   // Show feedback in history
   if (wd.feedback && (wd.feedback.mood || wd.feedback.rating || wd.feedback.text)) {
     html += '<div style="margin-top:12px;border-top:1px solid rgba(255,255,255,0.08);padding-top:12px">';
-    html += '<div style="font-size:13px;font-weight:600;margin-bottom:6px">📬 ' + t('feedbackReport') + '</div>';
+    html += '<div style="font-size:13px;font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:4px">' + SVG.mail + ' ' + t('feedbackReport') + '</div>';
     if (wd.feedback.mood) html += '<div style="font-size:13px;color:var(--text2)">' + t('feedbackMood') + ': ' + MOOD_EMOJIS[wd.feedback.mood] + '</div>';
     if (wd.feedback.rating) html += '<div style="font-size:13px;color:var(--text2)">' + t('feedbackRating') + ': ' + '★'.repeat(wd.feedback.rating) + '☆'.repeat(5 - wd.feedback.rating) + '</div>';
     if (wd.feedback.text) html += '<div style="font-size:13px;color:var(--text2);margin-top:4px">' + wd.feedback.text + '</div>';
@@ -1918,7 +2344,7 @@ function loadRewardNames(data) {
 function updateRewardDisplays() {
   // Week reward title
   const wrTitle = document.querySelector('.week-reward-title span:first-child');
-  if (wrTitle) wrTitle.textContent = rewardWeekName ? '🎁 ' + rewardWeekName : t('weekReward');
+  if (wrTitle) wrTitle.innerHTML = SVG.gift + ' ' + (rewardWeekName || t('weekReward'));
   // Month reward labels
   const rewardLabels = document.querySelectorAll('.reward-label');
   if (rewardLabels[0]) rewardLabels[0].textContent = rewardMonth2Name || t('reward2Label');
@@ -1930,6 +2356,7 @@ async function enablePush() {
   try {
     const permission = await Notification.requestPermission();
     if (permission === 'granted') {
+      trackEvent('push_enabled');
       await setupPush();
     }
     updateNotifBtn();
@@ -1996,6 +2423,9 @@ function cycleStatus(taskId) {
   const task = tasks.find(t => t.id === taskId);
   if (task && next) {
     window._lastTaskAction = { name: task.name, status: next, plus: task.plus, minus: task.minus };
+    trackEvent('task_status', { status: next, task_name: task.name });
+    // Ad: count completed tasks for interstitial trigger
+    if (next === 'done') onTaskAction();
   }
   render();
   saveData();
@@ -2015,7 +2445,7 @@ function saveRemarks() {
 function buildSummary() {
   const wd = getWeekData();
   const range = getWeekRange(currentWeekOffset);
-  let lines = ['📋 *' + t('weekReport') + ': ' + range + '*', ''];
+  let lines = ['*' + t('weekReport') + ': ' + range + '*', ''];
   let totalPos = 0, totalNeg = 0;
   for (const task of tasks) {
     let taskLine = '*' + task.id + '. ' + task.name + '*\n';
@@ -2023,7 +2453,7 @@ function buildSummary() {
     for (let di = 0; di < 7; di++) {
       const de = (wd.days && (wd.days[di] || wd.days[String(di)])) || {};
       const s = de[task.id] || de[String(task.id)] || '';
-      const icon = s === 'done' ? '✅' : s === 'missed' ? '❌' : s === 'na' ? '⬜' : '—';
+      const icon = s === 'done' ? '+' : s === 'missed' ? '-' : s === 'na' ? '~' : '—';
       dayResults.push(DAY_NAMES[di] + ': ' + icon);
       if (s === 'done') totalPos += task.plus;
       else if (s === 'missed') totalNeg += task.minus;
@@ -2031,11 +2461,11 @@ function buildSummary() {
     lines.push(taskLine + dayResults.join('  '));
     lines.push('');
   }
-  lines.push('📊 *' + t('result') + ': +' + totalPos + ' / -' + totalNeg + ' = ' + (totalPos-totalNeg) + ' ' + t('points') + '*');
+  lines.push('*' + t('result') + ': +' + totalPos + ' / -' + totalNeg + ' = ' + (totalPos-totalNeg) + ' ' + t('points') + '*');
   const weekNet = totalPos - totalNeg;
   if (goalWeek > 0) {
-    const rwName = rewardWeekName || t('weekReward').replace('🎁 ','');
-    lines.push(weekNet >= goalWeek ? '✅ ' + rwName + '!' : '📈 ' + weekNet + '/' + goalWeek + ' ' + t('forReward'));
+    const rwName = rewardWeekName || t('weekReward');
+    lines.push(weekNet >= goalWeek ? rwName + '!' : weekNet + '/' + goalWeek + ' ' + t('forReward'));
   }
   // Day remarks
   if (wd.dayRemarks) {
@@ -2044,10 +2474,10 @@ function buildSummary() {
       const dr = wd.dayRemarks[di] || wd.dayRemarks[String(di)];
       if (dr) drLines.push(DAY_NAMES[di] + ': ' + dr);
     }
-    if (drLines.length) lines.push('\n📝 ' + drLines.join('\n'));
+    if (drLines.length) lines.push('\n' + drLines.join('\n'));
   }
   // Legacy week remarks
-  if (wd.remarks) lines.push('📝 ' + wd.remarks);
+  if (wd.remarks) lines.push(wd.remarks);
   return lines.join('\n');
 }
 
@@ -2059,19 +2489,19 @@ function buildMonthSummary() {
   const month = currentMonthDate.getMonth();
   const data = calcMonthData(year, month);
   const fmt = d => String(d.getDate()).padStart(2,'0') + '.' + String(d.getMonth()+1).padStart(2,'0') + '.';
-  let lines = ['📅 *' + t('monthReport') + ': ' + MONTH_NAMES[month] + ' ' + year + '*', ''];
+  let lines = ['*' + t('monthReport') + ': ' + MONTH_NAMES[month] + ' ' + year + '*', ''];
   const pts = Math.max(0, data.total);
-  lines.push('📊 ' + t('totalPoints') + ': *' + data.total + '*  (+' + data.pos + ' / -' + data.neg + ')');
+  lines.push(t('totalPoints') + ': *' + data.total + '*  (+' + data.pos + ' / -' + data.neg + ')');
   lines.push('');
-  if (pts >= goalMonth2) lines.push('⭐ ' + (rewardMonth2Name || t('reward2Label')) + '!');
-  else lines.push('📈 ' + pts + '/' + goalMonth2 + ' ' + t('forReward'));
+  if (pts >= goalMonth2) lines.push((rewardMonth2Name || t('reward2Label')) + '!');
+  else lines.push(pts + '/' + goalMonth2 + ' ' + t('forReward'));
   lines.push('', '*' + t('weeksLabel') + ':*');
-  for (const w of data.weekScores) lines.push((w.total >= 0 ? '📈' : '📉') + ' ' + fmt(w.start) + '–' + fmt(w.end) + ': ' + (w.total > 0 ? '+' : '') + w.total);
+  for (const w of data.weekScores) lines.push(fmt(w.start) + '–' + fmt(w.end) + ': ' + (w.total > 0 ? '+' : '') + w.total);
   lines.push('', '*' + t('tasksLabel') + ':*');
   for (const tk of tasks) {
     const td = data.taskTotals[tk.id];
     const net = td ? td.pos - td.neg : 0;
-    lines.push((net > 0 ? '✅' : net < 0 ? '❌' : '⬜') + ' ' + tk.name + ': ' + (net > 0 ? '+' : '') + net);
+    lines.push((net > 0 ? '+' : net < 0 ? '-' : '~') + ' ' + tk.name + ': ' + (net > 0 ? '+' : '') + net);
   }
   return lines.join('\n');
 }
@@ -2153,6 +2583,7 @@ function pdfAddTable(doc, headers, rows, y, colWidths) {
 }
 
 function exportWeekPDF() {
+  if (!canUse('export')) { showPricing(); return; }
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
   const range = getWeekRange(currentWeekOffset);
@@ -2220,6 +2651,7 @@ function exportWeekPDF() {
 }
 
 function exportMonthPDF() {
+  if (!canUse('export')) { showPricing(); return; }
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
   const year = currentMonthDate.getFullYear();
@@ -2301,7 +2733,7 @@ function renderEditList() {
         </select>
       </div>
       <div class="reminder-row">
-        <span class="reminder-label">⏰ ${t('reminderLabel')}:</span>
+        <span class="reminder-label" style="display:inline-flex;align-items:center;gap:3px">${SVG.clock} ${t('reminderLabel')}:</span>
         <input type="time" class="reminder-time" value="${tk.reminderTime || ''}" onchange="setReminderTime(${idx}, this.value)">
         ${tk.reminderTime ? `<button class="reminder-clear" onclick="clearReminder(${idx})" type="button">✕</button>` : ''}
       </div>
@@ -2412,6 +2844,12 @@ function toggleDay(idx, day) {
 }
 
 function addTask() {
+  // Free users (trial/basic): max 5 tasks — premium unlimited
+  if (currentPlan !== 'premium' && tasks.length >= 5) {
+    alert(t('taskLimit'));
+    showPricing();
+    return;
+  }
   const maxId = tasks.reduce((m,t) => Math.max(m, t.id), 0);
   tasks.push({ id: maxId+1, name: t('newTask'), plus:0, minus:0, days:[] });
   renderEditList();
@@ -2462,6 +2900,7 @@ function getProof(weekKey, dayIdx, taskId) {
 }
 
 function openProofModal(taskId) {
+  if (!canUse('photos')) { showPricing(); return; }
   proofTaskId = taskId;
   const task = tasks.find(t => t.id === taskId);
   if (!task) return;
@@ -2588,13 +3027,13 @@ function renderFeedback() {
     document.getElementById('feedbackLocked').style.display = '';
     document.getElementById('feedbackContent').style.display = 'none';
     document.getElementById('feedbackSentView').style.display = 'none';
-    document.getElementById('feedbackHeader').textContent = t('feedbackTitle');
+    document.getElementById('feedbackHeader').innerHTML = SVG.mail + ' ' + t('feedbackTitle');
   } else if (fb.sent) {
     // Feedback already submitted — show read-only summary
     document.getElementById('feedbackLocked').style.display = 'none';
     document.getElementById('feedbackContent').style.display = 'none';
     document.getElementById('feedbackSentView').style.display = '';
-    document.getElementById('feedbackHeader').innerHTML = t('feedbackTitle') + ' <span class="feedback-sent-badge">' + t('feedbackSent') + '</span>';
+    document.getElementById('feedbackHeader').innerHTML = SVG.mail + ' ' + t('feedbackTitle') + ' <span class="feedback-sent-badge">' + t('feedbackSent') + '</span>';
     // Build summary
     let html = '';
     if (fb.mood) html += '<div>' + t('feedbackMood') + ': ' + MOOD_EMOJIS[fb.mood] + '</div>';
@@ -2605,7 +3044,7 @@ function renderFeedback() {
     document.getElementById('feedbackLocked').style.display = 'none';
     document.getElementById('feedbackContent').style.display = '';
     document.getElementById('feedbackSentView').style.display = 'none';
-    document.getElementById('feedbackHeader').textContent = t('feedbackTitle');
+    document.getElementById('feedbackHeader').innerHTML = SVG.mail + ' ' + t('feedbackTitle');
     loadFeedbackData(fb);
   }
 }
@@ -2665,7 +3104,7 @@ function buildFeedbackSummary() {
   const weekKey = getWeekKey(currentWeekOffset);
   const fb = (weekData[weekKey] && weekData[weekKey].feedback) || {};
   const range = getWeekRange(currentWeekOffset);
-  let lines = ['📬 *' + t('feedbackReport') + ': ' + range + '*', ''];
+  let lines = ['*' + t('feedbackReport') + ': ' + range + '*', ''];
   if (fb.mood) lines.push(t('feedbackMood') + ': ' + MOOD_EMOJIS[fb.mood]);
   if (fb.rating) lines.push(t('feedbackRating') + ': ' + '★'.repeat(fb.rating) + '☆'.repeat(5 - fb.rating));
   if (fb.text) lines.push('', fb.text);
@@ -2838,12 +3277,17 @@ function doShowSettings() {
 
 // ── NAVIGATION ──
 function showPage(page) {
+  trackEvent('page_view', { page: page });
+  // Feature gating for premium pages
+  if (page === 'month' && !canUse('monthView')) { showPricing(); return; }
+  if (page === 'stats' && !canUse('charts')) { showPricing(); return; }
+
   if (page === 'settings') {
-    if (typeof settingsPin === 'string' && settingsPin.length === 4) {
+    if (typeof settingsPin === 'string' && settingsPin.length === 4 && canUse('pin')) {
       // PIN exists → ask for it
       openPinModal('check');
       return;
-    } else if (settingsPin === null && currentRef) {
+    } else if (settingsPin === null && currentRef && canUse('pin')) {
       // No PIN set yet → ask to create one
       openPinModal('set');
       return;
@@ -2916,8 +3360,8 @@ function renderStats() {
   // Update translations
   document.getElementById('statsH1').textContent = t('statsTitle');
   document.getElementById('statsSub').textContent = t('statsSub');
-  document.getElementById('statsTaskTitle').textContent = '📊 ' + t('statsTaskRate');
-  document.getElementById('statsPieTitle').textContent = '📈 ' + t('statsOverall');
+  document.getElementById('statsTaskText').textContent = t('statsTaskRate');
+  document.getElementById('statsPieText').textContent = t('statsOverall');
 
   // Toggle button labels
   const toggleBtns = document.querySelectorAll('.stats-toggle button');
@@ -3029,7 +3473,7 @@ function renderStats() {
 function buildStatsSummary() {
   const data = getStatsData(statsRange);
   const lines = [];
-  lines.push('📊 ' + t('statsPdfTitle'));
+  lines.push(t('statsPdfTitle'));
   lines.push(t('statsPdfWeeks').replace('{n}', statsRange));
   lines.push('');
   lines.push(t('statsRate') + ': ' + data.rate + '%');
@@ -3052,6 +3496,7 @@ function sendStatsWhatsApp() {
 }
 
 function exportStatsPDF() {
+  if (!canUse('export')) { showPricing(); return; }
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
   const data = getStatsData(statsRange);
@@ -3144,6 +3589,513 @@ function exportStatsPDF() {
   doc.save(t('statsPdfTitle').replace(/\s/g, '_') + '_' + statsRange + 'w.pdf');
 }
 
+// ── SUBSCRIPTION SYSTEM ──
+const API_BASE = 'api/';
+let currentPlan = 'trial'; // trial, basic, premium
+let subStatus = null; // null, active, canceled, past_due
+let trialDaysLeft = 30;
+let subscriptionData = null;
+
+// Regional pricing detection
+function isSwiss() {
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    return tz === 'Europe/Zurich';
+  } catch(e) {}
+  return false;
+}
+const REGION = isSwiss() ? 'chf' : 'eur';
+const CURRENCY = isSwiss() ? 'CHF' : '€';
+
+const PLAN_PRICES = {
+  basic: { eur: { month: '6,99 €', year: '69 €', monthlyInYear: '5,75 €' }, chf: { month: '9,90 CHF', year: '89 CHF', monthlyInYear: '7,42 CHF' } },
+  premium: { eur: { month: '11,99 €', year: '99 €', monthlyInYear: '8,25 €', intro: '1,99 €' }, chf: { month: '14,90 CHF', year: '129 CHF', monthlyInYear: '10,75 CHF', intro: '2,90 CHF' } }
+};
+
+const ALL_PRICE_IDS = {
+  basic_eur_month:  'price_1Tc483PmuogOBuN8AFFaBmJ1',
+  basic_eur_year:   'price_1Tc483PmuogOBuN8toTILhZD',
+  basic_chf_month:  'price_1Tc45WPmuog0BuN8KR8BvixZ',
+  basic_chf_year:   'price_1Tc483PmuogOBuN8qhqruy2P',
+  premium_eur_month: 'price_1Tc4AUPmuogOBuN8L4pULbBr',
+  premium_eur_year:  'price_1Tc4AUPmuogOBuN8bbZk68Ee',
+  premium_chf_month: 'price_1Tc49XPmuogOBuN8pZcqVDKw',
+  premium_chf_year:  'price_1Tc4AUPmuogOBuN8qCpKcgEQ',
+};
+function getPriceId(plan, period) {
+  return ALL_PRICE_IDS[plan + '_' + REGION + '_' + period];
+}
+
+let pricingPeriod = 'month';
+
+function setPricingPeriod(period) {
+  pricingPeriod = period;
+  document.getElementById('pricingMonthBtn').classList.toggle('active', period === 'month');
+  document.getElementById('pricingYearBtn').classList.toggle('active', period === 'year');
+  updatePricingDisplay();
+}
+
+function updatePricingDisplay() {
+  const r = REGION;
+  const p = pricingPeriod;
+
+  const perLabel = p === 'month' ? t('pricingPerMonth') : t('pricingPerMonth');
+
+  // Basic price
+  const basicEl = document.getElementById('pricingBasicPrice');
+  if (p === 'month') {
+    basicEl.innerHTML = PLAN_PRICES.basic[r].month + '<span> ' + t('pricingPerMonth') + '</span>';
+    document.getElementById('pricingBasicPeriod').textContent = '';
+  } else {
+    basicEl.innerHTML = PLAN_PRICES.basic[r].year + '<span> ' + t('pricingPerYear') + '</span>';
+    document.getElementById('pricingBasicPeriod').textContent = '= ' + PLAN_PRICES.basic[r].monthlyInYear + ' ' + t('pricingPerMonth');
+  }
+
+  // Premium price
+  const premEl = document.getElementById('pricingPremiumPrice');
+  const premPeriod = document.getElementById('pricingPremiumPeriod');
+  if (p === 'month') {
+    premEl.innerHTML = PLAN_PRICES.premium[r].month + '<span> ' + t('pricingPerMonth') + '</span>';
+    premPeriod.textContent = '';
+  } else {
+    premEl.innerHTML = PLAN_PRICES.premium[r].year + '<span> ' + t('pricingPerYear') + '</span>';
+    premPeriod.textContent = '= ' + PLAN_PRICES.premium[r].monthlyInYear + ' ' + t('pricingPerMonth');
+  }
+
+  // Feature lists
+  const basicFeatures = document.getElementById('pricingBasicFeatures');
+  basicFeatures.innerHTML = [1,2,3,4,5,6].map(i => '<li>' + t('pricingBasicF' + i) + '</li>').join('');
+
+  const premFeatures = document.getElementById('pricingPremiumFeatures');
+  premFeatures.innerHTML = [1,2,3,4,5,6,7].map(i => '<li>' + t('pricingPremiumF' + i) + '</li>').join('');
+
+  // Labels
+  document.getElementById('pricingTitle').textContent = t('pricingTitle');
+  document.getElementById('pricingDesc').textContent = t('pricingDesc');
+  document.getElementById('pricingBadge').textContent = t('pricingRecommended');
+  document.getElementById('pricingMonthBtn').childNodes[0].textContent = t('pricingMonth');
+  document.getElementById('pricingSkipBtn').textContent = t('pricingSkip');
+
+  const basicBtn = document.querySelector('#pricingBasicCard .pricing-btn');
+  const premBtn = document.querySelector('#pricingPremiumCard .pricing-btn');
+  if (basicBtn) basicBtn.textContent = t('pricingBasicBtn');
+  if (premBtn) premBtn.textContent = t('pricingPremiumBtn');
+
+  // Legal note
+  const pln = document.getElementById('pricingLegalNote');
+  const plt = document.getElementById('pricingLegalTerms');
+  const plp = document.getElementById('pricingLegalPrivacy');
+  if (pln) pln.textContent = t('pricingLegalNote');
+  if (plt) plt.textContent = t('pricingLegalTerms');
+  if (plp) plp.textContent = t('pricingLegalPrivacy');
+}
+
+function showPricing() {
+  trackEvent('view_pricing', { plan: currentPlan });
+  updatePricingDisplay();
+  const ps = document.getElementById('pricingScreen');
+  ps.classList.remove('hidden');
+  ps.scrollTop = 0;
+  // Allow skip only if trial still active
+  const skipBtn = document.getElementById('pricingSkipBtn');
+  skipBtn.style.display = (currentPlan === 'trial' && trialDaysLeft > 0) ? 'block' : 'none';
+}
+
+function closePricing() {
+  document.getElementById('pricingScreen').classList.add('hidden');
+}
+
+async function startCheckout(plan) {
+  trackEvent('begin_checkout', { plan: plan, period: pricingPeriod, currency: CURRENCY });
+  const priceId = getPriceId(plan, pricingPeriod);
+  if (!priceId || !syncCode) return;
+
+  try {
+    const btn = document.querySelector('#pricing' + (plan === 'basic' ? 'Basic' : 'Premium') + 'Card .pricing-btn');
+    const origText = btn.textContent;
+    btn.textContent = '...';
+    btn.disabled = true;
+
+    const res = await fetch(API_BASE + 'create-checkout.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ priceId, pairCode: syncCode })
+    });
+    const data = await res.json();
+
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      alert(data.error || 'Error');
+      btn.textContent = origText;
+      btn.disabled = false;
+    }
+  } catch(e) {
+    console.error('Checkout error:', e);
+    alert('Connection error');
+  }
+}
+
+async function openCustomerPortal() {
+  if (!syncCode) return;
+  try {
+    const res = await fetch(API_BASE + 'customer-portal.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pairCode: syncCode })
+    });
+    const data = await res.json();
+    if (data.url) window.location.href = data.url;
+  } catch(e) {
+    console.error('Portal error:', e);
+  }
+}
+
+// Read subscription data from Firebase
+function loadSubscription(data) {
+  subscriptionData = data && data.subscription ? data.subscription : null;
+
+  // Manual override — free premium set directly in Firebase
+  if (subscriptionData && subscriptionData.manual === true) {
+    currentPlan = subscriptionData.plan || 'premium';
+    subStatus = 'active';
+    trialDaysLeft = 0;
+    updateSubUI();
+    applyFeatureGating();
+    return;
+  }
+
+  if (subscriptionData && subscriptionData.status === 'active') {
+    currentPlan = subscriptionData.plan || 'basic';
+    subStatus = 'active';
+    trialDaysLeft = 0;
+  } else if (subscriptionData && subscriptionData.status === 'canceled') {
+    // Canceled but maybe still in period
+    const endDate = subscriptionData.currentPeriodEnd ? new Date(subscriptionData.currentPeriodEnd) : null;
+    if (endDate && endDate > new Date()) {
+      currentPlan = subscriptionData.plan || 'basic';
+      subStatus = 'canceled';
+    } else {
+      currentPlan = 'trial';
+      subStatus = null;
+    }
+  } else {
+    // No subscription — check trial
+    currentPlan = 'trial';
+    subStatus = null;
+    const createdAt = data && data.createdAt ? new Date(data.createdAt) : null;
+    if (createdAt) {
+      const msLeft = createdAt.getTime() + (30 * 24 * 60 * 60 * 1000) - Date.now();
+      trialDaysLeft = Math.max(0, Math.ceil(msLeft / (24 * 60 * 60 * 1000)));
+    } else {
+      // First time for this code — check if device already had a trial
+      checkDeviceTrial();
+      return; // async — will call updateSubUI() + applyFeatureGating() when done
+    }
+  }
+  updateSubUI();
+  applyFeatureGating();
+}
+
+// ── DEVICE TRIAL TRACKING ──
+function checkDeviceTrial() {
+  if (!db) { fallbackNewTrial(); return; }
+  const devRef = db.ref('devices/' + deviceId + '/trialStart');
+  devRef.once('value').then(snap => {
+    let trialDate;
+    if (snap.val()) {
+      // Device already had a trial — use original start date
+      trialDate = snap.val();
+      console.log('Device trial found, original start:', trialDate);
+    } else {
+      // First trial for this device — start fresh
+      trialDate = new Date().toISOString();
+      devRef.set(trialDate);
+      console.log('New device trial started');
+    }
+    // Save createdAt + deviceId on current pair code
+    if (currentRef) {
+      currentRef.child('createdAt').set(trialDate);
+      currentRef.child('deviceId').set(deviceId);
+    }
+    const msLeft = new Date(trialDate).getTime() + (30 * 24 * 60 * 60 * 1000) - Date.now();
+    trialDaysLeft = Math.max(0, Math.ceil(msLeft / (24 * 60 * 60 * 1000)));
+    updateSubUI();
+    applyFeatureGating();
+  }).catch(() => {
+    fallbackNewTrial();
+  });
+}
+
+function fallbackNewTrial() {
+  trialDaysLeft = 30;
+  if (currentRef) {
+    currentRef.child('createdAt').set(new Date().toISOString());
+    currentRef.child('deviceId').set(deviceId);
+  }
+  updateSubUI();
+  applyFeatureGating();
+}
+
+function updateSubUI() {
+  const card = document.getElementById('subCard');
+  const planEl = document.getElementById('subCardPlan');
+  const badgeEl = document.getElementById('subCardBadge');
+  const infoEl = document.getElementById('subCardInfo');
+  const btnsEl = document.getElementById('subCardBtns');
+
+  if (!card) return;
+
+  if (currentPlan === 'trial') {
+    planEl.textContent = t('subTrial');
+    if (trialDaysLeft > 0) {
+      badgeEl.className = 'plan-badge trial';
+      badgeEl.textContent = t('subTrialDays').replace('{n}', trialDaysLeft);
+      infoEl.textContent = t('trialInfo');
+      btnsEl.innerHTML = '<button class="sub-card-btn-upgrade" onclick="showPricing()">' + t('subUpgrade') + '</button>';
+    } else {
+      badgeEl.className = 'plan-badge expired';
+      badgeEl.textContent = t('subTrialExpired');
+      infoEl.textContent = t('trialExpiredDesc');
+      btnsEl.innerHTML = '<button class="sub-card-btn-upgrade" onclick="showPricing()">' + t('subUpgrade') + '</button>';
+    }
+  } else {
+    planEl.textContent = currentPlan === 'premium' ? t('subPremium') : t('subBasic');
+    badgeEl.className = 'plan-badge ' + currentPlan;
+
+    if (subscriptionData && subscriptionData.manual) {
+      badgeEl.textContent = t('subActive');
+      infoEl.textContent = currentLang === 'de' ? 'Dauerhaft freigeschaltet' : 'Permanently unlocked';
+      btnsEl.innerHTML = '';
+    } else if (subStatus === 'active') {
+      badgeEl.textContent = t('subActive');
+      const endDate = subscriptionData && subscriptionData.currentPeriodEnd ? new Date(subscriptionData.currentPeriodEnd).toLocaleDateString(currentLang === 'de' ? 'de-DE' : 'en-US') : '';
+      infoEl.textContent = t('subRenewsAt').replace('{date}', endDate);
+      btnsEl.innerHTML = '';
+      if (currentPlan === 'basic') {
+        btnsEl.innerHTML += '<button class="sub-card-btn-upgrade" onclick="showPricing()">' + t('subUpgrade') + '</button>';
+      }
+      btnsEl.innerHTML += '<button class="sub-card-btn-manage" onclick="openCustomerPortal()">' + t('subManage') + '</button>';
+    } else if (subStatus === 'canceled') {
+      badgeEl.textContent = t('subCanceled');
+      const endDate = subscriptionData && subscriptionData.currentPeriodEnd ? new Date(subscriptionData.currentPeriodEnd).toLocaleDateString(currentLang === 'de' ? 'de-DE' : 'en-US') : '';
+      infoEl.textContent = t('subEndsAt').replace('{date}', endDate);
+      btnsEl.innerHTML = '';
+      if (currentPlan === 'basic') {
+        btnsEl.innerHTML += '<button class="sub-card-btn-upgrade" onclick="showPricing()">' + t('subUpgrade') + '</button>';
+      }
+      btnsEl.innerHTML += '<button class="sub-card-btn-manage" onclick="openCustomerPortal()">' + t('subManage') + '</button>';
+    }
+  }
+}
+
+// Feature gating
+function canUse(feature) {
+  // Premium: everything unlocked, no ads
+  if (currentPlan === 'premium') {
+    return true;
+  }
+  // Free / trial / basic: basic features only, ads shown
+  const premiumFeatures = ['photos', 'pin', 'monthView', 'charts', 'export'];
+  return !premiumFeatures.includes(feature);
+}
+
+function applyFeatureGating() {
+  // Trial banner — show upgrade hint instead of blocking
+  const trialBanner = document.getElementById('trialBanner');
+  if (trialBanner) {
+    if (currentPlan !== 'premium') {
+      trialBanner.style.display = 'flex';
+      if (currentPlan === 'trial' && trialDaysLeft > 0) {
+        const r = REGION;
+        const basePrice = PLAN_PRICES.basic[r].month;
+        document.getElementById('trialBannerTitle').textContent = t('subTrialDays').replace('{n}', trialDaysLeft) + ' — ' + t('subTrial');
+        document.getElementById('trialBannerSub').textContent = (currentLang === 'de' ? 'Danach ab ' : 'Then from ') + basePrice + (currentLang === 'de' ? '/Monat' : '/month');
+        document.getElementById('trialBannerBtn').textContent = currentLang === 'de' ? 'Pläne ansehen' : 'View plans';
+      } else {
+        // Free user (trial expired or no sub) — soft upgrade hint
+        document.getElementById('trialBannerTitle').textContent = t('adUpgradeHint');
+        document.getElementById('trialBannerSub').textContent = '';
+        document.getElementById('trialBannerBtn').textContent = currentLang === 'de' ? 'Upgrade' : 'Upgrade';
+      }
+    } else {
+      trialBanner.style.display = 'none';
+    }
+  }
+
+  // Month tab — premium only
+  const monthNav = document.getElementById('nav-month');
+  if (monthNav) {
+    const monthSvg = monthNav.querySelector('svg');
+    if (!canUse('monthView')) {
+      if (monthSvg) monthNav.innerHTML = monthSvg.outerHTML + '<span>' + t('navMonth') + '</span><span class="premium-badge-inline">' + t('premiumOnly') + '</span>';
+    } else {
+      // Remove badge if premium
+      const badge = monthNav.querySelector('.premium-badge-inline');
+      if (badge) badge.remove();
+    }
+  }
+
+  // Stats tab — premium only (detailed charts)
+  const statsNav = document.getElementById('nav-stats');
+  if (statsNav) {
+    const statsSvg = statsNav.querySelector('svg');
+    if (!canUse('charts')) {
+      if (statsSvg) statsNav.innerHTML = statsSvg.outerHTML + '<span>' + t('navStats') + '</span><span class="premium-badge-inline">' + t('premiumOnly') + '</span>';
+    } else {
+      const badge = statsNav.querySelector('.premium-badge-inline');
+      if (badge) badge.remove();
+    }
+  }
+
+  // PIN settings — premium only
+  const pinCard = document.getElementById('pinSettingsCard');
+  if (pinCard && !canUse('pin')) {
+    pinCard.classList.add('premium-lock');
+  } else if (pinCard) {
+    pinCard.classList.remove('premium-lock');
+  }
+
+  // Ads: show for free users, hide for premium
+  refreshAdsState();
+}
+
+// Check payment URL params
+function checkPaymentResult() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('payment') === 'success') {
+    trackEvent('purchase', { success: true });
+    // Show success notification
+    setTimeout(() => {
+      const banner = document.createElement('div');
+      banner.style.cssText = 'position:fixed;top:16px;left:16px;right:16px;z-index:9000;background:var(--green);color:#000;padding:14px 16px;border-radius:12px;font-size:14px;font-weight:600;text-align:center;animation:fadeIn .3s;';
+      banner.textContent = t('paymentSuccess');
+      document.body.appendChild(banner);
+      setTimeout(() => { banner.style.opacity = '0'; banner.style.transition = 'opacity .5s'; setTimeout(() => banner.remove(), 500); }, 4000);
+    }, 2000);
+    // Clean URL
+    window.history.replaceState({}, '', window.location.pathname);
+  } else if (params.get('payment') === 'cancel') {
+    setTimeout(() => {
+      const banner = document.createElement('div');
+      banner.style.cssText = 'position:fixed;top:16px;left:16px;right:16px;z-index:9000;background:var(--yellow);color:#000;padding:14px 16px;border-radius:12px;font-size:14px;font-weight:600;text-align:center;animation:fadeIn .3s;';
+      banner.textContent = t('paymentCancel');
+      document.body.appendChild(banner);
+      setTimeout(() => { banner.style.opacity = '0'; banner.style.transition = 'opacity .5s'; setTimeout(() => banner.remove(), 500); }, 3000);
+    }, 1000);
+    window.history.replaceState({}, '', window.location.pathname);
+  }
+}
+
+// ── AD SYSTEM ──
+const AD_CONFIG = {
+  bannerEnabled: true,
+  interstitialEnabled: true,
+  interstitialCooldownMs: 3 * 60 * 1000,   // Min 3 minutes between interstitials
+  interstitialAfterActions: 3,               // Show after every N task completions
+  interstitialCloseDelaySec: 5,              // Seconds before close button activates
+};
+
+let adActionCounter = 0;
+let lastInterstitialTime = 0;
+let adsBannerLoaded = false;
+let adsInterstitialLoaded = false;
+
+function shouldShowAds() {
+  return currentPlan !== 'premium';
+}
+
+function initAds() {
+  if (!shouldShowAds()) {
+    hideAllAds();
+    return;
+  }
+  if (AD_CONFIG.bannerEnabled) showBannerAd();
+}
+
+function showBannerAd() {
+  if (!shouldShowAds()) return;
+  const wrap = document.getElementById('adBannerWrap');
+  if (!wrap) return;
+  wrap.classList.add('visible');
+  document.body.classList.add('has-ads');
+  if (!adsBannerLoaded) {
+    try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch(e) {}
+    adsBannerLoaded = true;
+  }
+}
+
+function hideBannerAd() {
+  const wrap = document.getElementById('adBannerWrap');
+  if (wrap) wrap.classList.remove('visible');
+  document.body.classList.remove('has-ads');
+}
+
+function showInterstitialAd() {
+  if (!shouldShowAds() || !AD_CONFIG.interstitialEnabled) return;
+  const now = Date.now();
+  if (now - lastInterstitialTime < AD_CONFIG.interstitialCooldownMs) return;
+
+  const overlay = document.getElementById('adInterstitialOverlay');
+  const closeBtn = document.getElementById('adInterstitialClose');
+  if (!overlay || !closeBtn) return;
+
+  overlay.classList.add('visible');
+  lastInterstitialTime = now;
+
+  // Load ad unit
+  if (!adsInterstitialLoaded) {
+    try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch(e) {}
+    adsInterstitialLoaded = true;
+  }
+
+  // Countdown on close button
+  closeBtn.disabled = true;
+  let sec = AD_CONFIG.interstitialCloseDelaySec;
+  closeBtn.textContent = (currentLang === 'de' ? 'Schliessen' : 'Close') + ' (' + sec + 's)';
+  const timer = setInterval(() => {
+    sec--;
+    if (sec <= 0) {
+      clearInterval(timer);
+      closeBtn.disabled = false;
+      closeBtn.textContent = currentLang === 'de' ? 'Schliessen' : 'Close';
+    } else {
+      closeBtn.textContent = (currentLang === 'de' ? 'Schliessen' : 'Close') + ' (' + sec + 's)';
+    }
+  }, 1000);
+
+  trackEvent('ad_interstitial_shown');
+}
+
+function closeInterstitialAd() {
+  const overlay = document.getElementById('adInterstitialOverlay');
+  if (overlay) overlay.classList.remove('visible');
+  trackEvent('ad_interstitial_closed');
+}
+
+function onTaskAction() {
+  if (!shouldShowAds()) return;
+  adActionCounter++;
+  if (adActionCounter >= AD_CONFIG.interstitialAfterActions) {
+    adActionCounter = 0;
+    showInterstitialAd();
+  }
+}
+
+function hideAllAds() {
+  hideBannerAd();
+  const overlay = document.getElementById('adInterstitialOverlay');
+  if (overlay) overlay.classList.remove('visible');
+}
+
+function refreshAdsState() {
+  if (shouldShowAds()) {
+    initAds();
+  } else {
+    hideAllAds();
+  }
+}
+
 // ── INIT ──
 // ── SERVICE WORKER ──
 if ('serviceWorker' in navigator) {
@@ -3162,10 +4114,10 @@ function verifyAge() {
   const errEl = document.getElementById('ageError');
 
   if (!d || !m || !y || d < 1 || d > 31 || m < 1 || m > 12 || y < 1900 || y > 2026) {
-    errEl.textContent = 'Bitte gib ein gültiges Geburtsdatum ein.'; return;
+    errEl.textContent = t('ageErrDate'); return;
   }
   if (!checked) {
-    errEl.textContent = 'Bitte bestätige, dass du 18+ bist.'; return;
+    errEl.textContent = t('ageErrCheck'); return;
   }
   const birth = new Date(y, m - 1, d);
   const now = new Date();
@@ -3173,7 +4125,7 @@ function verifyAge() {
   const mDiff = now.getMonth() - birth.getMonth();
   if (mDiff < 0 || (mDiff === 0 && now.getDate() < birth.getDate())) age--;
   if (age < 18) {
-    errEl.textContent = 'Du musst mindestens 18 Jahre alt sein.'; return;
+    errEl.textContent = t('ageErrUnder'); return;
   }
   localStorage.setItem('devotion_age_verified', '1');
   document.getElementById('ageCheckScreen').classList.add('hidden');
@@ -3191,22 +4143,33 @@ function finishOnboarding() {
   document.getElementById('setupScreen').classList.remove('hidden');
 }
 
+// ── Language Select ──
+function selectLang(lang) {
+  setLanguage(lang);
+  localStorage.setItem('devotion_lang_selected', '1');
+  document.getElementById('langSelectScreen').classList.add('hidden');
+  document.getElementById('ageCheckScreen').classList.remove('hidden');
+}
+
 // ── App Start Logic ──
 const savedCode = getSavedCode();
 const ageVerified = localStorage.getItem('devotion_age_verified');
+const langSelected = localStorage.getItem('devotion_lang_selected');
 
 if (savedCode) {
-  // Already connected — hide everything, go to app
+  document.getElementById('langSelectScreen').classList.add('hidden');
   document.getElementById('ageCheckScreen').classList.add('hidden');
   document.getElementById('setupScreen').classList.add('hidden');
   initSync(savedCode);
 } else if (ageVerified) {
-  // Age verified but not connected — show setup
+  document.getElementById('langSelectScreen').classList.add('hidden');
   document.getElementById('ageCheckScreen').classList.add('hidden');
   document.getElementById('setupScreen').classList.remove('hidden');
-} else {
-  // First time — show age check
+} else if (langSelected) {
+  document.getElementById('langSelectScreen').classList.add('hidden');
   document.getElementById('ageCheckScreen').classList.remove('hidden');
+} else {
+  document.getElementById('langSelectScreen').classList.remove('hidden');
 }
 
 // ── Splash Screen ausblenden ──
